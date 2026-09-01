@@ -22,7 +22,7 @@ export async function GET() {
 
 /**
  * Public tenant signup. Creates company + NTA defaults + Super Admin.
- * Demo Blackcountry Group (seed-company / *@blackcountry.ng) is untouched.
+ * Demo Blackcountry Group (seed-company / *@blackcountry.africa) is untouched.
  * Closed in production unless SIGNUP_ENABLED=true.
  */
 export async function POST(req: NextRequest) {

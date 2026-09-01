@@ -43,9 +43,9 @@ async function main() {
   const passwordHash = await bcrypt.hash("password123", 12);
 
   const users = [
-    { email: "admin@blackcountry.ng", name: "Super Admin", role: "SUPER_ADMIN" as UserRole },
-    { email: "hr@blackcountry.ng", name: "HR Admin", role: "HR_ADMIN" as UserRole },
-    { email: "finance@blackcountry.ng", name: "Amaka Finance", role: "FINANCE" as UserRole },
+    { email: "admin@blackcountry.africa", name: "Super Admin", role: "SUPER_ADMIN" as UserRole },
+    { email: "hr@blackcountry.africa", name: "HR Admin", role: "HR_ADMIN" as UserRole },
+    { email: "finance@blackcountry.africa", name: "Amaka Finance", role: "FINANCE" as UserRole },
   ];
 
   for (const u of users) {
@@ -101,7 +101,7 @@ async function main() {
   }
 
   await prisma.user.upsert({
-    where: { email: "head@blackcountry.ng" },
+    where: { email: "head@blackcountry.africa" },
     update: {
       role: "BUSINESS_HEAD",
       name: "Ifeanyi Okoro",
@@ -109,7 +109,7 @@ async function main() {
       companyId: subsidiary.id,
     },
     create: {
-      email: "head@blackcountry.ng",
+      email: "head@blackcountry.africa",
       name: "Ifeanyi Okoro",
       role: "BUSINESS_HEAD",
       passwordHash,
@@ -127,7 +127,7 @@ async function main() {
     update: {
       firstName: "Ifeanyi",
       lastName: "Okoro",
-      workEmail: "head@blackcountry.ng",
+      workEmail: "head@blackcountry.africa",
     },
     create: {
       employeeCode: "BF-001",
@@ -143,11 +143,11 @@ async function main() {
       startDate: new Date("2024-01-15"),
       status: "ACTIVE",
       employmentType: "FULL_TIME",
-      workEmail: "head@blackcountry.ng",
+      workEmail: "head@blackcountry.africa",
     },
   });
   await prisma.user.update({
-    where: { email: "head@blackcountry.ng" },
+    where: { email: "head@blackcountry.africa" },
     data: { employeeId: headEmployee.id },
   });
 
@@ -298,7 +298,7 @@ async function main() {
   });
   if (adaeze) {
     await prisma.user.upsert({
-      where: { email: "adaeze@blackcountry.ng" },
+      where: { email: "adaeze@blackcountry.africa" },
       update: {
         role: "EMPLOYEE",
         name: `${adaeze.firstName} ${adaeze.lastName}`,
@@ -307,7 +307,7 @@ async function main() {
         companyId: company.id,
       },
       create: {
-        email: "adaeze@blackcountry.ng",
+        email: "adaeze@blackcountry.africa",
         name: `${adaeze.firstName} ${adaeze.lastName}`,
         role: "EMPLOYEE",
         passwordHash,
@@ -317,7 +317,7 @@ async function main() {
     });
     await prisma.employee.update({
       where: { id: adaeze.id },
-      data: { workEmail: "adaeze@blackcountry.ng" },
+      data: { workEmail: "adaeze@blackcountry.africa" },
     });
   }
 
@@ -336,11 +336,11 @@ async function main() {
   });
 
   console.log("Seed completed.");
-  console.log("Group Super Admin: admin@blackcountry.ng / password123");
-  console.log("Group HR:          hr@blackcountry.ng / password123");
-  console.log("Group Finance:     finance@blackcountry.ng / password123");
-  console.log("Business head:     head@blackcountry.ng / password123 (Blackcountry Foods)");
-  console.log("Staff (full-time): adaeze@blackcountry.ng / password123");
+  console.log("Group Super Admin: admin@blackcountry.africa / password123");
+  console.log("Group HR:          hr@blackcountry.africa / password123");
+  console.log("Group Finance:     finance@blackcountry.africa / password123");
+  console.log("Business head:     head@blackcountry.africa / password123 (Blackcountry Foods)");
+  console.log("Staff (full-time): adaeze@blackcountry.africa / password123");
   console.log("Contract (no login): EMP-004 Tunde Adeyemi");
 }
 

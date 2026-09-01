@@ -123,11 +123,11 @@ Blackcountry Group workspace plus Blackcountry Foods as a sub-company. Password 
 
 | User | Email | Password |
 |------|-------|----------|
-| Super Admin | admin@blackcountry.ng | password123 |
-| HR | hr@blackcountry.ng | password123 |
-| Finance | finance@blackcountry.ng | password123 |
-| Business head | head@blackcountry.ng | password123 |
-| Staff | adaeze@blackcountry.ng | password123 |
+| Super Admin | admin@blackcountry.africa | password123 |
+| HR | hr@blackcountry.africa | password123 |
+| Finance | finance@blackcountry.africa | password123 |
+| Business head | head@blackcountry.africa | password123 |
+| Staff | adaeze@blackcountry.africa | password123 |
 
 ## Core Features
 

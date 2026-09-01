@@ -173,7 +173,7 @@ export function SignupForm() {
           </form>
 
           <p className="mt-4 text-center text-xs text-muted">
-            Demo still available · admin@blackcountry.ng · hr@blackcountry.ng · password123
+            Demo still available · admin@blackcountry.africa · hr@blackcountry.africa · password123
           </p>
         </div>
       </div>

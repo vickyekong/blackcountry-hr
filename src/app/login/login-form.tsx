@@ -76,7 +76,7 @@ export function LoginForm({ signupEnabled }: { signupEnabled: boolean }) {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@blackcountry.ng"
+                  placeholder="admin@blackcountry.africa"
                   className="mt-1"
                   required
                 />
