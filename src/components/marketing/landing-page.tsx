@@ -197,7 +197,7 @@ export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean 
               <div className="pointer-events-none absolute -inset-6 -z-10 rounded-[2rem] bg-gradient-to-br from-ink/50 via-transparent to-lagoon/10 blur-xl" />
               <LandingLottie
                 src="/lottie/salary-truth.json"
-                className="mx-auto mb-5 h-40 w-40 opacity-90 sm:h-48 sm:w-48 lg:absolute lg:-right-1 lg:-top-32 lg:mb-0 lg:h-52 lg:w-52 lg:opacity-95"
+                className="mx-auto mb-6 h-36 w-36 shrink-0 sm:h-40 sm:w-40"
                 speed={0.9}
               />
               <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-lagoon-mist/70">
@@ -262,15 +262,15 @@ export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean 
         />
         <LandingLottie
           src="/lottie/flow-spark.json"
-          className="pointer-events-none absolute left-2 top-1/2 h-16 w-16 -translate-y-1/2 opacity-20 sm:left-8 sm:h-20 sm:w-20"
+          className="pointer-events-none absolute left-0 top-1/2 hidden h-16 w-16 -translate-y-1/2 opacity-15 lg:block"
           speed={1.1}
         />
         <LandingLottie
           src="/lottie/flow-spark.json"
-          className="pointer-events-none absolute right-2 top-1/2 h-16 w-16 -translate-y-1/2 opacity-20 sm:right-8 sm:h-20 sm:w-20"
+          className="pointer-events-none absolute right-0 top-1/2 hidden h-16 w-16 -translate-y-1/2 opacity-15 lg:block"
           speed={0.95}
         />
-        <p className="relative z-10 mx-auto max-w-3xl text-center text-lg font-medium leading-relaxed text-ink-soft sm:text-xl">
+        <p className="relative z-10 mx-auto max-w-3xl px-2 text-center text-lg font-medium leading-relaxed text-ink-soft sm:text-xl lg:px-20">
           {PRODUCT_TAGLINE} — one system for the holding company and every
           sub-company under it, not a product for the open market.
         </p>
@@ -299,7 +299,7 @@ export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean 
               >
                 <LandingLottie
                   src={pillar.lottie}
-                  className="mb-4 h-28 w-28 sm:h-32 sm:w-32"
+                  className="mb-4 h-28 w-28 shrink-0 sm:h-32 sm:w-32"
                   speed={0.9 + i * 0.05}
                 />
                 <p className="font-display text-sm font-medium text-ok">
@@ -365,16 +365,6 @@ export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean 
       </section>
 
       <section className="relative overflow-hidden border-t border-line bg-atmosphere px-5 py-20 text-ink sm:px-8 sm:py-24 lg:px-12">
-        <LandingLottie
-          src="/lottie/team-work.json"
-          className="pointer-events-none absolute -right-20 bottom-[-2rem] h-64 w-64 opacity-20 sm:h-80 sm:w-80 lg:opacity-25"
-          tone="mist"
-          speed={0.7}
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-y-0 right-0 w-1/2 bg-gradient-to-l from-transparent via-mist/40 to-mist/80 md:w-2/5"
-        />
         <div className="relative z-10 mx-auto max-w-6xl">
           <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-ok">
             Inside the product
@@ -419,27 +409,25 @@ export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean 
           aria-hidden
           className="landing-plus-field pointer-events-none absolute inset-0 opacity-[0.18]"
         />
-        <LandingLottie
-          src="/lottie/remittance-pack.json"
-          className="pointer-events-none absolute right-0 top-6 h-52 w-52 opacity-30 sm:right-6 sm:h-64 sm:w-64 lg:opacity-40"
-          speed={0.8}
-        />
-        <div
-          aria-hidden
-          className="landing-text-veil pointer-events-none absolute inset-0"
-        />
         <div className="relative z-10 mx-auto max-w-6xl">
-          <div className="max-w-2xl">
-            <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-lagoon-mist/75">
-              Statutory core
-            </p>
-            <h2 className="font-display mt-3 text-3xl font-semibold tracking-tight text-foam sm:text-4xl">
-              Nigerian remittances without a second set of books
-            </h2>
-            <p className="mt-4 text-base leading-relaxed text-lagoon-mist/90 sm:text-lg">
-              Every run snapshots the rules it used. Remittance packs and payslips
-              stay aligned — so month-end filing is a handoff, not a rebuild.
-            </p>
+          <div className="flex items-start justify-between gap-10">
+            <div className="max-w-2xl">
+              <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-lagoon-mist/75">
+                Statutory core
+              </p>
+              <h2 className="font-display mt-3 text-3xl font-semibold tracking-tight text-foam sm:text-4xl">
+                Nigerian remittances without a second set of books
+              </h2>
+              <p className="mt-4 text-base leading-relaxed text-lagoon-mist/90 sm:text-lg">
+                Every run snapshots the rules it used. Remittance packs and payslips
+                stay aligned — so month-end filing is a handoff, not a rebuild.
+              </p>
+            </div>
+            <LandingLottie
+              src="/lottie/remittance-pack.json"
+              className="hidden h-36 w-36 shrink-0 xl:block"
+              speed={0.8}
+            />
           </div>
 
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -492,7 +480,7 @@ export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean 
           </div>
           <LandingLottie
             src="/lottie/approval.json"
-            className="mx-auto h-44 w-44 sm:h-52 sm:w-52 lg:mx-0"
+            className="mx-auto h-40 w-40 shrink-0 sm:h-48 sm:w-48 lg:mx-0"
             tone="mist"
             speed={0.9}
           />
@@ -508,20 +496,10 @@ export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean 
           aria-hidden
           className="landing-plus-field-cta pointer-events-none absolute inset-0"
         />
-        <LandingLottie
-          src="/lottie/team-work.json"
-          className="pointer-events-none absolute left-1/2 top-1/2 h-[360px] w-[360px] -translate-x-1/2 -translate-y-1/2 opacity-15 sm:h-[440px] sm:w-[440px]"
-          tone="ink"
-          speed={0.75}
-        />
-        <div
-          aria-hidden
-          className="landing-cta-veil pointer-events-none absolute inset-0"
-        />
         <div className="relative z-10 mx-auto max-w-3xl text-center">
           <LandingLottie
             src="/lottie/approval.json"
-            className="mx-auto mb-6 h-24 w-24 opacity-90 sm:h-28 sm:w-28"
+            className="mx-auto mb-6 h-20 w-20 shrink-0 sm:h-24 sm:w-24"
             tone="ink"
           />
           <h2 className="font-display text-3xl font-semibold tracking-tight text-foam sm:text-5xl">

@@ -61,7 +61,7 @@ export function LandingLottie({
   if (!data) {
     return (
       <div
-        className={className}
+        className={`overflow-hidden ${className ?? ""}`}
         aria-hidden
         style={{ background: "transparent" }}
       />
@@ -76,7 +76,10 @@ export function LandingLottie({
         : "";
 
   return (
-    <div className={`${className ?? ""} ${toneClass}`.trim()} aria-hidden>
+    <div
+      className={`overflow-hidden ${className ?? ""} ${toneClass}`.trim()}
+      aria-hidden
+    >
       <Lottie
         lottieRef={lottieRef}
         animationData={data}
