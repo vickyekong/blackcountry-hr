@@ -12,6 +12,7 @@ import { OpenLifecycleQueue } from "@/components/employees/lifecycle-queue";
 import { serializeBigInts } from "@/lib/payroll/config-mapper";
 import { ensureOrgStructure } from "@/lib/org/ensure-org-structure";
 import { redirect } from "next/navigation";
+import { can } from "@/lib/permissions";
 
 export const dynamic = "force-dynamic";
 
@@ -89,14 +90,18 @@ export default async function EmployeesPage() {
         <div>
           <h1 className="text-2xl font-semibold text-stone-900">Employees</h1>
           <p className="mt-1 text-sm text-stone-500">
-            Staff directory, onboarding / offboarding, and attendance
+            Staff directory, onboarding / offboarding, and timesheets
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <ExportActions kind="staff" driveConnected={driveConnected} />
-          <Button asChild>
-            <Link href="/employees/new">Add employee</Link>
-          </Button>
+          {can(session.user.role, "manageEmployees") && (
+            <>
+              <ExportActions kind="staff" driveConnected={driveConnected} />
+              <Button asChild>
+                <Link href="/employees/new">Add employee</Link>
+              </Button>
+            </>
+          )}
         </div>
       </div>
 

@@ -11,14 +11,14 @@ import {
 import type { ChartSlice } from "@/lib/dashboard/overview";
 
 const COLORS = [
-  "#0b2e33",
-  "#14919b",
-  "#0f737a",
-  "#5c7270",
-  "#b45309",
-  "#0f766e",
-  "#163f45",
-  "#88b5b8",
+  "#292929",
+  "#316442",
+  "#6b9aed",
+  "#d65527",
+  "#545454",
+  "#264f34",
+  "#4a7ad4",
+  "#a8441f",
 ];
 
 function ChartCard({
@@ -73,7 +73,7 @@ function ChartCard({
                 }}
                 contentStyle={{
                   borderRadius: 10,
-                  border: "1px solid #c9d6d4",
+                  border: "1px solid #d3cec9",
                   fontSize: 12,
                   background: "#ffffff",
                 }}

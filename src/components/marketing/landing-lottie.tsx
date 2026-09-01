@@ -8,7 +8,7 @@ type LandingLottieProps = {
   className?: string;
   loop?: boolean;
   speed?: number;
-  /** Soften vivid third-party palettes on dark hero */
+  /** Opacity/contrast only — colors are already Blackcountry in the JSON. */
   tone?: "default" | "mist" | "ink";
 };
 
@@ -70,9 +70,9 @@ export function LandingLottie({
 
   const toneClass =
     tone === "mist"
-      ? "opacity-90 [filter:saturate(0.85)_hue-rotate(165deg)]"
+      ? "opacity-95"
       : tone === "ink"
-        ? "opacity-95 [filter:saturate(0.7)_brightness(1.05)_hue-rotate(150deg)]"
+        ? "opacity-90 brightness-110"
         : "";
 
   return (

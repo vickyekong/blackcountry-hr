@@ -2,10 +2,10 @@ import { cn } from "@/lib/cn";
 
 const variants = {
   default: "bg-sand text-ink-soft",
-  success: "bg-lagoon-mist text-ok",
-  warning: "bg-amber-50 text-warn",
-  danger: "bg-red-50 text-signal",
-  info: "bg-lagoon-mist/70 text-lagoon-deep",
+  success: "bg-ok/10 text-ok",
+  warning: "bg-warn/10 text-warn",
+  danger: "bg-signal/10 text-signal",
+  info: "bg-sky/15 text-sky",
 };
 
 export function Badge({
@@ -40,6 +40,10 @@ export function payrollStatusVariant(
       return "warning";
     case "APPROVED":
       return "info";
+    case "FORWARDED_TO_FINANCE":
+      return "info";
+    case "PROCESSING":
+      return "warning";
     case "PAID":
       return "success";
     default:

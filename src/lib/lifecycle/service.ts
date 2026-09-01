@@ -56,6 +56,14 @@ const ONBOARDING_TASKS: Array<{
     description: "Finance / Super Admin aware for next payroll run",
     sortOrder: 7,
   },
+  {
+    key: "ENABLE_STAFF_PORTAL",
+    title: "Enable staff portal login",
+    description:
+      "Give this person a Staff login so they can fill details and apply for leave",
+    href: (id) => `/employees/${id}`,
+    sortOrder: 8,
+  },
 ];
 
 const OFFBOARDING_TASKS: Array<{

@@ -6,11 +6,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+const ROLE_OPTIONS = [
+  { value: "HR_ADMIN", label: "HR" },
+  { value: "SUPER_ADMIN", label: "Super Admin" },
+  { value: "FINANCE", label: "Finance" },
+  { value: "BUSINESS_HEAD", label: "Business head" },
+] as const;
+
+type InviteRole = (typeof ROLE_OPTIONS)[number]["value"];
+
 export function TeamInviteForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<"HR_ADMIN" | "SUPER_ADMIN">("HR_ADMIN");
+  const [role, setRole] = useState<InviteRole>("HR_ADMIN");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -29,10 +38,9 @@ export function TeamInviteForm() {
       setMessage(data.error ?? "Invite failed");
       return;
     }
+    const label = ROLE_OPTIONS.find((o) => o.value === role)?.label ?? role;
     setMessage(
-      `Invited ${data.user?.name} (${data.user?.email}) as ${
-        role === "HR_ADMIN" ? "HR" : "Super Admin"
-      }. Share the password securely.`
+      `Invited ${data.user?.name} (${data.user?.email}) as ${label}. Share the password securely.`
     );
     setName("");
     setEmail("");
@@ -44,8 +52,8 @@ export function TeamInviteForm() {
       <CardHeader>
         <CardTitle>Invite team</CardTitle>
         <p className="text-sm text-muted">
-          Super Admin only — create HR or another Super Admin for this company.
-          Demo Acme accounts are separate and unchanged.
+          Super Admin only — create HR, Finance, a business head, or another Super
+          Admin for the company you are in.
         </p>
       </CardHeader>
       <CardContent>
@@ -89,13 +97,14 @@ export function TeamInviteForm() {
             <select
               id="invite-role"
               value={role}
-              onChange={(e) =>
-                setRole(e.target.value as "HR_ADMIN" | "SUPER_ADMIN")
-              }
+              onChange={(e) => setRole(e.target.value as InviteRole)}
               className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
             >
-              <option value="HR_ADMIN">HR Admin</option>
-              <option value="SUPER_ADMIN">Super Admin</option>
+              {ROLE_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
             </select>
           </div>
           <div className="sm:col-span-2 flex flex-wrap items-center gap-3">

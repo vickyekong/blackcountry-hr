@@ -9,18 +9,18 @@ import {
 
 describe("company-brand", () => {
   it("normalizes hex colors", () => {
-    expect(normalizeHex("#14919B")).toBe("#14919b");
+    expect(normalizeHex("#FCE74F")).toBe("#fce74f");
     expect(normalizeHex("bad")).toBeNull();
     expect(normalizeHex(null)).toBeNull();
   });
 
   it("converts hex to RGB channels", () => {
-    expect(hexToRgbChannels("#14919b")).toBe("20 145 155");
-    expect(hexToRgbChannels("#0b2e33")).toBe("11 46 51");
+    expect(hexToRgbChannels("#fce74f")).toBe("252 231 79");
+    expect(hexToRgbChannels("#292929")).toBe("41 41 41");
   });
 
   it("darkens and lightens", () => {
-    expect(darkenHex("#14919b", 0)).toBe("#14919b");
+    expect(darkenHex("#fce74f", 0)).toBe("#fce74f");
     expect(lightenHex("#000000", 1)).toBe("#ffffff");
   });
 
@@ -31,8 +31,8 @@ describe("company-brand", () => {
       brandAccentHex: null,
       brandInkHex: null,
     });
-    expect(vars["--lagoon"]).toBe("20 145 155");
-    expect(vars["--ink"]).toBe("11 46 51");
+    expect(vars["--lagoon"]).toBe("252 231 79");
+    expect(vars["--ink"]).toBe("41 41 41");
   });
 
   it("applies custom accent and ink", () => {

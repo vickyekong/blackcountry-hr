@@ -50,6 +50,18 @@ export function validateChangePayload(
     return { ok: true, normalized: { nextOfKinName, nextOfKinPhone } };
   }
 
+  if (type === "GENERAL") {
+    const subject = String(payload.subject ?? "").trim();
+    const message = String(payload.message ?? "").trim();
+    if (subject.length < 3) {
+      return { ok: false, error: "Give your request a short subject" };
+    }
+    if (message.length < 8) {
+      return { ok: false, error: "Describe what you need from the company" };
+    }
+    return { ok: true, normalized: { subject, message } };
+  }
+
   const addressLine = String(payload.addressLine ?? "").trim();
   if (!addressLine || addressLine.length < 8) {
     return { ok: false, error: "Provide a full residential address" };
@@ -69,13 +81,16 @@ export async function submitChangeRequest(options: {
     throw new Error(validated.error);
   }
 
-  const pending = await prisma.employeeChangeRequest.findFirst({
-    where: {
-      employeeId: options.employeeId,
-      type: options.type,
-      status: "PENDING",
-    },
-  });
+  const pending =
+    options.type === "GENERAL"
+      ? null
+      : await prisma.employeeChangeRequest.findFirst({
+          where: {
+            employeeId: options.employeeId,
+            type: options.type,
+            status: "PENDING",
+          },
+        });
   if (pending) {
     throw new Error("You already have a pending request of this type");
   }
@@ -107,9 +122,11 @@ export async function notifySuperAdminOfChangeRequest(options: {
     select: { id: true },
   });
 
-  const who = options.submittedByName ? `HR (${options.submittedByName})` : "HR";
+  const who = options.submittedByName
+    ? options.submittedByName
+    : "Staff";
   const title = "Change request awaiting your approval";
-  const body = `${who} logged a ${options.type.replace(/_/g, " ").toLowerCase()} update for ${options.employeeName}. Approve or reject in HR Ask.`;
+  const body = `${who} submitted a ${options.type.replace(/_/g, " ").toLowerCase()} update for ${options.employeeName}. Approve or reject in HR Ask.`;
   const linkUrl = `/hr-ask?tab=changes`;
 
   if (admins.length === 0) return;
@@ -136,6 +153,87 @@ export async function notifyHrOfChangeRequest(options: {
   type: string;
 }) {
   return notifySuperAdminOfChangeRequest(options);
+}
+
+const HR_REVIEWABLE = new Set(["NEXT_OF_KIN", "ADDRESS", "GENERAL"]);
+
+/** Staff-submitted requests: HR for personal/general, Super Admin for bank/tax. */
+export async function notifyReviewersOfChangeRequest(options: {
+  companyId: string;
+  requestId: string;
+  employeeName: string;
+  type: string;
+  submittedByName: string;
+  fromStaff: boolean;
+}) {
+  const roles = HR_REVIEWABLE.has(options.type)
+    ? (["HR_ADMIN", "SUPER_ADMIN"] as const)
+    : (["SUPER_ADMIN"] as const);
+
+  const reviewers = await prisma.user.findMany({
+    where: { companyId: options.companyId, role: { in: [...roles] } },
+    select: { id: true },
+  });
+  if (reviewers.length === 0) return;
+
+  const who = options.fromStaff
+    ? `${options.employeeName} (staff portal)`
+    : `HR (${options.submittedByName})`;
+  const title = "Request awaiting review";
+  const body = `${who} submitted a ${options.type.replace(/_/g, " ").toLowerCase()} request. Open HR Ask to approve or send back.`;
+
+  await prisma.notification.createMany({
+    data: reviewers.map((u) => ({
+      companyId: options.companyId,
+      userId: u.id,
+      type: "CHANGE_REQUEST",
+      title,
+      body,
+      linkUrl: "/hr-ask?tab=changes",
+      entityType: "EmployeeChangeRequest",
+      entityId: options.requestId,
+    })),
+  });
+}
+
+export async function notifyEmployeeOfChangeReview(options: {
+  employeeId: string;
+  companyId: string;
+  requestId: string;
+  type: string;
+  action: "approve" | "reject";
+  reviewNote?: string;
+}) {
+  const user = await prisma.user.findFirst({
+    where: {
+      employeeId: options.employeeId,
+      companyId: options.companyId,
+      role: "EMPLOYEE",
+    },
+    select: { id: true },
+  });
+  if (!user) return;
+
+  const label = options.type.replace(/_/g, " ").toLowerCase();
+  const approved = options.action === "approve";
+  await prisma.notification.create({
+    data: {
+      companyId: options.companyId,
+      userId: user.id,
+      type: "CHANGE_REQUEST_REVIEW",
+      title: approved
+        ? `Your ${label} request was approved`
+        : `Your ${label} request was sent back`,
+      body: options.reviewNote
+        ? options.reviewNote
+        : approved
+          ? "HR / Super Admin approved your request."
+          : "HR / Super Admin sent this request back. Open Requests for details.",
+      linkUrl: "/staff/requests",
+      entityType: "EmployeeChangeRequest",
+      entityId: options.requestId,
+    },
+  });
 }
 
 export async function reviewChangeRequest(options: {
@@ -194,6 +292,11 @@ export async function reviewChangeRequest(options: {
         nextOfKinName: payload.nextOfKinName,
         nextOfKinPhone: payload.nextOfKinPhone,
       },
+    });
+  } else if (req.type === "ADDRESS") {
+    await prisma.employee.update({
+      where: { id: req.employeeId },
+      data: { addressLine: payload.addressLine },
     });
   }
 

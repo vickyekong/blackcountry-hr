@@ -16,7 +16,7 @@ const signupSchema = z.object({
 
 /**
  * Public tenant signup. Creates company + NTA defaults + Super Admin.
- * Demo Acme (seed-company / *@acme.ng) is untouched.
+ * Demo Blackcountry Group (seed-company / *@blackcountry.ng) is untouched.
  */
 export async function POST(req: NextRequest) {
   try {

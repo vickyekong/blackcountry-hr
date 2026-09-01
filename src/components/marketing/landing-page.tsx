@@ -17,7 +17,7 @@ function CtaLink({
 }) {
   const className =
     variant === "primary"
-      ? "inline-flex h-11 items-center justify-center rounded-lg bg-lagoon px-6 text-sm font-medium text-foam shadow-soft transition hover:bg-lagoon-deep"
+      ? "inline-flex h-11 items-center justify-center rounded-lg bg-lagoon px-6 text-sm font-medium text-ink shadow-soft transition hover:bg-lagoon-deep"
       : variant === "ink"
         ? "inline-flex h-11 items-center justify-center rounded-lg bg-ink px-6 text-sm font-medium text-foam transition hover:bg-ink-soft"
         : variant === "outline"
@@ -85,8 +85,8 @@ const CAPABILITIES = [
     items: [
       "Employee profiles & compensation structure",
       "Onboarding and offboarding checklists",
-      "Leave recorded by HR, unpaid leave → payroll",
-      "Policy desk / change-request review",
+      "Leave recorded by HR or applied by staff",
+      "Staff portal for details, leave, and company requests",
     ],
   },
   {
@@ -101,7 +101,7 @@ const CAPABILITIES = [
   {
     title: "Command center",
     items: [
-      "Super Admin + HR portals only",
+      "Super Admin, HR, and Staff portals",
       "Compliance gaps (TIN, RSA PIN) at a glance",
       "Omni Co-Pilot workload insights",
       "Multi-tenant company workspaces",
@@ -129,7 +129,7 @@ export function LandingPage() {
           </CtaLink>
           <a
             href="/signup"
-            className="rounded-lg bg-lagoon px-3.5 py-2 text-sm font-medium text-foam shadow-soft transition hover:bg-lagoon-deep"
+            className="rounded-lg bg-lagoon px-3.5 py-2 text-sm font-medium text-ink shadow-soft transition hover:bg-lagoon-deep"
           >
             Sign up
           </a>
@@ -176,7 +176,7 @@ export function LandingPage() {
               </CtaLink>
             </div>
             <p className="mt-5 text-xs text-lagoon-mist/70">
-              Live demo · admin@acme.ng · hr@acme.ng · password123
+              Live demo · admin@blackcountry.ng · hr@blackcountry.ng · adaeze@blackcountry.ng · password123
             </p>
           </div>
 
@@ -269,7 +269,7 @@ export function LandingPage() {
 
       <section className="bg-mist px-5 pb-20 text-ink sm:px-8 sm:pb-24 lg:px-12">
         <div className="mx-auto max-w-6xl">
-          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-lagoon">
+          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-ok">
             Why teams switch
           </p>
           <h2 className="font-display mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
@@ -293,7 +293,7 @@ export function LandingPage() {
                   className="mb-4 h-28 w-28 sm:h-32 sm:w-32"
                   speed={0.9 + i * 0.05}
                 />
-                <p className="font-display text-sm font-medium text-lagoon">
+                <p className="font-display text-sm font-medium text-ok">
                   {pillar.label}
                 </p>
                 <h3 className="font-display mt-3 text-xl font-semibold tracking-tight text-ink sm:text-2xl">
@@ -310,7 +310,7 @@ export function LandingPage() {
 
       <section className="border-t border-line bg-foam px-5 py-20 text-ink sm:px-8 sm:py-24 lg:px-12">
         <div className="mx-auto max-w-6xl">
-          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-lagoon">
+          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-ok">
             How it works
           </p>
           <h2 className="font-display mt-3 max-w-xl text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -318,8 +318,8 @@ export function LandingPage() {
           </h2>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted sm:text-lg">
             Super Admin and HR share the command center. Sensitive actions stay
-            Super Admin–cleared. Staff never touch payroll — your team owns the
-            truth.
+            Super Admin–cleared. Staff use a separate portal for details, leave,
+            and requests — they never touch payroll.
           </p>
 
           <ol className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
@@ -339,7 +339,7 @@ export function LandingPage() {
                     speed={0.85}
                   />
                 </div>
-                <span className="font-display text-3xl font-semibold text-lagoon/40">
+                <span className="font-display text-3xl font-semibold text-ok/35">
                   {item.step}
                 </span>
                 <h3 className="mt-2 text-base font-semibold text-ink">
@@ -366,15 +366,15 @@ export function LandingPage() {
           className="pointer-events-none absolute inset-y-0 right-0 w-1/2 bg-gradient-to-l from-transparent via-mist/40 to-mist/80 md:w-2/5"
         />
         <div className="relative z-10 mx-auto max-w-6xl">
-          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-lagoon">
+          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-ok">
             Inside the product
           </p>
           <h2 className="font-display mt-3 max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">
             Everything HR needs before payday
           </h2>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted sm:text-lg">
-            People ops, statutory payroll, compliance, and exports — one Lagoon
-            Ink workspace instead of a folder of conflicting files.
+            People ops, statutory payroll, compliance, and exports — one
+            Blackcountry workspace instead of a folder of conflicting files.
           </p>
 
           <div className="mt-14 grid gap-12 md:grid-cols-3 md:gap-10">
@@ -391,7 +391,7 @@ export function LandingPage() {
                     >
                       <span
                         aria-hidden
-                        className="mt-2 h-1.5 w-1.5 shrink-0 rounded-sm bg-lagoon"
+                        className="mt-2 h-1.5 w-1.5 shrink-0 rounded-sm bg-ok"
                       />
                       <span>{item}</span>
                     </li>
@@ -453,16 +453,17 @@ export function LandingPage() {
       <section className="bg-mist px-5 py-20 text-ink sm:px-8 sm:py-24 lg:px-12">
         <div className="mx-auto flex max-w-6xl flex-col gap-12 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-xl">
-            <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-lagoon">
+            <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-ok">
               Who it&apos;s for
             </p>
             <h2 className="font-display mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-              Super Admin and HR — the people who own payroll truth
+              Super Admin, HR, and Staff — each with the right door
             </h2>
             <p className="mt-4 text-base leading-relaxed text-muted sm:text-lg">
-              No employee self-serve clutter. Your company gets its own tenant:
-              brand it, invite HR, run payroll, and keep sensitive clears with
-              Super Admin.
+              Super Admin and HR own payroll truth. Staff get a simple portal to
+              fill details, apply for leave, and send company requests — no admin
+              tools. Brand the tenant, invite HR, enable staff logins, and keep
+              sensitive clears with Super Admin.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <CtaLink href="/signup" variant="ink">
@@ -470,7 +471,7 @@ export function LandingPage() {
               </CtaLink>
               <a
                 href="/login"
-                className="inline-flex h-11 items-center justify-center rounded-lg border border-line bg-foam px-6 text-sm font-medium text-ink transition hover:border-lagoon/40 hover:bg-lagoon-mist/40"
+                className="inline-flex h-11 items-center justify-center rounded-lg border border-line bg-foam px-6 text-sm font-medium text-ink transition hover:border-ok/40 hover:bg-ok/10"
               >
                 Log in
               </a>

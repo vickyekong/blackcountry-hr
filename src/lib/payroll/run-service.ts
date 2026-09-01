@@ -175,7 +175,7 @@ async function loadYtdTotalsByEmployee(
         companyId,
         periodYear,
         periodMonth: { lt: periodMonth },
-        status: { in: ["APPROVED", "PAID"] },
+        status: { in: ["APPROVED", "FORWARDED_TO_FINANCE", "PROCESSING", "PAID"] },
       },
     },
     select: {
@@ -384,9 +384,14 @@ export async function reverseAndRegeneratePayrollRun(
     throw new PayrollRunError("Payroll run not found", 404);
   }
 
-  if (run.status !== "APPROVED" && run.status !== "PAID") {
+  if (
+    run.status !== "APPROVED" &&
+    run.status !== "FORWARDED_TO_FINANCE" &&
+    run.status !== "PROCESSING" &&
+    run.status !== "PAID"
+  ) {
     throw new PayrollRunError(
-      "Can only reverse approved or paid payroll runs",
+      "Can only reverse approved, forwarded, processing, or paid payroll runs",
       400
     );
   }

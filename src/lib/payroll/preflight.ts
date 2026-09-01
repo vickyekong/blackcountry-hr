@@ -308,7 +308,7 @@ export async function getPayrollPreflight(
   const prior = await prisma.payrollRun.findFirst({
     where: {
       companyId,
-      status: { in: ["APPROVED", "PAID"] },
+      status: { in: ["APPROVED", "FORWARDED_TO_FINANCE", "PROCESSING", "PAID"] },
       OR: [
         { periodYear: { lt: run.periodYear } },
         {

@@ -104,6 +104,7 @@ export function PayrollWizard({
   preflightLoading,
   loading,
   canApprove,
+  canForward,
   canSubmit,
   driveConnected,
   submitNotice,
@@ -124,6 +125,7 @@ export function PayrollWizard({
   preflightLoading: boolean;
   loading: boolean;
   canApprove: boolean;
+  canForward: boolean;
   canSubmit: boolean;
   driveConnected: boolean;
   submitNotice: {
@@ -149,7 +151,10 @@ export function PayrollWizard({
   const defaultStep =
     initialStep && initialStep >= 1 && initialStep <= 4
       ? initialStep
-      : run.status === "APPROVED" || run.status === "PAID"
+      : run.status === "APPROVED" ||
+          run.status === "PAID" ||
+          run.status === "FORWARDED_TO_FINANCE" ||
+          run.status === "PROCESSING"
         ? 4
         : run.status === "UNDER_REVIEW"
           ? canApprove
@@ -226,7 +231,7 @@ export function PayrollWizard({
     <div>
       <div className="mb-6 flex flex-wrap items-start justify-between gap-3 sm:gap-4">
         <div className="min-w-0">
-          <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-lagoon">
+          <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-ok">
             Payroll execution wizard
           </p>
           <h1 className="font-display mt-1 text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
@@ -248,7 +253,7 @@ export function PayrollWizard({
               "w-[min(72vw,16rem)] shrink-0 snap-start rounded-xl border px-3 py-3 text-left transition-all duration-200 ease-brand sm:w-auto",
               step === s.id
                 ? "border-ink bg-ink text-foam shadow-soft"
-                : "border-line bg-foam/90 text-ink-soft hover:border-lagoon/35 hover:bg-lagoon-mist/30"
+                : "border-line bg-foam/90 text-ink-soft hover:border-ok/35 hover:bg-ok/10"
             )}
           >
             <p className="text-[10px] font-medium uppercase tracking-wide opacity-70">
@@ -873,12 +878,26 @@ export function PayrollWizard({
                   Download filing pack (ZIP)
                 </a>
               </Button>
-              {run.status === "APPROVED" && (
-                <Button onClick={() => onAction("mark_paid")} disabled={loading}>
-                  Mark as paid
+              {run.status === "APPROVED" && canForward && (
+                <Button
+                  onClick={() => onAction("forward_finance")}
+                  disabled={loading}
+                >
+                  Forward to Finance
                 </Button>
               )}
-              {(run.status === "APPROVED" || run.status === "PAID") && (
+              {(run.status === "FORWARDED_TO_FINANCE" ||
+                run.status === "PROCESSING") && (
+                <p className="w-full text-sm text-stone-500">
+                  {run.status === "PROCESSING"
+                    ? "Finance is processing this run."
+                    : "Forwarded to Finance. They will process payment and notify HR when done."}
+                </p>
+              )}
+              {(run.status === "APPROVED" ||
+                run.status === "FORWARDED_TO_FINANCE" ||
+                run.status === "PROCESSING" ||
+                run.status === "PAID") && (
                 <Button
                   variant="outline"
                   onClick={() => {

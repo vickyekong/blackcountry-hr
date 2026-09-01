@@ -14,6 +14,8 @@ export async function requireAuth() {
   if (!session?.user) {
     throw new AuthError("Unauthorized", 401);
   }
+  const { ensureGroupSchema } = await import("@/lib/ensure-group-schema");
+  await ensureGroupSchema();
   return session;
 }
 
@@ -62,4 +64,22 @@ export function handleApiError(error: unknown) {
 
 export function isEmployeeSelf(session: { user: { role: UserRole; employeeId?: string | null } }, employeeId: string) {
   return session.user.role === "EMPLOYEE" && session.user.employeeId === employeeId;
+}
+
+/** Staff portal: must be EMPLOYEE with a linked staff record. */
+export async function requireStaffEmployee() {
+  const session = await requireAuth();
+  if (session.user.role !== "EMPLOYEE") {
+    throw new AuthError("Forbidden", 403);
+  }
+  if (!session.user.employeeId) {
+    throw new AuthError(
+      "This login is not linked to a staff record. Ask HR to enable your portal.",
+      403
+    );
+  }
+  return {
+    ...session,
+    employeeId: session.user.employeeId,
+  };
 }

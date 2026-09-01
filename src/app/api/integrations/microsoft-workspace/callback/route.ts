@@ -4,10 +4,12 @@ import { authOptions } from "@/lib/auth";
 import { can } from "@/lib/permissions";
 import { exchangeMicrosoftCode } from "@/lib/microsoft-workspace";
 import { prisma } from "@/lib/db";
+import { getAppBaseUrl } from "@/lib/app-url";
+
+export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
-  const base = process.env.NEXTAUTH_URL?.replace(/\/$/, "") || "";
-  const settingsUrl = `${base}/settings?microsoftWorkspace=`;
+  const settingsUrl = `${getAppBaseUrl()}/settings?microsoftWorkspace=`;
 
   try {
     const session = await getServerSession(authOptions);

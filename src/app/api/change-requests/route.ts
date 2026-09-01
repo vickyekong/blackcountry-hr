@@ -1,23 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { requirePermission, handleApiError } from "@/lib/api-auth";
+import {
+  requireAuth,
+  requirePermission,
+  handleApiError,
+} from "@/lib/api-auth";
 import { prisma } from "@/lib/db";
 import {
+  notifyEmployeeOfChangeReview,
   notifySuperAdminOfChangeRequest,
   reviewChangeRequest,
   submitChangeRequest,
 } from "@/lib/lifecycle/change-requests";
 import { displayName } from "@/lib/employees/data-quality";
+import { canReviewChangeType } from "@/lib/permissions";
+import { ensureStaffPortalSchema } from "@/lib/ensure-staff-portal-schema";
 
 const submitSchema = z.object({
   employeeId: z.string().min(1),
-  type: z.enum(["BANK", "TAX_RELIEF", "NEXT_OF_KIN", "ADDRESS"]),
+  type: z.enum(["BANK", "TAX_RELIEF", "NEXT_OF_KIN", "ADDRESS", "GENERAL"]),
   payload: z.record(z.string(), z.unknown()),
   note: z.string().max(500).optional(),
 });
 
 export async function GET(req: NextRequest) {
   try {
+    await ensureStaffPortalSchema();
     const session = await requirePermission("manageEmployees");
     const { searchParams } = new URL(req.url);
     const scope = searchParams.get("scope") ?? "pending";
@@ -90,7 +98,7 @@ export async function POST(req: NextRequest) {
         changes: {
           type: body.type,
           employeeId: body.employeeId,
-          payload: body.payload,
+          payload: body.payload as Record<string, string>,
         },
       },
     });
@@ -112,8 +120,28 @@ const reviewSchema = z.object({
 
 export async function PATCH(req: NextRequest) {
   try {
-    const session = await requirePermission("approveChangeRequests");
+    await ensureStaffPortalSchema();
+    const session = await requireAuth();
     const body = reviewSchema.parse(await req.json());
+
+    const existing = await prisma.employeeChangeRequest.findFirst({
+      where: { id: body.requestId, companyId: session.user.companyId },
+      select: { id: true, type: true, employeeId: true },
+    });
+    if (!existing) {
+      return NextResponse.json({ error: "Request not found" }, { status: 404 });
+    }
+    if (!canReviewChangeType(session.user.role, existing.type)) {
+      return NextResponse.json(
+        {
+          error:
+            existing.type === "BANK" || existing.type === "TAX_RELIEF"
+              ? "Bank and tax-relief changes need Super Admin clearance"
+              : "Forbidden",
+        },
+        { status: 403 }
+      );
+    }
 
     const updated = await reviewChangeRequest({
       companyId: session.user.companyId,
@@ -141,6 +169,15 @@ export async function PATCH(req: NextRequest) {
         readAt: null,
       },
       data: { readAt: new Date() },
+    });
+
+    await notifyEmployeeOfChangeReview({
+      employeeId: existing.employeeId,
+      companyId: session.user.companyId,
+      requestId: updated.id,
+      type: existing.type,
+      action: body.action,
+      reviewNote: body.reviewNote,
     });
 
     return NextResponse.json(updated);

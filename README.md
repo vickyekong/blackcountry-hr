@@ -118,13 +118,15 @@ The build script runs `prisma generate` automatically before `next build`.
 
 ## Demo Accounts
 
-Two similar users — both manage people and payroll. Super Admin clears a few
-sensitive actions (payroll approval, change requests) and company Settings.
+Blackcountry Group workspace plus Blackcountry Foods as a sub-company. Password is `password123` for all.
 
 | User | Email | Password |
 |------|-------|----------|
-| Super Admin | admin@acme.ng | password123 |
-| HR | hr@acme.ng | password123 |
+| Super Admin | admin@blackcountry.ng | password123 |
+| HR | hr@blackcountry.ng | password123 |
+| Finance | finance@blackcountry.ng | password123 |
+| Business head | head@blackcountry.ng | password123 |
+| Staff | adaeze@blackcountry.ng | password123 |
 
 ## Core Features
 
@@ -132,7 +134,8 @@ sensitive actions (payroll approval, change requests) and company Settings.
 - **Payroll engine** — pure, testable Nigerian statutory calculations (configurable tax bands)
 - **Payroll runs** — Draft → Under Review → Approved → Paid (immutable after approval)
 - **Payslips** — PDF generation with YTD summary (HR / Super Admin)
-- **Leave management** — HR records leave for staff; unpaid leave → payroll deductions
+- **Leave management** — Staff apply; HR can also record leave. Unpaid leave → payroll deductions
+- **Staff portal** — own details, leave, company requests, and approved payslips (no admin tools)
 - **Reports** — remittances, department breakdown, employer cost
 - **Exports** — staff & payroll CSV download, optional Google Drive upload
 - **HR Ask / Desk** — policy queries, lifecycle, change-request review
@@ -166,7 +169,8 @@ src/
     payroll/            # Payroll run workflow
     leave/              # Leave requests
     reports/            # Charts & remittances
-    my/                 # Employee self-service
+    staff/              # Staff portal (details, leave, requests, payslips)
+    my/                 # Redirects to /staff
     settings/           # Statutory config (Super Admin)
 prisma/
   schema.prisma         # Data model

@@ -3,20 +3,25 @@
 @tailwind utilities;
 
 :root {
-  /* Blackcountry HR System — Lagoon Ink (RGB channels for Tailwind opacity) */
-  --ink: 11 46 51;
-  --ink-soft: 22 63 69;
-  --lagoon: 20 145 155;
-  --lagoon-deep: 15 115 122;
-  --lagoon-mist: 216 240 242;
-  --mist: 240 245 244;
+  /* Blackcountry Corporate Design (RGB channels for Tailwind opacity)
+   * Primary black #292929 · Warm grey #eae5df · Yellow #fce74f
+   * Support: green #316442 · light blue #6b9aed · orange #d65527
+   */
+  --ink: 41 41 41;
+  --ink-soft: 84 84 84;
+  --lagoon: 252 231 79;
+  --lagoon-deep: 207 189 65;
+  --lagoon-mist: 255 251 229;
+  --mist: 234 229 223;
   --foam: 255 255 255;
-  --sand: 228 236 235;
-  --line: 201 214 212;
-  --muted: 92 114 112;
-  --signal: 180 35 24;
-  --ok: 15 118 110;
-  --warn: 180 83 9;
+  --sand: 245 242 239;
+  --line: 211 206 201;
+  --muted: 118 116 114;
+  --signal: 214 85 39;
+  --ok: 49 100 66;
+  --ok-deep: 38 80 52;
+  --warn: 214 85 39;
+  --sky: 107 154 237;
 
   --background: rgb(var(--mist));
   --foreground: rgb(var(--ink));
@@ -49,16 +54,16 @@ body {
   .bg-atmosphere {
     background-color: rgb(var(--mist));
     background-image:
-      radial-gradient(ellipse 80% 50% at 10% -10%, rgb(var(--lagoon) / 0.14), transparent 55%),
-      radial-gradient(ellipse 60% 40% at 100% 0%, rgb(var(--ink) / 0.08), transparent 50%),
-      linear-gradient(165deg, #f7fbfa 0%, rgb(var(--mist)) 45%, #e8f2f1 100%);
+      radial-gradient(ellipse 80% 50% at 10% -10%, rgb(var(--ok) / 0.12), transparent 55%),
+      radial-gradient(ellipse 60% 40% at 100% 0%, rgb(var(--ink) / 0.06), transparent 50%),
+      linear-gradient(165deg, #f7f4f0 0%, rgb(var(--mist)) 45%, #e4dfd8 100%);
   }
 
   .bg-login-atmosphere {
     background-color: rgb(var(--ink));
     background-image:
-      radial-gradient(ellipse 90% 70% at 80% 10%, rgb(var(--lagoon) / 0.35), transparent 55%),
-      radial-gradient(ellipse 70% 50% at 0% 100%, rgb(var(--lagoon-mist) / 0.12), transparent 50%),
+      radial-gradient(ellipse 90% 70% at 80% 10%, rgb(var(--lagoon) / 0.28), transparent 55%),
+      radial-gradient(ellipse 70% 50% at 0% 100%, rgb(var(--ok) / 0.18), transparent 50%),
       linear-gradient(145deg, rgb(var(--ink)) 0%, rgb(var(--ink-soft)) 48%, rgb(var(--ink)) 100%);
   }
 
@@ -67,7 +72,7 @@ body {
    * Larger tile + low opacity + mask so marks live in open space, not under type.
    */
   .landing-plus-field {
-    background-image: url("data:image/svg+xml,%3Csvg width='72' height='72' viewBox='0 0 72 72' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d8f0f2' fill-opacity='0.9'%3E%3Cpath d='M38 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM38 4V0h-2v4h-4v2h4v4h2V6h4V4h-4zM8 34v-4H6v4H2v2h4v4h2v-4h4v-2H8zM8 4V0H6v4H2v2h4v4h2V6h4V4H8z'/%3E%3C/g%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg width='72' height='72' viewBox='0 0 72 72' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23fce74f' fill-opacity='0.9'%3E%3Cpath d='M38 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM38 4V0h-2v4h-4v2h4v4h2V6h4V4h-4zM8 34v-4H6v4H2v2h4v4h2v-4h4v-2H8zM8 4V0H6v4H2v2h4v4h2V6h4V4H8z'/%3E%3C/g%3E%3C/svg%3E");
     background-size: 72px 72px;
     opacity: 0.28;
     -webkit-mask-image: linear-gradient(
@@ -89,7 +94,7 @@ body {
   }
 
   .landing-plus-field-login {
-    background-image: url("data:image/svg+xml,%3Csvg width='72' height='72' viewBox='0 0 72 72' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d8f0f2' fill-opacity='0.9'%3E%3Cpath d='M38 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM38 4V0h-2v4h-4v2h4v4h2V6h4V4h-4zM8 34v-4H6v4H2v2h4v4h2v-4h4v-2H8zM8 4V0H6v4H2v2h4v4h2V6h4V4H8z'/%3E%3C/g%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg width='72' height='72' viewBox='0 0 72 72' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23fce74f' fill-opacity='0.9'%3E%3Cpath d='M38 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM38 4V0h-2v4h-4v2h4v4h2V6h4V4h-4zM8 34v-4H6v4H2v2h4v4h2v-4h4v-2H8zM8 4V0H6v4H2v2h4v4h2V6h4V4H8z'/%3E%3C/g%3E%3C/svg%3E");
     background-size: 72px 72px;
     opacity: 0.2;
     -webkit-mask-image: radial-gradient(
@@ -109,7 +114,7 @@ body {
   }
 
   .landing-plus-field-cta {
-    background-image: url("data:image/svg+xml,%3Csvg width='72' height='72' viewBox='0 0 72 72' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d8f0f2' fill-opacity='0.9'%3E%3Cpath d='M38 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM38 4V0h-2v4h-4v2h4v4h2V6h4V4h-4zM8 34v-4H6v4H2v2h4v4h2v-4h4v-2H8zM8 4V0H6v4H2v2h4v4h2V6h4V4H8z'/%3E%3C/g%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg width='72' height='72' viewBox='0 0 72 72' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23fce74f' fill-opacity='0.9'%3E%3Cpath d='M38 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM38 4V0h-2v4h-4v2h4v4h2V6h4V4h-4zM8 34v-4H6v4H2v2h4v4h2v-4h4v-2H8zM8 4V0H6v4H2v2h4v4h2V6h4V4H8z'/%3E%3C/g%3E%3C/svg%3E");
     background-size: 72px 72px;
     opacity: 0.2;
     -webkit-mask-image: radial-gradient(
@@ -162,7 +167,7 @@ body {
   }
 
   .landing-plus-field-bridge {
-    background-image: url("data:image/svg+xml,%3Csvg width='72' height='72' viewBox='0 0 72 72' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%230b2e33' fill-opacity='0.35'%3E%3Cpath d='M38 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM38 4V0h-2v4h-4v2h4v4h2V6h4V4h-4zM8 34v-4H6v4H2v2h4v4h2v-4h4v-2H8zM8 4V0H6v4H2v2h4v4h2V6h4V4H8z'/%3E%3C/g%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg width='72' height='72' viewBox='0 0 72 72' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23292929' fill-opacity='0.35'%3E%3Cpath d='M38 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM38 4V0h-2v4h-4v2h4v4h2V6h4V4h-4zM8 34v-4H6v4H2v2h4v4h2v-4h4v-2H8zM8 4V0H6v4H2v2h4v4h2V6h4V4H8z'/%3E%3C/g%3E%3C/svg%3E");
     background-size: 72px 72px;
     opacity: 0.2;
     -webkit-mask-image: linear-gradient(

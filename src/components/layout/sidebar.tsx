@@ -15,6 +15,21 @@ import { useCompanyBrand } from "@/components/brand/company-brand-provider";
 import type { UserRole } from "@prisma/client";
 import { NotificationsBell } from "@/components/layout/notifications-bell";
 import { MobileApprovalsBadge } from "@/components/layout/mobile-approvals-badge";
+import { WorkspaceSwitcher } from "@/components/layout/workspace-switcher";
+
+const staffNavItems: Array<{ href: string; label: string }> = [
+  { href: "/staff", label: "Home" },
+  { href: "/staff/profile", label: "My details" },
+  { href: "/staff/leave", label: "Leave" },
+  { href: "/staff/timesheets", label: "Timesheets" },
+  { href: "/staff/files", label: "Files" },
+  { href: "/staff/requests", label: "Requests" },
+  { href: "/staff/payslips", label: "Payslips" },
+];
+
+const financeNavItems: Array<{ href: string; label: string }> = [
+  { href: "/finance", label: "Payroll to process" },
+];
 
 const navItems: Array<{
   href: string;
@@ -24,12 +39,12 @@ const navItems: Array<{
   {
     href: "/dashboard",
     label: "Overview",
-    roles: ["SUPER_ADMIN", "HR_ADMIN", "FINANCE"],
+    roles: ["SUPER_ADMIN", "HR_ADMIN", "BUSINESS_HEAD"],
   },
   {
     href: "/employees",
     label: "Employees",
-    roles: ["SUPER_ADMIN", "HR_ADMIN"],
+    roles: ["SUPER_ADMIN", "HR_ADMIN", "BUSINESS_HEAD"],
   },
   {
     href: "/hr-desk",
@@ -44,7 +59,22 @@ const navItems: Array<{
   {
     href: "/payroll",
     label: "Payroll",
-    roles: ["SUPER_ADMIN", "HR_ADMIN", "FINANCE"],
+    roles: ["SUPER_ADMIN", "HR_ADMIN"],
+  },
+  {
+    href: "/timesheets",
+    label: "Timesheets",
+    roles: ["SUPER_ADMIN", "HR_ADMIN", "BUSINESS_HEAD"],
+  },
+  {
+    href: "/projects",
+    label: "Projects",
+    roles: ["SUPER_ADMIN", "HR_ADMIN", "BUSINESS_HEAD"],
+  },
+  {
+    href: "/files",
+    label: "Files",
+    roles: ["SUPER_ADMIN", "HR_ADMIN", "BUSINESS_HEAD"],
   },
   {
     href: "/leave",
@@ -54,12 +84,12 @@ const navItems: Array<{
   {
     href: "/reports",
     label: "Reports",
-    roles: ["SUPER_ADMIN", "HR_ADMIN", "FINANCE"],
+    roles: ["SUPER_ADMIN", "HR_ADMIN", "BUSINESS_HEAD"],
   },
   {
     href: "/audit-log",
     label: "Audit log",
-    roles: ["SUPER_ADMIN", "HR_ADMIN", "FINANCE"],
+    roles: ["SUPER_ADMIN", "HR_ADMIN"],
   },
 ];
 
@@ -76,9 +106,15 @@ function NavPanel({
   const role = session?.user?.role;
   const portal = role ? effectivePortalRole(role) : null;
 
-  const visible = navItems.filter(
-    (item) => role && item.roles.includes(role)
-  );
+  const visible =
+    portal === "EMPLOYEE"
+      ? staffNavItems.map((item) => ({ ...item, roles: ["EMPLOYEE" as const] }))
+      : portal === "FINANCE"
+        ? financeNavItems.map((item) => ({
+            ...item,
+            roles: ["FINANCE" as const],
+          }))
+        : navItems.filter((item) => role && item.roles.includes(role));
 
   return (
     <div className="flex h-full flex-col bg-ink text-foam">
@@ -93,7 +129,13 @@ function NavPanel({
             ? "Super Admin"
             : portal === "HR_ADMIN"
               ? "HR"
-              : "Workspace"}
+              : portal === "FINANCE"
+                ? "Finance"
+                : portal === "BUSINESS_HEAD"
+                  ? "Business head"
+                  : portal === "EMPLOYEE"
+                    ? "Staff"
+                    : "Workspace"}
         </p>
         <div className="mt-2 flex items-center gap-3">
           {brand?.logoUrl ? (
@@ -121,7 +163,13 @@ function NavPanel({
               ? "Clear payroll & sensitive updates"
               : portal === "HR_ADMIN"
                 ? "People ops — seek clearance when needed"
-                : null}
+                : portal === "FINANCE"
+                  ? "Process approved payroll for this company"
+                  : portal === "BUSINESS_HEAD"
+                    ? "This company’s people, projects, and files"
+                    : portal === "EMPLOYEE"
+                      ? "Your details, leave, timesheets, and requests"
+                      : null}
           </p>
         )}
       </div>
@@ -129,10 +177,14 @@ function NavPanel({
       <div className="border-b border-white/10 px-3 py-2">
         <NotificationsBell />
       </div>
+      <WorkspaceSwitcher />
 
       <nav className="flex-1 space-y-0.5 overflow-y-auto p-3">
         {visible.map((item) => {
-          const active = pathname.startsWith(item.href);
+          const active =
+            item.href === "/staff"
+              ? pathname === "/staff"
+              : pathname.startsWith(item.href);
           return (
             <Link
               key={item.href}
@@ -141,14 +193,14 @@ function NavPanel({
               className={cn(
                 "relative block rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ease-brand",
                 active
-                  ? "bg-lagoon text-foam shadow-soft"
+                  ? "bg-lagoon text-ink shadow-soft"
                   : "text-lagoon-mist/75 hover:bg-white/5 hover:text-foam"
               )}
             >
               {active && (
                 <span
                   aria-hidden
-                  className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-foam/80"
+                  className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-ink/80"
                 />
               )}
               {item.label}
@@ -162,7 +214,7 @@ function NavPanel({
             className={cn(
               "block rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ease-brand",
               pathname.startsWith("/settings")
-                ? "bg-lagoon text-foam"
+                ? "bg-lagoon text-ink"
                 : "text-lagoon-mist/75 hover:bg-white/5 hover:text-foam"
             )}
           >
@@ -234,7 +286,7 @@ export function MobileNav() {
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-line bg-mist text-ink transition hover:border-lagoon/40"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-line bg-mist text-ink transition hover:border-ok/40"
         >
           <span className="sr-only">Menu</span>
           {open ? (
@@ -266,7 +318,13 @@ export function MobileNav() {
               ? "Super Admin"
               : portal === "HR_ADMIN"
                 ? "HR"
-                : "Workspace"}
+                : portal === "FINANCE"
+                  ? "Finance"
+                  : portal === "BUSINESS_HEAD"
+                    ? "Business head"
+                    : portal === "EMPLOYEE"
+                      ? "Staff"
+                      : "Workspace"}
           </p>
         </div>
         <MobileApprovalsBadge />

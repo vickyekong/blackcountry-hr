@@ -7,10 +7,10 @@ const prisma = new PrismaClient();
 async function main() {
   const company = await prisma.company.upsert({
     where: { id: "seed-company" },
-    update: {},
+    update: { name: "Blackcountry Group" },
     create: {
       id: "seed-company",
-      name: "Acme Nigeria Ltd",
+      name: "Blackcountry Group",
       address: "12 Victoria Island, Lagos",
     },
   });
@@ -43,8 +43,9 @@ async function main() {
   const passwordHash = await bcrypt.hash("password123", 12);
 
   const users = [
-    { email: "admin@acme.ng", name: "Super Admin", role: "SUPER_ADMIN" as UserRole },
-    { email: "hr@acme.ng", name: "HR Admin", role: "HR_ADMIN" as UserRole },
+    { email: "admin@blackcountry.ng", name: "Super Admin", role: "SUPER_ADMIN" as UserRole },
+    { email: "hr@blackcountry.ng", name: "HR Admin", role: "HR_ADMIN" as UserRole },
+    { email: "finance@blackcountry.ng", name: "Amaka Finance", role: "FINANCE" as UserRole },
   ];
 
   for (const u of users) {
@@ -61,11 +62,82 @@ async function main() {
     });
   }
 
-  // Remove legacy portal logins — product is Super Admin + HR only
-  await prisma.user.deleteMany({
+  // Legacy cleanup no longer deletes Finance — it is a first-class portal
+
+  const subsidiary = await prisma.company.upsert({
+    where: { id: "seed-subsidiary" },
+    update: { parentId: company.id, name: "Blackcountry Foods Ltd" },
+    create: {
+      id: "seed-subsidiary",
+      name: "Blackcountry Foods Ltd",
+      address: "8 Trans Amadi, Port Harcourt",
+      parentId: company.id,
+    },
+  });
+
+  await prisma.statutoryConfig.upsert({
+    where: { companyId: subsidiary.id },
+    update: {},
+    create: {
+      companyId: subsidiary.id,
+      taxReliefMode: "NTA2025",
+    },
+  });
+
+  for (let i = 0; i < DEFAULT_NTA2025_TAX_BANDS.length; i++) {
+    const band = DEFAULT_NTA2025_TAX_BANDS[i];
+    await prisma.taxBand.upsert({
+      where: { id: `seed-sub-band-${i}` },
+      update: {},
+      create: {
+        id: `seed-sub-band-${i}`,
+        companyId: subsidiary.id,
+        lowerBoundKobo: band.lowerBoundKobo,
+        upperBoundKobo: band.upperBoundKobo,
+        rateBps: band.rateBps,
+        sortOrder: i,
+      },
+    });
+  }
+
+  await prisma.user.upsert({
+    where: { email: "head@blackcountry.ng" },
+    update: {
+      role: "BUSINESS_HEAD",
+      name: "Ifeanyi Okoro",
+      passwordHash,
+      companyId: subsidiary.id,
+    },
+    create: {
+      email: "head@blackcountry.ng",
+      name: "Ifeanyi Okoro",
+      role: "BUSINESS_HEAD",
+      passwordHash,
+      companyId: subsidiary.id,
+    },
+  });
+
+  await prisma.project.upsert({
     where: {
+      companyId_name: { companyId: company.id, name: "HQ operations" },
+    },
+    update: {},
+    create: {
       companyId: company.id,
-      email: { in: ["finance@acme.ng", "adaeze@acme.ng"] },
+      name: "HQ operations",
+      code: "HQ",
+    },
+  });
+
+  await prisma.project.upsert({
+    where: {
+      companyId_name: { companyId: subsidiary.id, name: "Plant line A" },
+    },
+    update: {},
+    create: {
+      companyId: subsidiary.id,
+      name: "Plant line A",
+      code: "PLA",
     },
   });
 
@@ -158,10 +230,84 @@ async function main() {
     });
   }
 
-  // Keep staff records only — no employee login users
+  const contract = await prisma.employee.upsert({
+    where: {
+      companyId_employeeCode: {
+        companyId: company.id,
+        employeeCode: "EMP-004",
+      },
+    },
+    update: { employmentType: "CONTRACT" },
+    create: {
+      employeeCode: "EMP-004",
+      firstName: "Tunde",
+      lastName: "Adeyemi",
+      sex: "MALE",
+      department: "Operations",
+      jobTitle: "Contract analyst",
+      basicSalaryKobo: 18000000n,
+      housingAllowanceKobo: 0n,
+      transportAllowanceKobo: 0n,
+      companyId: company.id,
+      startDate: new Date("2025-06-01"),
+      status: "ACTIVE",
+      employmentType: "CONTRACT",
+    },
+  });
+  await prisma.user.deleteMany({
+    where: { employeeId: contract.id, role: "EMPLOYEE" },
+  });
+
+  const adaeze = await prisma.employee.findFirst({
+    where: { companyId: company.id, employeeCode: "EMP-001" },
+    select: { id: true, firstName: true, lastName: true },
+  });
+  if (adaeze) {
+    await prisma.user.upsert({
+      where: { email: "adaeze@blackcountry.ng" },
+      update: {
+        role: "EMPLOYEE",
+        name: `${adaeze.firstName} ${adaeze.lastName}`,
+        passwordHash,
+        employeeId: adaeze.id,
+        companyId: company.id,
+      },
+      create: {
+        email: "adaeze@blackcountry.ng",
+        name: `${adaeze.firstName} ${adaeze.lastName}`,
+        role: "EMPLOYEE",
+        passwordHash,
+        companyId: company.id,
+        employeeId: adaeze.id,
+      },
+    });
+    await prisma.employee.update({
+      where: { id: adaeze.id },
+      data: { workEmail: "adaeze@blackcountry.ng" },
+    });
+  }
+
+  await prisma.user.deleteMany({
+    where: {
+      email: {
+        in: [
+          "admin@acme.ng",
+          "hr@acme.ng",
+          "finance@acme.ng",
+          "adaeze@acme.ng",
+          "head@acme-foods.ng",
+        ],
+      },
+    },
+  });
+
   console.log("Seed completed.");
-  console.log("Super Admin: admin@acme.ng / password123");
-  console.log("HR portal:   hr@acme.ng / password123");
+  console.log("Group Super Admin: admin@blackcountry.ng / password123");
+  console.log("Group HR:          hr@blackcountry.ng / password123");
+  console.log("Group Finance:     finance@blackcountry.ng / password123");
+  console.log("Business head:     head@blackcountry.ng / password123 (Blackcountry Foods)");
+  console.log("Staff (full-time): adaeze@blackcountry.ng / password123");
+  console.log("Contract (no login): EMP-004 Tunde Adeyemi");
 }
 
 main()

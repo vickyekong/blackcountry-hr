@@ -33,6 +33,9 @@ function PayrollRunDetailInner() {
   const canApprove = session?.user?.role
     ? can(session.user.role, "approvePayroll")
     : false;
+  const canForward = session?.user?.role
+    ? can(session.user.role, "forwardPayrollToFinance")
+    : false;
 
   const stepParam = Number(searchParams.get("step") ?? "");
   const initialStep =
@@ -274,6 +277,7 @@ function PayrollRunDetailInner() {
         preflightLoading={preflightLoading}
         loading={loading}
         canApprove={canApprove}
+        canForward={canForward}
         canSubmit={canSubmit}
         driveConnected={driveConnected}
         submitNotice={submitNotice}

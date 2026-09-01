@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { cn } from "@/lib/cn";
-import { can } from "@/lib/permissions";
 
 interface NotificationItem {
   id: string;
@@ -23,9 +22,7 @@ export function NotificationsBell() {
   const [unreadCount, setUnreadCount] = useState(0);
 
   const role = session?.user?.role;
-  const showBell = role
-    ? can(role, "approvePayroll") || can(role, "manageLeave")
-    : false;
+  const showBell = Boolean(role);
 
   const load = useCallback(() => {
     if (!showBell) return;
@@ -76,9 +73,9 @@ export function NotificationsBell() {
         }}
         className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-lagoon-mist/80 transition hover:bg-white/5 hover:text-foam"
       >
-        <span>Approvals & inbox</span>
+        <span>{role === "EMPLOYEE" ? "Inbox" : "Approvals & inbox"}</span>
         {unreadCount > 0 && (
-          <span className="inline-flex min-w-[1.25rem] items-center justify-center rounded-md bg-lagoon px-1.5 py-0.5 text-[10px] font-semibold text-foam">
+          <span className="inline-flex min-w-[1.25rem] items-center justify-center rounded-md bg-lagoon px-1.5 py-0.5 text-[10px] font-semibold text-ink">
             {unreadCount}
           </span>
         )}
@@ -114,7 +111,7 @@ export function NotificationsBell() {
                     }}
                     className={cn(
                       "block px-3 py-3 hover:bg-mist",
-                      !item.readAt && "bg-lagoon-mist/40"
+                      !item.readAt && "bg-ok/10"
                     )}
                   >
                     <p className="text-sm font-medium text-ink">

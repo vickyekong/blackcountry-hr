@@ -14,6 +14,8 @@ import {
 } from "@/lib/employees/status";
 import { EmployeeLifecyclePanel } from "@/components/employees/lifecycle-panel";
 import { EmployeeDocumentsPanel } from "@/components/employees/employee-documents-panel";
+import { StaffPortalCard } from "@/components/employees/staff-portal-card";
+import { ensureStaffPortalSchema } from "@/lib/ensure-staff-portal-schema";
 
 export default async function EmployeeDetailPage({
   params,
@@ -21,9 +23,13 @@ export default async function EmployeeDetailPage({
   params: { id: string };
 }) {
   const session = await getServerSession(authOptions);
+  await ensureStaffPortalSchema();
   const employee = await prisma.employee.findFirst({
     where: { id: params.id, companyId: session!.user.companyId },
-    include: { leaveBalances: true },
+    include: {
+      leaveBalances: true,
+      user: { select: { email: true, role: true } },
+    },
   });
 
   if (!employee) notFound();
@@ -72,6 +78,14 @@ export default async function EmployeeDetailPage({
       <div className="mb-8">
         <EmployeeDocumentsPanel employeeId={employee.id} />
       </div>
+
+      <StaffPortalCard
+        employeeId={employee.id}
+        employmentType={employee.employmentType}
+        portalEmail={
+          employee.user?.role === "EMPLOYEE" ? employee.user.email : null
+        }
+      />
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card>

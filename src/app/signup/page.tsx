@@ -63,7 +63,7 @@ export default function SignupPage() {
     <div className="relative flex min-h-screen min-h-dvh overflow-x-hidden bg-atmosphere text-ink">
       <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col justify-center gap-8 px-4 py-10 sm:gap-10 sm:px-6 sm:py-12 lg:flex-row lg:items-center lg:gap-16 lg:px-10">
         <div className="animate-soft-rise max-w-md lg:flex-1">
-          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-lagoon">
+          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-ok">
             New company
           </p>
           <h1 className="font-display mt-3 text-4xl font-semibold leading-[1.05] tracking-tight text-ink sm:mt-4 sm:text-5xl">
@@ -75,7 +75,7 @@ export default function SignupPage() {
           </p>
           <p className="mt-6 text-sm text-muted">
             Already have an account?{" "}
-            <a href="/login" className="font-medium text-lagoon underline underline-offset-2">
+            <a href="/login" className="font-medium text-ok underline underline-offset-2">
               Log in
             </a>
           </p>
@@ -173,7 +173,7 @@ export default function SignupPage() {
           </form>
 
           <p className="mt-4 text-center text-xs text-muted">
-            Demo still available · admin@acme.ng · hr@acme.ng · password123
+            Demo still available · admin@blackcountry.ng · hr@blackcountry.ng · password123
           </p>
         </div>
       </div>

@@ -51,8 +51,9 @@ export default function LoginPage() {
             {PRODUCT_NAME}
           </h1>
           <p className="mt-3 max-w-sm text-sm leading-relaxed text-lagoon-mist/75 sm:mt-4 sm:text-base">
-            {PRODUCT_TAGLINE}. HR and Super Admin share one workspace — clearance
-            only when money and sensitive data need it.
+            {PRODUCT_TAGLINE}. Super Admin, HR, Finance, business heads, and
+            Staff each have their own door — clearance only when money and
+            sensitive data need it.
           </p>
         </div>
 
@@ -66,7 +67,7 @@ export default function LoginPage() {
           >
             <p className="text-sm font-medium text-ink">Sign in</p>
             <p className="mt-1 text-xs text-muted">
-              Super Admin or HR — same tools, clearance where it counts
+              Super Admin, HR, Finance, business head, or Staff
             </p>
             <div className="mt-5 space-y-4">
               <div>
@@ -76,7 +77,7 @@ export default function LoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@acme.ng"
+                  placeholder="admin@blackcountry.ng"
                   className="mt-1"
                   required
                 />
@@ -110,7 +111,7 @@ export default function LoginPage() {
             </Link>
           </p>
           <p className="mt-2 text-center text-xs text-lagoon-mist/50">
-            Demo · admin@acme.ng · hr@acme.ng · password123
+            Demo · admin@blackcountry.ng · hr@blackcountry.ng · adaeze@blackcountry.ng · password123
           </p>
         </div>
       </div>

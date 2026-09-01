@@ -29,8 +29,12 @@ const config: Config = {
         line: withAlpha("--line"),
         muted: withAlpha("--muted"),
         signal: withAlpha("--signal"),
-        ok: withAlpha("--ok"),
+        ok: {
+          DEFAULT: withAlpha("--ok"),
+          deep: withAlpha("--ok-deep"),
+        },
         warn: withAlpha("--warn"),
+        sky: withAlpha("--sky"),
       },
       fontFamily: {
         sans: ["var(--font-manrope)", "Manrope", "ui-sans-serif", "system-ui"],
@@ -40,7 +44,7 @@ const config: Config = {
         xl: "var(--radius)",
       },
       boxShadow: {
-        soft: "0 1px 0 rgba(11, 46, 51, 0.04), 0 8px 24px -12px rgba(11, 46, 51, 0.12)",
+        soft: "0 1px 0 rgba(41, 41, 41, 0.04), 0 8px 24px -12px rgba(41, 41, 41, 0.14)",
       },
       transitionTimingFunction: {
         brand: "cubic-bezier(0.22, 1, 0.36, 1)",

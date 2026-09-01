@@ -13,13 +13,21 @@ alwaysApply: true
 - **Co-pilot voice:** Omni Co-Pilot
 - Repo folder: `blackcountry-hr`; user-facing strings use **Blackcountry HR System**
 
-## Portal users (only two logins)
-- **Super Admin** — clears payroll approval, sensitive change requests, Settings
-- **HR** — same workspace; seeks Super Admin clearance on payroll & sensitive updates
-- No employee self-service portal
+## Org language
+- **Group company** — parent / holding workspace
+- **Sub-company** — separate legal employer under the group (not a department)
+
+## Portal users
+- **Group CEO** — Super Admin of the group
+- **Super Admin** — a seat on the group and every sub-company (payslip approval for that company)
+- **Business head** — lead of one sub-company (distinct login from Super Admin)
+- **HR** — creates people; issues full-time logins; payroll draft; forwards approved run to Finance
+- **Finance** — own portal; processes payroll; does not hire or create logins
+- **Staff** — full-time only: own details, leave, timesheets, files (view), and company requests
 
 ## Employee status / sex labels
 Use exact labels in `src/lib/employees/status.ts`.
 
 ## Approval language
 - HR submits for Super Admin approval; Super Admin is notified and approves or sends back
+- After Super Admin approval, HR forwards to Finance; Finance processes and notifies HR when complete

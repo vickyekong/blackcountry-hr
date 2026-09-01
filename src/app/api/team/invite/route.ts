@@ -10,7 +10,9 @@ const inviteSchema = z.object({
   name: z.string().trim().min(2).max(120),
   email: z.string().trim().email().max(180),
   password: z.string().min(8).max(128),
-  role: z.enum(["HR_ADMIN", "SUPER_ADMIN"]).default("HR_ADMIN"),
+  role: z.enum(["HR_ADMIN", "SUPER_ADMIN", "FINANCE", "BUSINESS_HEAD"]).default(
+    "HR_ADMIN"
+  ),
 });
 
 /** Super Admin invites HR (or another Super Admin) into their company. */

@@ -5,6 +5,7 @@ import { buildPayrollExportCsv } from "@/lib/exports/payroll";
 import { buildCsv, formatNairaFromKobo } from "@/lib/reports/csv";
 import { decryptSecret, encryptSecret } from "@/lib/crypto/secrets";
 import { WORKSPACE_ROOT_FOLDER } from "@/lib/brand";
+import { getAppBaseUrl } from "@/lib/app-url";
 
 const SCOPES = [
   "openid",
@@ -40,11 +41,7 @@ export function isMicrosoftWorkspaceConfigured(): boolean {
 }
 
 export function getMicrosoftRedirectUri(): string {
-  const base = process.env.NEXTAUTH_URL?.replace(/\/$/, "");
-  if (!base) {
-    throw new Error("NEXTAUTH_URL is required for Microsoft Workspace OAuth");
-  }
-  return `${base}/api/integrations/microsoft-workspace/callback`;
+  return `${getAppBaseUrl()}/api/integrations/microsoft-workspace/callback`;
 }
 
 export function getMicrosoftAuthUrl(state: string): string {

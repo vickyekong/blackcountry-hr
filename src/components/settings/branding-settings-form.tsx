@@ -225,7 +225,9 @@ export function BrandingSettingsForm() {
                 />
               </div>
               <p className="mt-1 text-xs text-muted">
-                Buttons, active nav, and highlights
+                Sidebar active state and dark-surface highlights. Buttons on light
+                pages use brand green so they stay readable. Default yellow is
+                #fce74f.
               </p>
             </div>
             <div>
@@ -253,7 +255,8 @@ export function BrandingSettingsForm() {
                 />
               </div>
               <p className="mt-1 text-xs text-muted">
-                Navigation background and strong text
+                Navigation background and strong text. Default is Blackcountry black
+                (#292929).
               </p>
             </div>
           </div>
@@ -281,8 +284,8 @@ export function BrandingSettingsForm() {
                 <p className="truncate text-xs opacity-75">{data.name}</p>
               </div>
               <span
-                className="ml-auto rounded-md px-2.5 py-1 text-xs font-medium text-white"
-                style={{ backgroundColor: accentPreview }}
+                className="ml-auto rounded-md px-2.5 py-1 text-xs font-medium"
+                style={{ backgroundColor: accentPreview, color: inkPreview }}
               >
                 Active
               </span>

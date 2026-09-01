@@ -8,7 +8,10 @@ import { BrandingSettingsForm } from "@/components/settings/branding-settings-fo
 import { GoogleDriveSettings } from "@/components/settings/google-drive-settings";
 import { MicrosoftWorkspaceSettings } from "@/components/settings/microsoft-workspace-settings";
 import { TeamInviteForm } from "@/components/settings/team-invite-form";
+import { GroupCompaniesForm } from "@/components/settings/group-companies-form";
 import { Suspense } from "react";
+
+export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
   const session = await getServerSession(authOptions);
@@ -30,6 +33,7 @@ export default async function SettingsPage() {
         </p>
       </div>
       <BrandingSettingsForm />
+      {isSuperAdmin && <GroupCompaniesForm />}
       {isSuperAdmin && <TeamInviteForm />}
       {canEditStatutory && <SettingsForm />}
       <Suspense fallback={null}>

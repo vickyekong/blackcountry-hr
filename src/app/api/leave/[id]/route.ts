@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requirePermission, handleApiError } from "@/lib/api-auth";
+import { notifyEmployeeUser } from "@/lib/notifications";
 import { z } from "zod";
 
 const actionSchema = z.object({
@@ -70,6 +71,23 @@ export async function PATCH(
         entityId: leave.id,
         performedById: session.user.id,
       },
+    });
+
+    await notifyEmployeeUser({
+      companyId: session.user.companyId,
+      employeeId: leave.employeeId,
+      type: "LEAVE_REVIEW",
+      title:
+        status === "APPROVED"
+          ? "Your leave request was approved"
+          : "Your leave request was sent back",
+      body:
+        status === "APPROVED"
+          ? `${leave.type.replace(/_/g, " ")} leave (${leave.days} day${leave.days === 1 ? "" : "s"}) was approved.`
+          : `${leave.type.replace(/_/g, " ")} leave was not approved. Open Leave for details.`,
+      linkUrl: "/staff/leave",
+      entityType: "LeaveRequest",
+      entityId: leave.id,
     });
 
     return NextResponse.json(updated);

@@ -25,4 +25,15 @@ describe("change request validation", () => {
     });
     expect(bad.ok).toBe(false);
   });
+
+  it("accepts a general company request", () => {
+    const bad = validateChangePayload("GENERAL", { subject: "Hi" });
+    expect(bad.ok).toBe(false);
+
+    const good = validateChangePayload("GENERAL", {
+      subject: "Employment letter",
+      message: "Please issue a letter of employment for my visa.",
+    });
+    expect(good.ok).toBe(true);
+  });
 });

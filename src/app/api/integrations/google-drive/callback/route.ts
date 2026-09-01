@@ -4,10 +4,12 @@ import { authOptions } from "@/lib/auth";
 import { can } from "@/lib/permissions";
 import { exchangeGoogleCode } from "@/lib/google-drive";
 import { prisma } from "@/lib/db";
+import { getAppBaseUrl } from "@/lib/app-url";
+
+export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
-  const base = process.env.NEXTAUTH_URL?.replace(/\/$/, "") || "";
-  const settingsUrl = `${base}/settings?googleDrive=`;
+  const settingsUrl = `${getAppBaseUrl()}/settings?googleDrive=`;
 
   try {
     const session = await getServerSession(authOptions);

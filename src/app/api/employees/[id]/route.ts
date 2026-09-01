@@ -56,6 +56,9 @@ const updateSchema = z.object({
   nextOfKinPhone: z.string().optional(),
   clockDeviceId: z.string().nullable().optional(),
   shiftId: z.string().nullable().optional(),
+  phone: z.string().trim().max(30).nullable().optional(),
+  addressLine: z.string().trim().max(400).nullable().optional(),
+  workEmail: z.string().trim().email().max(180).nullable().optional(),
 });
 
 export async function GET(
@@ -71,6 +74,7 @@ export async function GET(
         leaveBalances: true,
         documents: true,
         shiftAssignment: { include: { shift: true } },
+        user: { select: { id: true, email: true, role: true } },
       },
     });
     if (!employee) {
@@ -153,6 +157,9 @@ export async function PATCH(
         ...(body.annualRent !== undefined && { annualRentKobo: nairaToKobo(body.annualRent) }),
         ...(body.nextOfKinName !== undefined && { nextOfKinName: body.nextOfKinName }),
         ...(body.nextOfKinPhone !== undefined && { nextOfKinPhone: body.nextOfKinPhone }),
+        ...(body.phone !== undefined && { phone: body.phone || null }),
+        ...(body.addressLine !== undefined && { addressLine: body.addressLine || null }),
+        ...(body.workEmail !== undefined && { workEmail: body.workEmail || null }),
         ...(body.clockDeviceId !== undefined && {
           clockDeviceId: body.clockDeviceId?.trim() || null,
         }),

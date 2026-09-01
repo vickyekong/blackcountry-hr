@@ -8,12 +8,25 @@ import {
   PayrollRunError,
 } from "@/lib/payroll/run-service";
 import { serializeBigInts } from "@/lib/payroll/config-mapper";
-import { notifyPayrollSubmitted } from "@/lib/notifications";
+import {
+  notifyPayrollSubmitted,
+  notifyPayrollForwardedToFinance,
+  notifyPayrollProcessingComplete,
+} from "@/lib/notifications";
 import { getPayrollPreflight } from "@/lib/payroll/preflight";
+import { approvedTimesheetHoursForPeriod } from "@/lib/timesheets/period";
 import { z } from "zod";
 
 const actionSchema = z.object({
-  action: z.enum(["submit_review", "approve", "reject", "mark_paid", "reverse"]),
+  action: z.enum([
+    "submit_review",
+    "approve",
+    "reject",
+    "forward_finance",
+    "start_processing",
+    "complete_processing",
+    "reverse",
+  ]),
   reason: z.string().optional(),
 });
 
@@ -65,12 +78,19 @@ export async function GET(
       );
     } else if (
       !can(session.user.role, "runPayroll") &&
-      !can(session.user.role, "approvePayroll")
+      !can(session.user.role, "approvePayroll") &&
+      !can(session.user.role, "processPayrollFinance")
     ) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    return NextResponse.json(serializeBigInts(run));
+    const timesheetHours = await approvedTimesheetHoursForPeriod(
+      session.user.companyId,
+      run.periodYear,
+      run.periodMonth
+    );
+
+    return NextResponse.json(serializeBigInts({ ...run, timesheetHours }));
   } catch (error) {
     return handleApiError(error);
   }
@@ -91,16 +111,14 @@ export async function PATCH(
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    if (run.status === "APPROVED" || run.status === "PAID") {
-      if (body.action !== "reverse") {
-        return NextResponse.json(
-          {
-            error:
-              "Approved payroll runs are immutable. Use reverse and re-run.",
-          },
-          { status: 400 }
-        );
-      }
+    if (run.status === "PAID" && body.action !== "reverse") {
+      return NextResponse.json(
+        {
+          error:
+            "Paid payroll runs are immutable. Use reverse and re-run.",
+        },
+        { status: 400 }
+      );
     }
 
     if (body.action === "reverse") {
@@ -140,14 +158,24 @@ export async function PATCH(
     }
 
     let update: {
-      status?: "DRAFT" | "UNDER_REVIEW" | "APPROVED" | "PAID";
+      status?:
+        | "DRAFT"
+        | "UNDER_REVIEW"
+        | "APPROVED"
+        | "FORWARDED_TO_FINANCE"
+        | "PROCESSING"
+        | "PAID";
       approvedById?: string | null;
       approvedAt?: Date | null;
       paidAt?: Date | null;
+      forwardedAt?: Date | null;
+      processedAt?: Date | null;
     } = {};
     let notificationResult: Awaited<
       ReturnType<typeof notifyPayrollSubmitted>
     > | null = null;
+    let forwardedCount: number | null = null;
+    let processedCount: number | null = null;
 
     switch (body.action) {
       case "submit_review":
@@ -229,15 +257,62 @@ export async function PATCH(
         };
         break;
 
-      case "mark_paid":
-        await requirePermission("approvePayroll");
+      case "forward_finance":
+        if (!can(session.user.role, "forwardPayrollToFinance")) {
+          return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        }
         if (run.status !== "APPROVED") {
           return NextResponse.json(
-            { error: "Can only mark approved runs as paid" },
+            { error: "Can only forward approved payroll to Finance" },
             { status: 400 }
           );
         }
-        update = { status: "PAID", paidAt: new Date() };
+        update = {
+          status: "FORWARDED_TO_FINANCE",
+          forwardedAt: new Date(),
+        };
+        forwardedCount = await notifyPayrollForwardedToFinance({
+          companyId: session.user.companyId,
+          runId: run.id,
+          periodMonth: run.periodMonth,
+          periodYear: run.periodYear,
+          forwardedByName: session.user.name,
+          excludeUserId: session.user.id,
+        });
+        break;
+
+      case "start_processing":
+        await requirePermission("processPayrollFinance");
+        if (run.status !== "FORWARDED_TO_FINANCE") {
+          return NextResponse.json(
+            { error: "Can only start processing after HR forwards the run" },
+            { status: 400 }
+          );
+        }
+        update = { status: "PROCESSING" };
+        break;
+
+      case "complete_processing":
+        await requirePermission("processPayrollFinance");
+        if (run.status !== "PROCESSING") {
+          return NextResponse.json(
+            { error: "Can only complete a run that Finance has started" },
+            { status: 400 }
+          );
+        }
+        update = {
+          status: "PAID",
+          paidAt: new Date(),
+          processedAt: new Date(),
+        };
+        processedCount = await notifyPayrollProcessingComplete({
+          companyId: session.user.companyId,
+          runId: run.id,
+          periodMonth: run.periodMonth,
+          periodYear: run.periodYear,
+          processedByName: session.user.name,
+          excludeUserId: session.user.id,
+        });
         break;
     }
 
@@ -276,6 +351,8 @@ export async function PATCH(
             notificationId: r.notificationId,
           })),
           reviewUrl: notificationResult?.linkUrl,
+          financeNotified: forwardedCount,
+          hrNotified: processedCount,
         },
       },
     });

@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { can } from "@/lib/permissions";
+import { can, canReviewChangeType } from "@/lib/permissions";
 import type { UserRole } from "@prisma/client";
 
 interface QueryDef {
@@ -112,8 +112,7 @@ export default function HrAskClient() {
       <div className="mb-8">
         <h1 className="text-2xl font-semibold text-stone-900">HR Ask</h1>
         <p className="mt-1 text-sm text-stone-500">
-          Policy &amp; query desk — plus change requests HR logs for Super Admin
-          approval
+          Policy &amp; query desk — plus staff and HR change requests awaiting review
         </p>
       </div>
 
@@ -206,9 +205,9 @@ export default function HrAskClient() {
           <CardHeader>
             <CardTitle>Pending employee updates</CardTitle>
             <p className="text-sm text-stone-500">
-              {canApproveChanges
-                ? "HR logged these for your approval — approve to write into the employee record, or reject."
-                : "Logged for Super Admin approval. You can view the queue; only Super Admin can approve or reject."}
+              Staff can submit these from their portal. Bank and tax-relief still
+              need Super Admin. Next of kin, address, and general requests can be
+              cleared by HR.
             </p>
           </CardHeader>
           <CardContent>
@@ -240,7 +239,7 @@ export default function HrAskClient() {
                         </p>
                       )}
                     </div>
-                    {canApproveChanges ? (
+                    {role && canReviewChangeType(role, r.type) ? (
                       <div className="flex gap-2">
                         <Button
                           size="sm"
@@ -260,7 +259,9 @@ export default function HrAskClient() {
                       </div>
                     ) : (
                       <p className="text-xs font-medium text-amber-700">
-                        Awaiting Super Admin
+                        {canApproveChanges
+                          ? "Awaiting review"
+                          : "Awaiting Super Admin"}
                       </p>
                     )}
                   </li>

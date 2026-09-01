@@ -3,18 +3,15 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { can } from "@/lib/permissions";
 
 /** Compact approvals entry for the mobile top bar. */
 export function MobileApprovalsBadge() {
   const { data: session } = useSession();
   const [unreadCount, setUnreadCount] = useState(0);
-  const [href, setHref] = useState("/payroll");
+  const [href, setHref] = useState("/staff");
 
   const role = session?.user?.role;
-  const show = role
-    ? can(role, "approvePayroll") || can(role, "manageLeave")
-    : false;
+  const show = Boolean(role);
 
   const load = useCallback(() => {
     if (!show) return;
@@ -30,12 +27,14 @@ export function MobileApprovalsBadge() {
         if (first?.linkUrl) {
           const path = String(first.linkUrl).replace(/^https?:\/\/[^/]+/, "");
           setHref(path.includes("step=") ? path : `${path}${path.includes("?") ? "&" : "?"}step=4`);
+        } else if (role === "EMPLOYEE") {
+          setHref("/staff");
         } else {
           setHref("/payroll");
         }
       })
       .catch(() => undefined);
-  }, [show]);
+  }, [show, role]);
 
   useEffect(() => {
     load();
@@ -51,14 +50,16 @@ export function MobileApprovalsBadge() {
       href={href}
       aria-label={
         unreadCount > 0
-          ? `${unreadCount} pending approvals`
-          : "Approvals inbox"
+          ? `${unreadCount} unread`
+          : role === "EMPLOYEE"
+            ? "Inbox"
+            : "Approvals inbox"
       }
-      className="relative inline-flex h-10 items-center justify-center rounded-lg border border-line bg-mist px-3 text-sm font-medium text-ink transition hover:border-lagoon/40"
+      className="relative inline-flex h-10 items-center justify-center rounded-lg border border-line bg-mist px-3 text-sm font-medium text-ink transition hover:border-ok/40"
     >
-      Clear
+      {role === "EMPLOYEE" ? "Inbox" : "Clear"}
       {unreadCount > 0 && (
-        <span className="absolute -right-1.5 -top-1.5 inline-flex min-w-[1.15rem] items-center justify-center rounded-md bg-lagoon px-1 py-0.5 text-[10px] font-semibold text-foam">
+        <span className="absolute -right-1.5 -top-1.5 inline-flex min-w-[1.15rem] items-center justify-center rounded-md bg-ok px-1 py-0.5 text-[10px] font-semibold text-foam">
           {unreadCount}
         </span>
       )}

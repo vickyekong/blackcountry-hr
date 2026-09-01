@@ -163,10 +163,10 @@ export default function OnboardingPage() {
 
         <div className="mt-4 flex gap-2">
           <span
-            className={`h-1.5 flex-1 rounded-full ${step >= 1 ? "bg-lagoon" : "bg-sand"}`}
+            className={`h-1.5 flex-1 rounded-full ${step >= 1 ? "bg-ok" : "bg-sand"}`}
           />
           <span
-            className={`h-1.5 flex-1 rounded-full ${step >= 2 ? "bg-lagoon" : "bg-sand"}`}
+            className={`h-1.5 flex-1 rounded-full ${step >= 2 ? "bg-ok" : "bg-sand"}`}
           />
         </div>
 

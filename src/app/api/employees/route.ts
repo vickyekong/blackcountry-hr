@@ -10,6 +10,7 @@ import {
 import { startLifecycle } from "@/lib/lifecycle/service";
 import { isEmploymentEnded } from "@/lib/employees/status";
 import { ensureEmployeeStatusSchema } from "@/lib/ensure-employee-status-schema";
+import { ensureStaffPortalSchema } from "@/lib/ensure-staff-portal-schema";
 import { can } from "@/lib/permissions";
 import { z } from "zod";
 
@@ -59,10 +60,14 @@ const employeeSchema = z.object({
 
 export async function GET() {
   try {
-    const session = await requirePermission("manageEmployees");
+    const session = await requirePermission("viewEmployees");
     await ensureEmployeeStatusSchema();
+    await ensureStaffPortalSchema();
     const employees = await prisma.employee.findMany({
       where: { companyId: session.user.companyId },
+      include: {
+        user: { select: { id: true, email: true, role: true } },
+      },
       orderBy: { createdAt: "desc" },
     });
     return NextResponse.json(serializeBigInts(employees));

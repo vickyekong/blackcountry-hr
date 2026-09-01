@@ -1,6 +1,6 @@
-/** Default Blackcountry HR Lagoon Ink — used when company has no custom branding. */
-export const DEFAULT_BRAND_ACCENT = "#14919b";
-export const DEFAULT_BRAND_INK = "#0b2e33";
+/** Default Blackcountry Corporate Design — used when company has no custom branding. */
+export const DEFAULT_BRAND_ACCENT = "#fce74f";
+export const DEFAULT_BRAND_INK = "#292929";
 
 const HEX_RE = /^#([0-9a-fA-F]{6})$/;
 

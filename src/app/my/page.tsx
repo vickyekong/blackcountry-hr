@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-/** Employee self-service portal removed — staff are managed by HR / Super Admin. */
+/** Legacy path — staff portal lives at /staff. */
 export default function MyPortalRedirect() {
-  redirect("/dashboard");
+  redirect("/staff");
 }

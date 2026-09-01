@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { requirePermission, handleApiError } from "@/lib/api-auth";
+import { requireAuth, requirePermission, handleApiError } from "@/lib/api-auth";
+import { can } from "@/lib/permissions";
 import {
   recalculatePayrollRun,
   PayrollRunError,
@@ -22,7 +23,13 @@ const createSchema = z.object({
 
 export async function GET() {
   try {
-    const session = await requirePermission("runPayroll");
+    const session = await requireAuth();
+    if (
+      !can(session.user.role, "runPayroll") &&
+      !can(session.user.role, "processPayrollFinance")
+    ) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
     const runs = await prisma.payrollRun.findMany({
       where: { companyId: session.user.companyId },
       include: {

@@ -20,7 +20,7 @@ export function CommandCenterHero({
     <div className="mb-8 animate-fade-up">
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
         <div className="min-w-0">
-          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-lagoon">
+          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-ok">
             {PRODUCT_NAME}
           </p>
           <h1 className="font-display mt-2 text-2xl font-semibold tracking-tight text-ink sm:text-3xl md:text-4xl">
@@ -49,10 +49,10 @@ export function CommandCenterHero({
                 <li key={a.id}>
                   <Link
                     href={a.href}
-                    className="flex justify-between gap-2 text-sm text-ink-soft hover:text-lagoon-deep"
+                    className="flex justify-between gap-2 text-sm text-ink-soft hover:text-ok-deep"
                   >
                     <span>
-                      <span className="font-semibold text-lagoon">{a.count}</span>{" "}
+                      <span className="font-semibold text-ok">{a.count}</span>{" "}
                       {a.label}
                     </span>
                     <span className="shrink-0 text-muted">→</span>
@@ -87,7 +87,7 @@ export function CommandCenterHero({
               </p>
               <Link
                 href={`/payroll/${data.runRate.runId}`}
-                className="mt-2 inline-block text-xs font-medium text-lagoon hover:text-lagoon-deep"
+                className="mt-2 inline-block text-xs font-medium text-ok hover:text-ok-deep"
               >
                 Open last approved run →
               </Link>
@@ -122,7 +122,7 @@ export function CommandCenterHero({
             </p>
             <Link
               href="/hr-ask"
-              className="inline-block text-xs font-medium text-lagoon hover:text-lagoon-deep"
+              className="inline-block text-xs font-medium text-ok hover:text-ok-deep"
             >
               Query compliance gaps →
             </Link>
@@ -169,10 +169,21 @@ export function OmniCoPilotStrip({
   );
 }
 
-export function QuickWorkflows() {
+export function QuickWorkflows({
+  showOnboard = true,
+  showHrAsk = true,
+}: {
+  showOnboard?: boolean;
+  showHrAsk?: boolean;
+}) {
   const items = [
-    { href: "/employees/new", label: "Onboard employee" },
-    { href: "/hr-ask", label: "Draft policy / query desk" },
+    ...(showOnboard
+      ? [{ href: "/employees/new", label: "Onboard employee" }]
+      : []),
+    { href: "/timesheets", label: "Review timesheets" },
+    ...(showHrAsk
+      ? [{ href: "/hr-ask", label: "Draft policy / query desk" }]
+      : []),
     { href: "/reports", label: "Run headcount forecast" },
   ];
 
@@ -186,7 +197,7 @@ export function QuickWorkflows() {
           <Link
             key={item.href}
             href={item.href}
-            className="inline-flex h-9 items-center rounded-lg border border-line bg-foam/90 px-3 text-sm font-medium text-ink transition duration-200 ease-brand hover:border-lagoon/40 hover:bg-lagoon-mist/50"
+            className="inline-flex h-9 items-center rounded-lg border border-line bg-foam/90 px-3 text-sm font-medium text-ink transition duration-200 ease-brand hover:border-ok/40 hover:bg-ok/10"
           >
             {item.label}
           </Link>

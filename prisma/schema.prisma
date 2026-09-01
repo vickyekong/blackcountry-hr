@@ -11,6 +11,7 @@ enum UserRole {
   SUPER_ADMIN
   HR_ADMIN
   FINANCE
+  BUSINESS_HEAD
   EMPLOYEE
 }
 
@@ -37,6 +38,8 @@ enum PayrollRunStatus {
   DRAFT
   UNDER_REVIEW
   APPROVED
+  FORWARDED_TO_FINANCE
+  PROCESSING
   PAID
 }
 
@@ -60,10 +63,14 @@ model Company {
   name           String
   address        String?
   logoUrl        String?
-  /// Primary accent (hex, e.g. #14919b). Null = Blackcountry HR lagoon default.
+  /// Primary accent (hex, e.g. #fce74f). Null = Blackcountry yellow default.
   brandAccentHex String?
-  /// Sidebar / ink color (hex). Null = Blackcountry HR ink default.
+  /// Sidebar / ink color (hex). Null = Blackcountry black #292929.
   brandInkHex    String?
+  /// Group company: null. Sub-company: parent group id.
+  parentId       String?
+  parent         Company?  @relation("CompanyGroup", fields: [parentId], references: [id], onDelete: Restrict)
+  subsidiaries   Company[] @relation("CompanyGroup")
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -84,6 +91,11 @@ model Company {
   employeeLifecycles    EmployeeLifecycle[]
   changeRequests        EmployeeChangeRequest[]
   jobDescriptions       JobDescription[]
+  projects              Project[]
+  timesheetEntries      TimesheetEntry[]
+  workspaceFiles        WorkspaceFile[]
+
+  @@index([parentId])
 }
 
 model Department {
@@ -210,6 +222,10 @@ model Employee {
 
   nextOfKinName       String?
   nextOfKinPhone      String?
+  /// Work / login email shown on the staff record (portal User.email is source of truth)
+  workEmail           String?
+  phone               String?
+  addressLine         String?
 
   // Biometric / clock-in machine badge or user ID
   clockDeviceId       String?
@@ -226,6 +242,8 @@ model Employee {
   hrDeskMessages      HrDeskMessage[]
   lifecycles          EmployeeLifecycle[]
   changeRequests      EmployeeChangeRequest[]
+  timesheetEntries    TimesheetEntry[]
+  workspaceFileGrants WorkspaceFileGrant[]
 
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
@@ -257,6 +275,8 @@ model PayrollRun {
   approvedBy  User?            @relation("ApprovedBy", fields: [approvedById], references: [id])
   approvedAt  DateTime?
   paidAt      DateTime?
+  forwardedAt DateTime?
+  processedAt DateTime?
   notes       String?
   /// Snapshot of statutory rates + tax bands used when this run was calculated/approved
   statutorySnapshot Json?
@@ -621,6 +641,7 @@ enum ChangeRequestType {
   TAX_RELIEF
   NEXT_OF_KIN
   ADDRESS
+  GENERAL
 }
 
 enum ChangeRequestStatus {
@@ -648,5 +669,78 @@ model EmployeeChangeRequest {
 
   @@index([companyId, status, createdAt])
   @@index([employeeId, status])
+}
+
+enum TimesheetStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  REJECTED
+}
+
+enum WorkspaceFileVisibility {
+  EDITORS
+  ALL_FULL_TIME
+  SPECIFIC
+}
+
+model Project {
+  id         String            @id @default(cuid())
+  companyId  String
+  company    Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name       String
+  code       String?
+  status     String            @default("ACTIVE")
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+  timesheets TimesheetEntry[]
+
+  @@unique([companyId, name])
+  @@index([companyId, status])
+}
+
+model TimesheetEntry {
+  id         String          @id @default(cuid())
+  companyId  String
+  company    Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  employeeId String
+  employee   Employee        @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  projectId  String
+  project    Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  workDate   DateTime
+  minutes    Int
+  notes      String?
+  status     TimesheetStatus @default(DRAFT)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  @@unique([employeeId, projectId, workDate])
+  @@index([companyId, workDate])
+  @@index([employeeId, status])
+}
+
+model WorkspaceFile {
+  id           String                  @id @default(cuid())
+  companyId    String
+  company      Company                 @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name         String
+  fileUrl      String
+  folder       String                  @default("general")
+  visibility   WorkspaceFileVisibility @default(EDITORS)
+  uploadedById String
+  createdAt    DateTime                @default(now())
+  grants       WorkspaceFileGrant[]
+
+  @@index([companyId, folder])
+}
+
+model WorkspaceFileGrant {
+  id         String        @id @default(cuid())
+  fileId     String
+  file       WorkspaceFile @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  employeeId String
+  employee   Employee      @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@unique([fileId, employeeId])
 }
 

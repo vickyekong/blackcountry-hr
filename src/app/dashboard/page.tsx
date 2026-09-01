@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { authOptions } from "@/lib/auth";
+import { can, isFinanceRole, isStaffRole } from "@/lib/permissions";
 import { AppShell } from "@/components/layout/app-shell";
 import { Badge, payrollStatusVariant } from "@/components/ui/badge";
 import { OverviewCharts } from "@/components/dashboard/overview-charts";
@@ -20,6 +21,12 @@ export default async function DashboardPage() {
   if (!session?.user?.companyId) {
     redirect("/login");
   }
+  if (isStaffRole(session.user.role)) {
+    redirect("/staff");
+  }
+  if (isFinanceRole(session.user.role)) {
+    redirect("/finance");
+  }
 
   const companyId = session.user.companyId;
   const data = await getCommandCenterData(companyId);
@@ -35,7 +42,10 @@ export default async function DashboardPage() {
 
       <OmniCoPilotStrip lines={data.coPilot} />
 
-      <QuickWorkflows />
+      <QuickWorkflows
+        showOnboard={can(session.user.role, "manageEmployees")}
+        showHrAsk={can(session.user.role, "manageHrDesk")}
+      />
 
       <section className="mb-8">
         <div className="mb-3 flex items-end justify-between gap-3">
@@ -50,7 +60,7 @@ export default async function DashboardPage() {
           </div>
           <Link
             href="/employees"
-            className="text-sm font-medium text-lagoon hover:text-lagoon-deep"
+            className="text-sm font-medium text-ok hover:text-ok-deep"
           >
             Manage employees →
           </Link>
@@ -72,7 +82,7 @@ export default async function DashboardPage() {
           </div>
           <Link
             href="/payroll"
-            className="text-xs font-medium text-lagoon hover:text-lagoon-deep"
+            className="text-xs font-medium text-ok hover:text-ok-deep"
           >
             All runs →
           </Link>
