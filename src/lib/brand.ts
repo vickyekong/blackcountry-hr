@@ -3,7 +3,7 @@ export const PRODUCT_NAME = "Blackcountry HR System";
 /** Root folder name in Google Drive / OneDrive workspace sync. */
 export const WORKSPACE_ROOT_FOLDER = "Blackcountry HR";
 export const PRODUCT_TAGLINE =
-  "People operations and payroll in one command center";
-/** Homepage positioning — salary truth for Nigerian payroll. */
+  "People operations and payroll for Blackcountry Group";
+/** Homepage positioning — private group workspace, not a public product. */
 export const PRODUCT_POSITIONING =
-  "The salary truth engine for Nigerian businesses";
+  "The private people and payroll workspace for Blackcountry Group";

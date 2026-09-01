@@ -5,7 +5,7 @@ import {
 } from "@/lib/brand";
 import { LandingLottie } from "@/components/marketing/landing-lottie";
 
-/** Hard <a> navigations so Sign up never soft-routes into the login shell by mistake. */
+/** Hard <a> navigations so Sign in never soft-routes into the login shell by mistake. */
 function CtaLink({
   href,
   children,
@@ -101,10 +101,10 @@ const CAPABILITIES = [
   {
     title: "Command center",
     items: [
-      "Super Admin, HR, and Staff portals",
+      "Super Admin, HR, Finance, Business head, and Staff portals",
       "Compliance gaps (TIN, RSA PIN) at a glance",
       "Omni Co-Pilot workload insights",
-      "Multi-tenant company workspaces",
+      "Group company and sub-company workspaces",
     ],
   },
 ] as const;
@@ -125,14 +125,14 @@ export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean 
         </p>
         <nav className="flex items-center gap-2 sm:gap-3" aria-label="Account">
           <CtaLink href="/login" variant="ghost">
-            Log in
+            Sign in
           </CtaLink>
           {signupEnabled ? (
             <a
               href="/signup"
               className="rounded-lg bg-lagoon px-3.5 py-2 text-sm font-medium text-ink shadow-soft transition hover:bg-lagoon-deep"
             >
-              Sign up
+              Internal setup
             </a>
           ) : null}
         </nav>
@@ -159,28 +159,33 @@ export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean 
 
         <div className="relative z-10 mx-auto grid min-h-[calc(100dvh-4.5rem)] max-w-6xl items-center gap-12 px-5 pb-16 pt-8 sm:px-8 sm:pb-20 lg:grid-cols-12 lg:gap-12 lg:px-12 lg:pb-24">
           <div className="animate-soft-rise relative lg:col-span-6 xl:col-span-7">
-            <h1 className="font-display text-5xl font-semibold leading-[0.98] tracking-tight text-foam drop-shadow-[0_1px_12px_rgb(11_46_51_/_0.45)] sm:text-6xl md:text-7xl">
+            <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-lagoon-mist/75">
+              Private · Blackcountry Group
+            </p>
+            <h1 className="font-display mt-4 text-5xl font-semibold leading-[0.98] tracking-tight text-foam drop-shadow-[0_1px_12px_rgb(11_46_51_/_0.45)] sm:text-6xl md:text-7xl">
               {PRODUCT_NAME}
             </h1>
             <p className="mt-5 max-w-lg text-xl font-medium leading-snug text-lagoon-mist sm:text-2xl">
               {PRODUCT_POSITIONING}
             </p>
             <p className="mt-4 max-w-md text-base leading-relaxed text-lagoon-mist/90 sm:text-lg">
-              Contracts, clocks, leave, and adjustments become correct net pay —
-              with HR clearance before money moves.
+              Designed for the group company and its sub-companies — not for the
+              general public. People, attendance, and payroll stay in one
+              command center, with HR clearance before money moves.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               {signupEnabled ? (
                 <CtaLink href="/signup" variant="primary">
-                  Create your workspace
+                  Internal setup
                 </CtaLink>
               ) : null}
               <CtaLink href="/login" variant={signupEnabled ? "outline" : "primary"}>
-                Log in to the app
+                Sign in
               </CtaLink>
             </div>
             <p className="mt-5 text-xs text-lagoon-mist/70">
-              Live demo · admin@blackcountry.ng · hr@blackcountry.ng · adaeze@blackcountry.ng · password123
+              Access is by issued login only. If you do not have an account, ask
+              HR or Super Admin.
             </p>
           </div>
 
@@ -266,23 +271,23 @@ export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean 
           speed={0.95}
         />
         <p className="relative z-10 mx-auto max-w-3xl text-center text-lg font-medium leading-relaxed text-ink-soft sm:text-xl">
-          {PRODUCT_TAGLINE} — built so Nigerian HR teams stop reconciling three
-          tools the night before payday.
+          {PRODUCT_TAGLINE} — one system for the holding company and every
+          sub-company under it, not a product for the open market.
         </p>
       </section>
 
       <section className="bg-mist px-5 pb-20 text-ink sm:px-8 sm:pb-24 lg:px-12">
         <div className="mx-auto max-w-6xl">
           <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-ok">
-            Why teams switch
+            Built for the group
           </p>
           <h2 className="font-display mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
             Payroll that explains itself
           </h2>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted sm:text-lg">
-            {PRODUCT_NAME} is not another payslip printer. It is the layer that makes
-            every naira on the slip defensible — to staff, auditors, and month-end
-            remittance officers.
+            {PRODUCT_NAME} was designed for Blackcountry Group, not the general
+            public. It is the layer that makes every naira on the slip
+            defensible — to staff, Super Admin, and month-end remittance.
           </p>
 
           <div className="mt-14 grid gap-10 border-t border-line pt-10 md:grid-cols-3 md:gap-8 lg:gap-12">
@@ -318,12 +323,13 @@ export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean 
             How it works
           </p>
           <h2 className="font-display mt-3 max-w-xl text-3xl font-semibold tracking-tight sm:text-4xl">
-            From roster to remittance in one workspace
+            From roster to remittance in one group workspace
           </h2>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted sm:text-lg">
-            Super Admin and HR share the command center. Sensitive actions stay
-            Super Admin–cleared. Staff use a separate portal for details, leave,
-            and requests — they never touch payroll.
+            Super Admin and HR share the command center across the group and
+            each sub-company. Sensitive actions stay Super Admin–cleared.
+            Finance processes approved pay. Staff use a separate portal — they
+            never touch payroll.
           </p>
 
           <ol className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
@@ -374,11 +380,12 @@ export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean 
             Inside the product
           </p>
           <h2 className="font-display mt-3 max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">
-            Everything HR needs before payday
+            Everything the group needs before payday
           </h2>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted sm:text-lg">
             People ops, statutory payroll, compliance, and exports — one
-            Blackcountry workspace instead of a folder of conflicting files.
+            Blackcountry Group workspace instead of a folder of conflicting
+            files.
           </p>
 
           <div className="mt-14 grid gap-12 md:grid-cols-3 md:gap-10">
@@ -461,25 +468,25 @@ export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean 
               Who it&apos;s for
             </p>
             <h2 className="font-display mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-              Super Admin, HR, and Staff — each with the right door
+              Blackcountry Group officers and staff
             </h2>
             <p className="mt-4 text-base leading-relaxed text-muted sm:text-lg">
-              Super Admin and HR own payroll truth. Staff get a simple portal to
-              fill details, apply for leave, and send company requests — no admin
-              tools. Brand the tenant, invite HR, enable staff logins, and keep
-              sensitive clears with Super Admin.
+              Super Admin, HR, Finance, and Business heads of the group and its
+              sub-companies. Staff get a portal for details, leave, timesheets,
+              and requests — no admin tools. Accounts are issued inside the
+              group. This is not an open signup.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               {signupEnabled ? (
                 <CtaLink href="/signup" variant="ink">
-                  Start a company workspace
+                  Internal setup
                 </CtaLink>
               ) : null}
               <a
                 href="/login"
                 className="inline-flex h-11 items-center justify-center rounded-lg border border-line bg-foam px-6 text-sm font-medium text-ink transition hover:border-ok/40 hover:bg-ok/10"
               >
-                Log in
+                Sign in
               </a>
             </div>
           </div>
@@ -518,21 +525,21 @@ export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean 
             tone="ink"
           />
           <h2 className="font-display text-3xl font-semibold tracking-tight text-foam sm:text-5xl">
-            Open the command center
+            Sign in to the group workspace
           </h2>
           <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-lagoon-mist/90">
-            {signupEnabled
-              ? "Create a workspace in minutes, or sign in to the tenant you already run. Demo accounts stay available while you evaluate."
-              : "Sign in to the tenant you already run. Demo accounts stay available while you evaluate."}
+            {PRODUCT_NAME} is a private system for Blackcountry Group. It is
+            not offered to the public. Sign in with the account you were
+            issued.
           </p>
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
             {signupEnabled ? (
               <CtaLink href="/signup" variant="primary">
-                Sign up
+                Internal setup
               </CtaLink>
             ) : null}
             <CtaLink href="/login" variant={signupEnabled ? "outline" : "primary"}>
-              Log in
+              Sign in
             </CtaLink>
           </div>
         </div>
@@ -544,8 +551,8 @@ export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean 
             {PRODUCT_NAME}
           </p>
           <p>
-            © {new Date().getFullYear()} {PRODUCT_NAME} · People operations &amp;
-            payroll for Nigeria
+            © {new Date().getFullYear()} {PRODUCT_NAME} · Private workspace for
+            Blackcountry Group
           </p>
         </div>
       </footer>

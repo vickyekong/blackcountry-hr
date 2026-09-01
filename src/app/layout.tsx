@@ -17,7 +17,7 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: `${PRODUCT_NAME} — People & Payroll`,
+  title: `${PRODUCT_NAME} — Blackcountry Group`,
   description: PRODUCT_POSITIONING,
 };
 

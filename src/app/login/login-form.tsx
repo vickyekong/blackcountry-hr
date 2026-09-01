@@ -45,15 +45,14 @@ export function LoginForm({ signupEnabled }: { signupEnabled: boolean }) {
       <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col justify-center gap-8 px-4 py-10 sm:gap-10 sm:px-6 sm:py-12 lg:flex-row lg:items-center lg:gap-16 lg:px-10">
         <div className="animate-soft-rise max-w-md text-foam lg:flex-1">
           <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-lagoon-mist/70">
-            People &amp; payroll
+            Blackcountry Group · issued accounts only
           </p>
           <h1 className="font-display mt-3 text-4xl font-semibold leading-[1.05] tracking-tight text-foam sm:mt-4 sm:text-5xl md:text-6xl">
             {PRODUCT_NAME}
           </h1>
           <p className="mt-3 max-w-sm text-sm leading-relaxed text-lagoon-mist/75 sm:mt-4 sm:text-base">
             {PRODUCT_TAGLINE}. Super Admin, HR, Finance, business heads, and
-            Staff each have their own door — clearance only when money and
-            sensitive data need it.
+            Staff each have their own door — this is not a public product.
           </p>
         </div>
 
@@ -67,7 +66,7 @@ export function LoginForm({ signupEnabled }: { signupEnabled: boolean }) {
           >
             <p className="text-sm font-medium text-ink">Sign in</p>
             <p className="mt-1 text-xs text-muted">
-              Super Admin, HR, Finance, business head, or Staff
+              Sign in with the account HR issued for your company
             </p>
             <div className="mt-5 space-y-4">
               <div>
@@ -106,15 +105,12 @@ export function LoginForm({ signupEnabled }: { signupEnabled: boolean }) {
           </form>
           {signupEnabled ? (
             <p className="mt-4 text-center text-xs text-lagoon-mist/60">
-              New company?{" "}
+              Internal setup only.{" "}
               <Link href="/signup" className="underline underline-offset-2">
-                Create a workspace
+                Continue
               </Link>
             </p>
           ) : null}
-          <p className="mt-2 text-center text-xs text-lagoon-mist/50">
-            Demo · admin@blackcountry.ng · hr@blackcountry.ng · adaeze@blackcountry.ng · password123
-          </p>
         </div>
       </div>
     </div>
