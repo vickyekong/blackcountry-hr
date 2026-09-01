@@ -45,6 +45,11 @@ export default async function DashboardPage() {
       <QuickWorkflows
         showOnboard={can(session.user.role, "manageEmployees")}
         showHrAsk={can(session.user.role, "manageHrDesk")}
+        timesheetsLabel={
+          can(session.user.role, "validateTimesheets")
+            ? "Validate timesheets"
+            : "Log timesheets"
+        }
       />
 
       <section className="mb-8">

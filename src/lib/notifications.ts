@@ -122,7 +122,6 @@ export async function notifyEmployeeUser(options: {
     where: {
       companyId: options.companyId,
       employeeId: options.employeeId,
-      role: "EMPLOYEE",
     },
     select: { id: true },
   });

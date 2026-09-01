@@ -117,6 +117,40 @@ async function main() {
     },
   });
 
+  const headEmployee = await prisma.employee.upsert({
+    where: {
+      companyId_employeeCode: {
+        companyId: subsidiary.id,
+        employeeCode: "BF-001",
+      },
+    },
+    update: {
+      firstName: "Ifeanyi",
+      lastName: "Okoro",
+      workEmail: "head@blackcountry.ng",
+    },
+    create: {
+      employeeCode: "BF-001",
+      firstName: "Ifeanyi",
+      lastName: "Okoro",
+      sex: "MALE",
+      department: "Management",
+      jobTitle: "Business head",
+      basicSalaryKobo: 80000000n,
+      housingAllowanceKobo: 20000000n,
+      transportAllowanceKobo: 5000000n,
+      companyId: subsidiary.id,
+      startDate: new Date("2024-01-15"),
+      status: "ACTIVE",
+      employmentType: "FULL_TIME",
+      workEmail: "head@blackcountry.ng",
+    },
+  });
+  await prisma.user.update({
+    where: { email: "head@blackcountry.ng" },
+    data: { employeeId: headEmployee.id },
+  });
+
   await prisma.project.upsert({
     where: {
       companyId_name: { companyId: company.id, name: "HQ operations" },

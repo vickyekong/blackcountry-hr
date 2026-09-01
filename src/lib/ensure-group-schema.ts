@@ -105,6 +105,57 @@ export async function ensureGroupSchema() {
   );
   await prisma.$executeRawUnsafe(`
     DO $$ BEGIN
+      CREATE TYPE "TimesheetWeekStatus" AS ENUM ('OPEN', 'SUBMITTED', 'VALIDATED', 'RETURNED');
+    EXCEPTION WHEN duplicate_object THEN NULL;
+    END $$;
+  `);
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "TimesheetWeek" (
+      "id" TEXT NOT NULL,
+      "companyId" TEXT NOT NULL,
+      "employeeId" TEXT NOT NULL,
+      "weekStart" TIMESTAMP(3) NOT NULL,
+      "status" "TimesheetWeekStatus" NOT NULL DEFAULT 'SUBMITTED',
+      "validatedById" TEXT,
+      "validatedAt" TIMESTAMP(3),
+      "returnReason" TEXT,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "updatedAt" TIMESTAMP(3) NOT NULL,
+      CONSTRAINT "TimesheetWeek_pkey" PRIMARY KEY ("id")
+    )
+  `);
+  await prisma.$executeRawUnsafe(
+    `CREATE UNIQUE INDEX IF NOT EXISTS "TimesheetWeek_employeeId_weekStart_key" ON "TimesheetWeek"("employeeId", "weekStart")`
+  );
+  await prisma.$executeRawUnsafe(
+    `CREATE INDEX IF NOT EXISTS "TimesheetWeek_companyId_status_weekStart_idx" ON "TimesheetWeek"("companyId", "status", "weekStart")`
+  );
+  await prisma.$executeRawUnsafe(`
+    DO $$ BEGIN
+      ALTER TABLE "TimesheetWeek"
+        ADD CONSTRAINT "TimesheetWeek_companyId_fkey"
+        FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    EXCEPTION WHEN duplicate_object THEN NULL;
+    END $$;
+  `);
+  await prisma.$executeRawUnsafe(`
+    DO $$ BEGIN
+      ALTER TABLE "TimesheetWeek"
+        ADD CONSTRAINT "TimesheetWeek_employeeId_fkey"
+        FOREIGN KEY ("employeeId") REFERENCES "Employee"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    EXCEPTION WHEN duplicate_object THEN NULL;
+    END $$;
+  `);
+  await prisma.$executeRawUnsafe(`
+    DO $$ BEGIN
+      ALTER TABLE "TimesheetWeek"
+        ADD CONSTRAINT "TimesheetWeek_validatedById_fkey"
+        FOREIGN KEY ("validatedById") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+    EXCEPTION WHEN duplicate_object THEN NULL;
+    END $$;
+  `);
+  await prisma.$executeRawUnsafe(`
+    DO $$ BEGIN
       ALTER TABLE "TimesheetEntry"
         ADD CONSTRAINT "TimesheetEntry_companyId_fkey"
         FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE CASCADE ON UPDATE CASCADE;

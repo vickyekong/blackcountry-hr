@@ -5,7 +5,7 @@ import type { UserRole } from "@prisma/client";
  *   Super Admin — payroll sign-off, sensitive change requests, Settings, group tree
  *   HR — people ops; seeks Super Admin clearance on payroll & bank/tax updates
  *   Finance — processes approved payroll; does not hire or create logins
- *   Business head — one sub-company; files, projects, timesheets; not payroll approve
+ *   Business head — one sub-company; files, projects, own weekly timesheets; not payroll approve
  *   Staff — own profile, leave, timesheets, and company requests only
  */
 export const PORTAL_ROLES = [
@@ -97,7 +97,11 @@ export const PERMISSIONS = {
   accessStaffPortal: ["EMPLOYEE"] as UserRole[],
   accessFinancePortal: ["FINANCE"] as UserRole[],
   manageProjects: ["SUPER_ADMIN", "HR_ADMIN", "BUSINESS_HEAD"] as UserRole[],
-  reviewTimesheets: ["SUPER_ADMIN", "HR_ADMIN", "BUSINESS_HEAD"] as UserRole[],
+  /** Own weekly hours — Staff and Business head (linked staff record). */
+  logTimesheets: ["EMPLOYEE", "BUSINESS_HEAD"] as UserRole[],
+  /** HR validates a week; after that the week is locked. */
+  validateTimesheets: ["SUPER_ADMIN", "HR_ADMIN"] as UserRole[],
+  reviewTimesheets: ["SUPER_ADMIN", "HR_ADMIN"] as UserRole[],
   editWorkspaceFiles: ["SUPER_ADMIN", "HR_ADMIN", "BUSINESS_HEAD"] as UserRole[],
   viewWorkspaceFiles: [
     "SUPER_ADMIN",

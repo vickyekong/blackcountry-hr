@@ -172,15 +172,17 @@ export function OmniCoPilotStrip({
 export function QuickWorkflows({
   showOnboard = true,
   showHrAsk = true,
+  timesheetsLabel = "Review timesheets",
 }: {
   showOnboard?: boolean;
   showHrAsk?: boolean;
+  timesheetsLabel?: string;
 }) {
   const items = [
     ...(showOnboard
       ? [{ href: "/employees/new", label: "Onboard employee" }]
       : []),
-    { href: "/timesheets", label: "Review timesheets" },
+    { href: "/timesheets", label: timesheetsLabel },
     ...(showHrAsk
       ? [{ href: "/hr-ask", label: "Draft policy / query desk" }]
       : []),

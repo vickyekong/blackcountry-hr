@@ -93,6 +93,7 @@ model Company {
   jobDescriptions       JobDescription[]
   projects              Project[]
   timesheetEntries      TimesheetEntry[]
+  timesheetWeeks        TimesheetWeek[]
   workspaceFiles        WorkspaceFile[]
 
   @@index([parentId])
@@ -186,6 +187,7 @@ model User {
   auditLogs           AuditLog[]
   notifications       Notification[]
   hrDeskAssigned      HrDeskMessage[] @relation("HrDeskAssignee")
+  timesheetWeeksValidated TimesheetWeek[] @relation("TimesheetWeekValidator")
 }
 
 model Employee {
@@ -243,6 +245,7 @@ model Employee {
   lifecycles          EmployeeLifecycle[]
   changeRequests      EmployeeChangeRequest[]
   timesheetEntries    TimesheetEntry[]
+  timesheetWeeks      TimesheetWeek[]
   workspaceFileGrants WorkspaceFileGrant[]
 
   createdAt           DateTime @default(now())
@@ -678,6 +681,13 @@ enum TimesheetStatus {
   REJECTED
 }
 
+enum TimesheetWeekStatus {
+  OPEN
+  SUBMITTED
+  VALIDATED
+  RETURNED
+}
+
 enum WorkspaceFileVisibility {
   EDITORS
   ALL_FULL_TIME
@@ -717,6 +727,25 @@ model TimesheetEntry {
   @@unique([employeeId, projectId, workDate])
   @@index([companyId, workDate])
   @@index([employeeId, status])
+}
+
+model TimesheetWeek {
+  id            String              @id @default(cuid())
+  companyId     String
+  company       Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  employeeId    String
+  employee      Employee            @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  weekStart     DateTime
+  status        TimesheetWeekStatus @default(SUBMITTED)
+  validatedById String?
+  validatedBy   User?               @relation("TimesheetWeekValidator", fields: [validatedById], references: [id], onDelete: SetNull)
+  validatedAt   DateTime?
+  returnReason  String?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  @@unique([employeeId, weekStart])
+  @@index([companyId, status, weekStart])
 }
 
 model WorkspaceFile {

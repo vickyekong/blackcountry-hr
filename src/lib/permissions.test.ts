@@ -32,7 +32,9 @@ describe("five-portal roles", () => {
     expect(homePathForRole("BUSINESS_HEAD")).toBe("/dashboard");
     expect(portalLabel("BUSINESS_HEAD")).toBe("Business head");
     expect(can("BUSINESS_HEAD", "editWorkspaceFiles")).toBe(true);
-    expect(can("BUSINESS_HEAD", "reviewTimesheets")).toBe(true);
+    expect(can("BUSINESS_HEAD", "logTimesheets")).toBe(true);
+    expect(can("BUSINESS_HEAD", "reviewTimesheets")).toBe(false);
+    expect(can("BUSINESS_HEAD", "validateTimesheets")).toBe(false);
     expect(can("BUSINESS_HEAD", "approvePayroll")).toBe(false);
     expect(can("BUSINESS_HEAD", "manageStatutoryRates")).toBe(false);
     expect(can("BUSINESS_HEAD", "manageCompanySettings")).toBe(false);
@@ -43,6 +45,8 @@ describe("five-portal roles", () => {
     expect(can("EMPLOYEE", "runPayroll")).toBe(false);
     expect(can("EMPLOYEE", "manageCompanySettings")).toBe(false);
     expect(can("EMPLOYEE", "accessStaffPortal")).toBe(true);
+    expect(can("EMPLOYEE", "logTimesheets")).toBe(true);
+    expect(can("HR_ADMIN", "validateTimesheets")).toBe(true);
   });
 
   it("lets HR review general staff requests but not bank/tax", () => {

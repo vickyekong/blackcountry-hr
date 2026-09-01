@@ -3,7 +3,8 @@ import { z } from "zod";
 import { requireAuth, handleApiError } from "@/lib/api-auth";
 import { can } from "@/lib/permissions";
 import { prisma } from "@/lib/db";
-import { utcDay } from "@/lib/timesheets/period";
+import { utcDay, utcWeekEndExclusive, utcWeekStart } from "@/lib/timesheets/period";
+import { upsertOpenTimesheetWeek } from "@/lib/timesheets/weeks";
 
 const createSchema = z.object({
   employeeId: z.string().optional(),
@@ -13,27 +14,51 @@ const createSchema = z.object({
   notes: z.string().trim().max(500).optional().nullable(),
 });
 
+function canViewTimesheets(role: Parameters<typeof can>[0]) {
+  return (
+    can(role, "validateTimesheets") ||
+    can(role, "logTimesheets") ||
+    can(role, "accessStaffPortal")
+  );
+}
+
 export async function GET(req: NextRequest) {
   try {
     const session = await requireAuth();
-    const reviewer = can(session.user.role, "reviewTimesheets");
-    const staff = can(session.user.role, "accessStaffPortal");
-    if (!reviewer && !staff) {
+    const validator = can(session.user.role, "validateTimesheets");
+    const logger = can(session.user.role, "logTimesheets");
+    if (!canViewTimesheets(session.user.role)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const url = new URL(req.url);
     const status = url.searchParams.get("status");
     const employeeId = url.searchParams.get("employeeId");
+    const weekStartParam = url.searchParams.get("weekStart");
+
+    const ownOnly = !validator && (logger || can(session.user.role, "accessStaffPortal"));
+    const scopedEmployeeId = ownOnly
+      ? session.user.employeeId
+      : employeeId || undefined;
+    if (ownOnly && !scopedEmployeeId) {
+      return NextResponse.json([]);
+    }
+
+    const weekFilter = weekStartParam
+      ? {
+          workDate: {
+            gte: utcWeekStart(weekStartParam),
+            lt: utcWeekEndExclusive(weekStartParam),
+          },
+        }
+      : {};
 
     const entries = await prisma.timesheetEntry.findMany({
       where: {
         companyId: session.user.companyId,
-        ...(staff && !reviewer && session.user.employeeId
-          ? { employeeId: session.user.employeeId }
-          : {}),
-        ...(reviewer && employeeId ? { employeeId } : {}),
+        ...(scopedEmployeeId ? { employeeId: scopedEmployeeId } : {}),
         ...(status ? { status: status as "SUBMITTED" } : {}),
+        ...weekFilter,
       },
       include: {
         employee: {
@@ -59,20 +84,23 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const session = await requireAuth();
-    const reviewer = can(session.user.role, "reviewTimesheets");
-    const staff = can(session.user.role, "accessStaffPortal");
-    if (!reviewer && !staff) {
+    const validator = can(session.user.role, "validateTimesheets");
+    const logger = can(session.user.role, "logTimesheets");
+    if (!validator && !logger && !can(session.user.role, "accessStaffPortal")) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const body = createSchema.parse(await req.json());
     let employeeId = session.user.employeeId ?? null;
-    if (reviewer && body.employeeId) {
+    if (validator && body.employeeId) {
       employeeId = body.employeeId;
+    }
+    if (!validator && body.employeeId && body.employeeId !== session.user.employeeId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
     if (!employeeId) {
       return NextResponse.json(
-        { error: "Choose a staff record for this timesheet" },
+        { error: "Ask HR to link your staff record so you can log hours." },
         { status: 400 }
       );
     }
@@ -84,7 +112,7 @@ export async function POST(req: NextRequest) {
     if (!employee) {
       return NextResponse.json({ error: "Employee not found" }, { status: 404 });
     }
-    if (!reviewer && employee.employmentType === "CONTRACT") {
+    if (!validator && employee.employmentType === "CONTRACT") {
       return NextResponse.json(
         { error: "Contract staff do not have a portal. Ask HR to log hours." },
         { status: 403 }
@@ -103,6 +131,12 @@ export async function POST(req: NextRequest) {
     }
 
     const workDate = utcDay(body.workDate);
+    await upsertOpenTimesheetWeek({
+      companyId: session.user.companyId,
+      employeeId: employee.id,
+      workDate,
+    });
+
     const entry = await prisma.timesheetEntry.upsert({
       where: {
         employeeId_projectId_workDate: {
@@ -118,12 +152,12 @@ export async function POST(req: NextRequest) {
         workDate,
         minutes: body.minutes,
         notes: body.notes ?? null,
-        status: reviewer ? "APPROVED" : "SUBMITTED",
+        status: "SUBMITTED",
       },
       update: {
         minutes: body.minutes,
         notes: body.notes ?? null,
-        status: reviewer ? "APPROVED" : "SUBMITTED",
+        status: "SUBMITTED",
       },
     });
     return NextResponse.json(entry, { status: 201 });
