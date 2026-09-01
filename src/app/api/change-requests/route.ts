@@ -15,6 +15,10 @@ import {
 import { displayName } from "@/lib/employees/data-quality";
 import { canReviewChangeType } from "@/lib/permissions";
 import { ensureStaffPortalSchema } from "@/lib/ensure-staff-portal-schema";
+import {
+  accessibleCompanyIds,
+  findAccessibleChangeRequest,
+} from "@/lib/tenancy/workspace";
 
 const submitSchema = z.object({
   employeeId: z.string().min(1),
@@ -29,10 +33,14 @@ export async function GET(req: NextRequest) {
     const session = await requirePermission("manageEmployees");
     const { searchParams } = new URL(req.url);
     const scope = searchParams.get("scope") ?? "pending";
+    const companyIds = await accessibleCompanyIds(
+      session.user.homeCompanyId || session.user.companyId,
+      session.user.role
+    );
 
     const requests = await prisma.employeeChangeRequest.findMany({
       where: {
-        companyId: session.user.companyId,
+        companyId: { in: companyIds },
         ...(scope === "pending" ? { status: "PENDING" } : {}),
       },
       include: {
@@ -45,6 +53,7 @@ export async function GET(req: NextRequest) {
             department: true,
           },
         },
+        company: { select: { name: true } },
       },
       orderBy: { createdAt: "desc" },
       take: 100,
@@ -124,10 +133,10 @@ export async function PATCH(req: NextRequest) {
     const session = await requireAuth();
     const body = reviewSchema.parse(await req.json());
 
-    const existing = await prisma.employeeChangeRequest.findFirst({
-      where: { id: body.requestId, companyId: session.user.companyId },
-      select: { id: true, type: true, employeeId: true },
-    });
+    const existing = await findAccessibleChangeRequest(
+      session.user,
+      body.requestId
+    );
     if (!existing) {
       return NextResponse.json({ error: "Request not found" }, { status: 404 });
     }
@@ -144,7 +153,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     const updated = await reviewChangeRequest({
-      companyId: session.user.companyId,
+      companyId: existing.companyId,
       requestId: body.requestId,
       reviewerId: session.user.id,
       action: body.action,
@@ -153,7 +162,7 @@ export async function PATCH(req: NextRequest) {
 
     await prisma.auditLog.create({
       data: {
-        companyId: session.user.companyId,
+        companyId: existing.companyId,
         action: body.action.toUpperCase(),
         entityType: "EmployeeChangeRequest",
         entityId: updated.id,
@@ -173,7 +182,7 @@ export async function PATCH(req: NextRequest) {
 
     await notifyEmployeeOfChangeReview({
       employeeId: existing.employeeId,
-      companyId: session.user.companyId,
+      companyId: existing.companyId,
       requestId: updated.id,
       type: existing.type,
       action: body.action,

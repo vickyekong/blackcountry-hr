@@ -116,7 +116,7 @@ const STATUTORY = [
   { name: "NSITF", detail: "Employer remittance aligned to run" },
 ] as const;
 
-export function LandingPage() {
+export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean }) {
   return (
     <div className="min-h-screen min-h-dvh bg-ink text-foam">
       <header className="relative z-30 flex items-center justify-between px-5 py-5 sm:px-8 lg:px-12">
@@ -127,12 +127,14 @@ export function LandingPage() {
           <CtaLink href="/login" variant="ghost">
             Log in
           </CtaLink>
-          <a
-            href="/signup"
-            className="rounded-lg bg-lagoon px-3.5 py-2 text-sm font-medium text-ink shadow-soft transition hover:bg-lagoon-deep"
-          >
-            Sign up
-          </a>
+          {signupEnabled ? (
+            <a
+              href="/signup"
+              className="rounded-lg bg-lagoon px-3.5 py-2 text-sm font-medium text-ink shadow-soft transition hover:bg-lagoon-deep"
+            >
+              Sign up
+            </a>
+          ) : null}
         </nav>
       </header>
 
@@ -168,10 +170,12 @@ export function LandingPage() {
               with HR clearance before money moves.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <CtaLink href="/signup" variant="primary">
-                Create your workspace
-              </CtaLink>
-              <CtaLink href="/login" variant="outline">
+              {signupEnabled ? (
+                <CtaLink href="/signup" variant="primary">
+                  Create your workspace
+                </CtaLink>
+              ) : null}
+              <CtaLink href="/login" variant={signupEnabled ? "outline" : "primary"}>
                 Log in to the app
               </CtaLink>
             </div>
@@ -466,9 +470,11 @@ export function LandingPage() {
               sensitive clears with Super Admin.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <CtaLink href="/signup" variant="ink">
-                Start a company workspace
-              </CtaLink>
+              {signupEnabled ? (
+                <CtaLink href="/signup" variant="ink">
+                  Start a company workspace
+                </CtaLink>
+              ) : null}
               <a
                 href="/login"
                 className="inline-flex h-11 items-center justify-center rounded-lg border border-line bg-foam px-6 text-sm font-medium text-ink transition hover:border-ok/40 hover:bg-ok/10"
@@ -515,14 +521,17 @@ export function LandingPage() {
             Open the command center
           </h2>
           <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-lagoon-mist/90">
-            Create a workspace in minutes, or sign in to the tenant you already
-            run. Demo accounts stay available while you evaluate.
+            {signupEnabled
+              ? "Create a workspace in minutes, or sign in to the tenant you already run. Demo accounts stay available while you evaluate."
+              : "Sign in to the tenant you already run. Demo accounts stay available while you evaluate."}
           </p>
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-            <CtaLink href="/signup" variant="primary">
-              Sign up
-            </CtaLink>
-            <CtaLink href="/login" variant="outline">
+            {signupEnabled ? (
+              <CtaLink href="/signup" variant="primary">
+                Sign up
+              </CtaLink>
+            ) : null}
+            <CtaLink href="/login" variant={signupEnabled ? "outline" : "primary"}>
               Log in
             </CtaLink>
           </div>

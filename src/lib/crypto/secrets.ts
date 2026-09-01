@@ -1,11 +1,11 @@
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from "crypto";
+import { envFirst } from "@/lib/env";
 
 const PREFIX = "enc:v1:";
 
 function encryptionKey(): Buffer {
   const raw =
-    process.env.TOKEN_ENCRYPTION_KEY ||
-    process.env.NEXTAUTH_SECRET ||
+    envFirst("TOKEN_ENCRYPTION_KEY", "NEXTAUTH_SECRET", "AUTH_SECRET") ||
     "blackcountry-hr-dev-only-token-key";
   return createHash("sha256").update(raw).digest();
 }

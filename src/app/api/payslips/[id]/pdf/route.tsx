@@ -4,6 +4,8 @@ import { prisma } from "@/lib/db";
 import { requireAuth, handleApiError, AuthError } from "@/lib/api-auth";
 import { PayslipDocument } from "@/lib/payslip-pdf";
 import { getMonthName } from "@/lib/utils";
+import { can } from "@/lib/permissions";
+import { canAccessCompany } from "@/lib/tenancy/workspace";
 
 export async function GET(
   _req: NextRequest,
@@ -20,13 +22,33 @@ export async function GET(
       },
     });
 
-    if (!payslip || payslip.payrollRun.companyId !== session.user.companyId) {
+    if (!payslip) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    const sameCompany =
+      payslip.payrollRun.companyId === session.user.companyId;
+    const groupAccess =
+      !sameCompany &&
+      (await canAccessCompany(
+        session.user.homeCompanyId || session.user.companyId,
+        session.user.role,
+        payslip.payrollRun.companyId
+      ));
+    if (!sameCompany && !groupAccess) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
     if (
       session.user.role === "EMPLOYEE" &&
       payslip.employeeId !== session.user.employeeId
+    ) {
+      throw new AuthError("Forbidden", 403);
+    }
+
+    if (
+      session.user.role !== "EMPLOYEE" &&
+      !can(session.user.role, "viewPayslips")
     ) {
       throw new AuthError("Forbidden", 403);
     }

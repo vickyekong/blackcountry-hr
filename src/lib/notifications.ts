@@ -69,6 +69,8 @@ export async function notifyPayrollSubmitted(options: {
 
 export async function notifyUsersInRoles(options: {
   companyId: string;
+  /** When set, notify seats on these companies (e.g. group + operating). */
+  recipientCompanyIds?: string[];
   roles: UserRole[];
   type: string;
   title: string;
@@ -78,9 +80,12 @@ export async function notifyUsersInRoles(options: {
   entityId?: string;
   excludeUserId?: string;
 }) {
+  const companyFilter = options.recipientCompanyIds?.length
+    ? { in: options.recipientCompanyIds }
+    : options.companyId;
   const recipients = await prisma.user.findMany({
     where: {
-      companyId: options.companyId,
+      companyId: companyFilter,
       role: { in: options.roles },
       ...(options.excludeUserId ? { id: { not: options.excludeUserId } } : {}),
     },
@@ -146,8 +151,10 @@ export async function notifyPayrollForwardedToFinance(options: {
 }) {
   const periodLabel = `${getMonthName(options.periodMonth)} ${options.periodYear}`;
   const linkUrl = financePayrollUrl(options.runId);
+  const recipientCompanyIds = await payrollApproverCompanyIds(options.companyId);
   return notifyUsersInRoles({
     companyId: options.companyId,
+    recipientCompanyIds,
     roles: ["FINANCE"],
     type: "PAYROLL_FINANCE",
     title: `Payroll ready to process — ${periodLabel}`,
@@ -169,8 +176,10 @@ export async function notifyPayrollProcessingComplete(options: {
 }) {
   const periodLabel = `${getMonthName(options.periodMonth)} ${options.periodYear}`;
   const linkUrl = payrollReviewUrl(options.runId);
+  const recipientCompanyIds = await payrollApproverCompanyIds(options.companyId);
   return notifyUsersInRoles({
     companyId: options.companyId,
+    recipientCompanyIds,
     roles: ["HR_ADMIN", "SUPER_ADMIN"],
     type: "PAYROLL_PAID",
     title: `Payroll processing complete — ${periodLabel}`,

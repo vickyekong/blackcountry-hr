@@ -33,7 +33,24 @@ export interface WizardPayslip {
     lastName: string;
     employeeCode: string;
     department: string;
+    employmentType?: string;
   };
+}
+
+export interface WizardTimesheetHours {
+  employeeId: string;
+  minutes: number;
+  hours: number;
+}
+
+export interface WizardRun {
+  id: string;
+  periodMonth: number;
+  periodYear: number;
+  status: string;
+  payslips: WizardPayslip[];
+  adjustments: WizardAdjustment[];
+  timesheetHours?: WizardTimesheetHours[];
 }
 
 export interface WizardAdjustment {
@@ -48,20 +65,11 @@ export interface WizardAdjustment {
   };
 }
 
-export interface WizardRun {
-  id: string;
-  periodMonth: number;
-  periodYear: number;
-  status: string;
-  payslips: WizardPayslip[];
-  adjustments: WizardAdjustment[];
-}
-
 const STEPS = [
   {
     id: 1,
     title: "Aggregate & pre-flight",
-    blurb: "Contracts, deductions, then confirm attendance",
+    blurb: "Contracts, timesheets, then confirm any remaining deductions",
   },
   {
     id: 2,
@@ -184,6 +192,21 @@ export function PayrollWizard({
     };
   }, [run.adjustments]);
 
+  const timesheetByEmployee = useMemo(() => {
+    const map = new Map<string, WizardTimesheetHours>();
+    for (const row of run.timesheetHours ?? []) {
+      map.set(row.employeeId, row);
+    }
+    return map;
+  }, [run.timesheetHours]);
+
+  const timesheetImpact = useMemo(() => {
+    const rows = run.timesheetHours ?? [];
+    if (rows.length === 0) return null;
+    const hours = rows.reduce((sum, row) => sum + row.hours, 0);
+    return { people: rows.length, hours: Number(hours.toFixed(2)) };
+  }, [run.timesheetHours]);
+
   useEffect(() => {
     if (initialStep && initialStep >= 1 && initialStep <= 4) {
       setStep(initialStep);
@@ -278,13 +301,25 @@ export function PayrollWizard({
             <CardHeader>
               <CardTitle>Automated data aggregation</CardTitle>
               <p className="text-sm text-stone-500">
-                Salaries use contracts and unpaid leave. Clock attendance
-                deductions are <strong>proposed only after HR confirms</strong>{" "}
-                via “Review &amp; apply attendance” — they are not applied
-                automatically.
+                Full-time pay uses the contract salary; approved timesheet
+                hours above a standard month are overtime. Contract staff are
+                paid from approved hours (monthly basic as the full-month
+                rate). Clock attendance deductions are{" "}
+                <strong>proposed only after HR confirms</strong> via “Review
+                &amp; apply attendance”.
               </p>
             </CardHeader>
             <CardContent className="space-y-4">
+              {timesheetImpact && (
+                <div className="rounded-md border border-lagoon/30 bg-lagoon-mist/40 px-3 py-2 text-sm text-ink">
+                  <p className="font-medium">Approved timesheets in this period</p>
+                  <p className="mt-1 text-muted">
+                    {timesheetImpact.people} staff · {timesheetImpact.hours}{" "}
+                    hours. Contract pay uses these hours; full-time overtime
+                    is hours above a standard month.
+                  </p>
+                </div>
+              )}
               {attendanceImpact && (
                 <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-950">
                   <p className="font-medium">Attendance deductions (HR confirmed)</p>
@@ -676,14 +711,15 @@ export function PayrollWizard({
             </div>
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Employee</TableHead>
-                  <TableHead>Department</TableHead>
-                  <TableHead className="text-right">Gross</TableHead>
-                  <TableHead className="text-right">PAYE</TableHead>
-                  <TableHead className="text-right">Net</TableHead>
-                  <TableHead />
-                </TableRow>
+                  <TableRow>
+                    <TableHead>Employee</TableHead>
+                    <TableHead>Department</TableHead>
+                    <TableHead className="text-right">Hours</TableHead>
+                    <TableHead className="text-right">Gross</TableHead>
+                    <TableHead className="text-right">PAYE</TableHead>
+                    <TableHead className="text-right">Net</TableHead>
+                    <TableHead />
+                  </TableRow>
               </TableHeader>
               <TableBody>
                 {run.payslips.map((p) => (
@@ -697,6 +733,13 @@ export function PayrollWizard({
                       </span>
                     </TableCell>
                     <TableCell>{p.employee.department}</TableCell>
+                    <TableCell className="text-right tabular-nums text-sm text-muted">
+                      {timesheetByEmployee.get(p.employee.id)?.hours ??
+                        "—"}
+                      {p.employee.employmentType === "CONTRACT"
+                        ? " · contract"
+                        : ""}
+                    </TableCell>
                     <TableCell className="text-right">
                       <TableCurrency value={p.grossPayKobo} />
                     </TableCell>
@@ -723,7 +766,7 @@ export function PayrollWizard({
                 {run.payslips.length === 0 && (
                   <TableRow>
                     <TableCell
-                      colSpan={6}
+                      colSpan={7}
                       className="text-center text-stone-500"
                     >
                       No payslips — recalculate in step 1
@@ -897,13 +940,14 @@ export function PayrollWizard({
               {(run.status === "APPROVED" ||
                 run.status === "FORWARDED_TO_FINANCE" ||
                 run.status === "PROCESSING" ||
-                run.status === "PAID") && (
+                run.status === "PAID") &&
+                canApprove && (
                 <Button
                   variant="outline"
                   onClick={() => {
                     if (
                       confirm(
-                        "Reverse this run? It will reset to draft and regenerate payslips."
+                        "Reverse this run? It will reset to draft and regenerate payslips. Only Super Admin should do this after approval."
                       )
                     ) {
                       onAction("reverse");

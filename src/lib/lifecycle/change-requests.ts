@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import type { ChangeRequestType, Prisma } from "@prisma/client";
+import { payrollApproverCompanyIds } from "@/lib/tenancy/workspace";
 
 function digitsOnly(value: string): string {
   return value.replace(/\D/g, "");
@@ -114,9 +115,10 @@ export async function notifySuperAdminOfChangeRequest(options: {
   type: string;
   submittedByName?: string;
 }) {
+  const recipientCompanyIds = await payrollApproverCompanyIds(options.companyId);
   const admins = await prisma.user.findMany({
     where: {
-      companyId: options.companyId,
+      companyId: { in: recipientCompanyIds },
       role: "SUPER_ADMIN",
     },
     select: { id: true },
@@ -170,8 +172,12 @@ export async function notifyReviewersOfChangeRequest(options: {
     ? (["HR_ADMIN", "SUPER_ADMIN"] as const)
     : (["SUPER_ADMIN"] as const);
 
+  const recipientCompanyIds = await payrollApproverCompanyIds(options.companyId);
   const reviewers = await prisma.user.findMany({
-    where: { companyId: options.companyId, role: { in: [...roles] } },
+    where: {
+      companyId: { in: recipientCompanyIds },
+      role: { in: [...roles] },
+    },
     select: { id: true },
   });
   if (reviewers.length === 0) return;

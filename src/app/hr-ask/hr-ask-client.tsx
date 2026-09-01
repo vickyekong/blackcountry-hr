@@ -37,6 +37,7 @@ interface PendingChange {
   status: string;
   payload: Record<string, string>;
   note: string | null;
+  company?: { name: string };
   employee: {
     id: string;
     employeeCode: string;
@@ -227,6 +228,7 @@ export default function HrAskClient() {
                         {r.type.replace(/_/g, " ")}
                       </p>
                       <p className="mt-1 text-xs text-stone-500">
+                        {r.company?.name ? `${r.company.name} · ` : ""}
                         {r.employee.department} ·{" "}
                         {new Date(r.createdAt).toLocaleString()}
                       </p>

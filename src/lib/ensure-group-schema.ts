@@ -181,5 +181,8 @@ export async function ensureGroupSchema() {
     END $$;
   `);
 
+  const { ensureAppRls } = await import("@/lib/ensure-app-rls");
+  await ensureAppRls();
+
   ensured = true;
 }

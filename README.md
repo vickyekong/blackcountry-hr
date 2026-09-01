@@ -54,13 +54,14 @@ Open [http://localhost:3000](http://localhost:3000)
 
 ## Deploy to Vercel
 
-The build **requires** these environment variables in your Vercel project (**Settings → Environment Variables**). Apply to Production, Preview, and Development:
+The app **needs** these environment variables in your Vercel project (**Settings → Environment Variables**). Apply to Production, Preview, and Development. Mark `NEXTAUTH_SECRET` and `DATABASE_URL` as Sensitive — the app reads them at runtime (not at build).
 
 | Variable | Example | Notes |
 |----------|---------|-------|
-| `DATABASE_URL` | `postgresql://user:pass@host/db?sslmode=require` | Supabase, Neon, or Railway Postgres |
-| `NEXTAUTH_SECRET` | output of `openssl rand -base64 32` | **Build fails without this** |
+| `DATABASE_URL` | Transaction pooler URL (port 6543) | Falls back to `POSTGRES_PRISMA_URL` / `POSTGRES_URL` if unset |
+| `NEXTAUTH_SECRET` | output of `openssl rand -base64 32` | **Required at runtime** (`AUTH_SECRET` is an alias) |
 | `NEXTAUTH_URL` | `https://your-app.vercel.app` | Your production URL (or preview URL for previews) |
+| `SIGNUP_ENABLED` | `true` | Optional. Public signup is **off in production** unless this is `true` |
 | `GOOGLE_CLIENT_ID` | from Google Cloud Console | Optional — Workspace Drive/Sheets sync |
 | `GOOGLE_CLIENT_SECRET` | from Google Cloud Console | Optional — pair with client ID |
 | `GOOGLE_DRIVE_FOLDER_ID` | Shared Drive folder ID | Optional HR root folder |

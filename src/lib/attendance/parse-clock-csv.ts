@@ -165,7 +165,7 @@ export function parseClockMachineCsv(csvText: string): {
 
     for (let i = startIndex; i < lines.length; i++) {
       const cells = splitCsvLine(lines[i]);
-      const deviceUserId = (cells[deviceIdx] ?? "").replace(/^0+/, "") || cells[deviceIdx];
+      const deviceUserId = (cells[deviceIdx] ?? "").trim();
       if (!deviceUserId) {
         errors.push(`Line ${i + 1}: missing device user ID`);
         continue;

@@ -21,6 +21,7 @@ interface PayrollRun {
   periodYear: number;
   status: string;
   createdBy: { name: string };
+  company?: { name: string };
   _count: { payslips: number };
 }
 
@@ -57,6 +58,7 @@ export default function FinanceHomePage() {
           <TableHeader>
             <TableRow>
               <TableHead>Period</TableHead>
+              <TableHead>Company</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>From HR</TableHead>
               <TableHead>Payslips</TableHead>
@@ -73,6 +75,7 @@ export default function FinanceHomePage() {
                     {getMonthName(run.periodMonth)} {run.periodYear}
                   </Link>
                 </TableCell>
+                <TableCell>{run.company?.name ?? "—"}</TableCell>
                 <TableCell>
                   <Badge variant={payrollStatusVariant(run.status)}>
                     {run.status.replace(/_/g, " ")}
@@ -84,7 +87,7 @@ export default function FinanceHomePage() {
             ))}
             {queue.length === 0 && (
               <TableRow>
-                <TableCell colSpan={4} className="text-center text-muted">
+                <TableCell colSpan={5} className="text-center text-muted">
                   Nothing forwarded from HR yet
                 </TableCell>
               </TableRow>

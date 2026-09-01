@@ -4,6 +4,8 @@ import { can } from "@/lib/permissions";
 import type { UserRole } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
+import { prisma } from "@/lib/db";
+import { isEmploymentEnded } from "@/lib/employees/status";
 
 export async function getSession() {
   return getServerSession(authOptions);
@@ -16,6 +18,8 @@ export async function requireAuth() {
   }
   const { ensureGroupSchema } = await import("@/lib/ensure-group-schema");
   await ensureGroupSchema();
+  const { ensureAppRls } = await import("@/lib/ensure-app-rls");
+  await ensureAppRls();
   return session;
 }
 
@@ -75,6 +79,23 @@ export async function requireStaffEmployee() {
   if (!session.user.employeeId) {
     throw new AuthError(
       "This login is not linked to a staff record. Ask HR to enable your portal.",
+      403
+    );
+  }
+  const employee = await prisma.employee.findFirst({
+    where: {
+      id: session.user.employeeId,
+      companyId: session.user.companyId,
+    },
+    select: { status: true, employmentType: true },
+  });
+  if (
+    !employee ||
+    isEmploymentEnded(employee.status) ||
+    employee.employmentType === "CONTRACT"
+  ) {
+    throw new AuthError(
+      "Staff portal access has ended. Ask HR if you still need a login.",
       403
     );
   }

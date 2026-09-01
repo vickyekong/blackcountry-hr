@@ -15,6 +15,7 @@ import {
 } from "@/lib/notifications";
 import { getPayrollPreflight } from "@/lib/payroll/preflight";
 import { approvedTimesheetHoursForPeriod } from "@/lib/timesheets/period";
+import { findAccessiblePayrollRun } from "@/lib/tenancy/workspace";
 import { z } from "zod";
 
 const actionSchema = z.object({
@@ -36,8 +37,12 @@ export async function GET(
 ) {
   try {
     const session = await requireAuth();
+    const access = await findAccessiblePayrollRun(session.user, params.id);
+    if (!access) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
     const run = await prisma.payrollRun.findFirst({
-      where: { id: params.id, companyId: session.user.companyId },
+      where: { id: access.id },
       include: {
         payslips: {
           include: {
@@ -48,6 +53,7 @@ export async function GET(
                 lastName: true,
                 employeeCode: true,
                 department: true,
+                employmentType: true,
               },
             },
           },
@@ -85,7 +91,7 @@ export async function GET(
     }
 
     const timesheetHours = await approvedTimesheetHoursForPeriod(
-      session.user.companyId,
+      access.companyId,
       run.periodYear,
       run.periodMonth
     );
@@ -104,12 +110,11 @@ export async function PATCH(
     const session = await requireAuth();
     const body = actionSchema.parse(await req.json());
 
-    const run = await prisma.payrollRun.findFirst({
-      where: { id: params.id, companyId: session.user.companyId },
-    });
+    const run = await findAccessiblePayrollRun(session.user, params.id);
     if (!run) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
+    const operatingCompanyId = run.companyId;
 
     if (run.status === "PAID" && body.action !== "reverse") {
       return NextResponse.json(
@@ -122,21 +127,24 @@ export async function PATCH(
     }
 
     if (body.action === "reverse") {
-      if (
-        !can(session.user.role, "runPayroll") &&
-        !can(session.user.role, "approvePayroll")
-      ) {
-        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      if (!can(session.user.role, "approvePayroll")) {
+        return NextResponse.json(
+          {
+            error:
+              "Only Super Admin can reverse an approved or paid payroll run.",
+          },
+          { status: 403 }
+        );
       }
 
       const result = await reverseAndRegeneratePayrollRun(
         run.id,
-        session.user.companyId
+        operatingCompanyId
       );
 
       await prisma.auditLog.create({
         data: {
-          companyId: session.user.companyId,
+          companyId: operatingCompanyId,
           action: "REVERSE",
           entityType: "PayrollRun",
           entityId: run.id,
@@ -198,7 +206,7 @@ export async function PATCH(
           );
         }
         const preflight = await getPayrollPreflight(
-          session.user.companyId,
+          operatingCompanyId,
           run.id
         );
         if (!preflight.canSubmit) {
@@ -213,7 +221,7 @@ export async function PATCH(
         }
         update = { status: "UNDER_REVIEW" };
         notificationResult = await notifyPayrollSubmitted({
-          companyId: session.user.companyId,
+          companyId: operatingCompanyId,
           runId: run.id,
           periodMonth: run.periodMonth,
           periodYear: run.periodYear,
@@ -231,7 +239,7 @@ export async function PATCH(
           );
         }
         // Freeze statutory rules used for this approved historical payroll
-        await snapshotStatutoryConfigForRun(run.id, session.user.companyId);
+        await snapshotStatutoryConfigForRun(run.id, operatingCompanyId);
         update = {
           status: "APPROVED",
           approvedById: session.user.id,
@@ -272,7 +280,7 @@ export async function PATCH(
           forwardedAt: new Date(),
         };
         forwardedCount = await notifyPayrollForwardedToFinance({
-          companyId: session.user.companyId,
+          companyId: operatingCompanyId,
           runId: run.id,
           periodMonth: run.periodMonth,
           periodYear: run.periodYear,
@@ -306,7 +314,7 @@ export async function PATCH(
           processedAt: new Date(),
         };
         processedCount = await notifyPayrollProcessingComplete({
-          companyId: session.user.companyId,
+          companyId: operatingCompanyId,
           runId: run.id,
           periodMonth: run.periodMonth,
           periodYear: run.periodYear,
@@ -335,7 +343,7 @@ export async function PATCH(
 
     await prisma.auditLog.create({
       data: {
-        companyId: session.user.companyId,
+        companyId: operatingCompanyId,
         action: body.action.toUpperCase(),
         entityType: "PayrollRun",
         entityId: run.id,

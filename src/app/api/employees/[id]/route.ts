@@ -13,6 +13,7 @@ import { isEmploymentEnded } from "@/lib/employees/status";
 import { ensureEmployeeStatusSchema } from "@/lib/ensure-employee-status-schema";
 import { ensureJobDescriptionName } from "@/lib/org/ensure-org-structure";
 import { can } from "@/lib/permissions";
+import { disableStaffPortal } from "@/lib/tenancy/bootstrap-company";
 import { z } from "zod";
 
 const realName = (label: string) =>
@@ -220,6 +221,16 @@ export async function PATCH(
         employeeId: employee.id,
         kind: "OFFBOARDING",
       });
+    }
+
+    if (
+      body.employmentType === "CONTRACT" ||
+      (body.status && isEmploymentEnded(body.status))
+    ) {
+      await disableStaffPortal({
+        companyId: session.user.companyId,
+        employeeId: employee.id,
+      }).catch(() => null);
     }
 
     return NextResponse.json(serializeBigInts(employee));

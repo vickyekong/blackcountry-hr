@@ -21,6 +21,8 @@ import {
 } from "@/lib/leave/unpaid-leave";
 import type { PayrollAdjustments, StatutoryConfigInput } from "@/lib/payroll/types";
 import { ensurePayrollHardeningSchema } from "@/lib/ensure-payroll-hardening-schema";
+import { approvedTimesheetHoursForPeriod } from "@/lib/timesheets/period";
+import { applyTimesheetsToCompensation } from "@/lib/payroll/timesheet-pay";
 
 export class PayrollRunError extends Error {
   constructor(
@@ -204,8 +206,15 @@ function payslipDataFromBreakdown(
   runId: string,
   employeeId: string,
   breakdown: ReturnType<typeof calculatePayroll>,
-  ytd: { ytdGrossKobo: bigint; ytdPayeKobo: bigint; ytdNetKobo: bigint }
+  ytd: { ytdGrossKobo: bigint; ytdPayeKobo: bigint; ytdNetKobo: bigint },
+  timesheet?: ReturnType<typeof applyTimesheetsToCompensation>["timesheet"]
 ) {
+  const payload = {
+    ...(serializeBigInts(breakdown) as object),
+    ...(timesheet
+      ? { timesheet: serializeBigInts(timesheet) }
+      : {}),
+  } as object;
   return {
     payrollRunId: runId,
     employeeId,
@@ -229,7 +238,7 @@ function payslipDataFromBreakdown(
     ytdGrossKobo: ytd.ytdGrossKobo,
     ytdPayeKobo: ytd.ytdPayeKobo,
     ytdNetKobo: ytd.ytdNetKobo,
-    breakdown: serializeBigInts(breakdown) as object,
+    breakdown: payload,
   };
 }
 
@@ -276,6 +285,15 @@ export async function recalculatePayrollRun(
     employees.map((e) => e.id)
   );
 
+  const timesheetRows = await approvedTimesheetHoursForPeriod(
+    companyId,
+    run.periodYear,
+    run.periodMonth
+  );
+  const timesheetMinutes = new Map(
+    timesheetRows.map((row) => [row.employeeId, row.minutes])
+  );
+
   const payslipRows = employees.map((employee) => {
     const leaveAdj = buildLeaveAdjustments(
       employee,
@@ -285,8 +303,11 @@ export async function recalculatePayrollRun(
     const manualAdj = manualAdjustments.get(employee.id) ?? {};
     const adjustments = mergeAdjustments(leaveAdj, manualAdj);
 
-    const breakdown = calculatePayroll(
-      {
+    const { compensation, timesheet } = applyTimesheetsToCompensation({
+      employmentType: employee.employmentType,
+      approvedMinutes: timesheetMinutes.get(employee.id) ?? 0,
+      workingDaysPerMonth: config.workingDaysPerMonth,
+      compensation: {
         basicSalaryKobo: employee.basicSalaryKobo,
         housingAllowanceKobo: employee.housingAllowanceKobo,
         transportAllowanceKobo: employee.transportAllowanceKobo,
@@ -294,6 +315,10 @@ export async function recalculatePayrollRun(
         nonTaxableReimbursementsKobo: employee.nonTaxableReimbursementsKobo,
         annualRentKobo: employee.annualRentKobo,
       },
+    });
+
+    const breakdown = calculatePayroll(
+      compensation,
       config,
       { month: run.periodMonth, year: run.periodYear },
       adjustments
@@ -305,11 +330,17 @@ export async function recalculatePayrollRun(
       net: 0n,
     };
 
-    return payslipDataFromBreakdown(run.id, employee.id, breakdown, {
-      ytdGrossKobo: prior.gross + breakdown.earnings.grossPayKobo,
-      ytdPayeKobo: prior.paye + breakdown.deductions.payeKobo,
-      ytdNetKobo: prior.net + breakdown.netPayKobo,
-    });
+    return payslipDataFromBreakdown(
+      run.id,
+      employee.id,
+      breakdown,
+      {
+        ytdGrossKobo: prior.gross + breakdown.earnings.grossPayKobo,
+        ytdPayeKobo: prior.paye + breakdown.deductions.payeKobo,
+        ytdNetKobo: prior.net + breakdown.netPayKobo,
+      },
+      timesheet
+    );
   });
 
   const processedEmployeeIds = payslipRows.map((r) => r.employeeId);

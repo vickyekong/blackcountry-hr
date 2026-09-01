@@ -108,21 +108,6 @@ export function calculatePaye(
 
   const isMinimumWageExempt = annualGrossKobo <= config.minimumWageExemptKobo;
 
-  if (isMinimumWageExempt) {
-    return {
-      annualGrossKobo,
-      annualPensionEmployeeKobo,
-      annualNhfKobo,
-      annualRentReliefKobo: 0n,
-      annualTaxReliefKobo: 0n,
-      annualTaxableIncomeKobo: 0n,
-      annualPayeKobo: 0n,
-      monthlyPayeKobo: 0n,
-      taxByBand: [],
-      isMinimumWageExempt: true,
-    };
-  }
-
   const annualRentReliefKobo =
     config.taxReliefMode === "NTA2025"
       ? calculateAnnualRentRelief(annualRentKobo, config.rentReliefCapKobo)
@@ -141,6 +126,21 @@ export function calculatePaye(
       annualNhfKobo -
       annualTaxReliefKobo
   );
+
+  if (isMinimumWageExempt) {
+    return {
+      annualGrossKobo,
+      annualPensionEmployeeKobo,
+      annualNhfKobo,
+      annualRentReliefKobo,
+      annualTaxReliefKobo,
+      annualTaxableIncomeKobo,
+      annualPayeKobo: 0n,
+      monthlyPayeKobo: 0n,
+      taxByBand: [],
+      isMinimumWageExempt: true,
+    };
+  }
 
   const { totalTaxKobo: annualPayeKobo, taxByBand } = calculateProgressiveTax(
     annualTaxableIncomeKobo,

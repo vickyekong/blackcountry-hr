@@ -8,6 +8,7 @@ import {
 } from "@/lib/payroll/run-service";
 import { syncAttendanceIntoPayroll } from "@/lib/attendance/service";
 import { getPayrollPreflight } from "@/lib/payroll/preflight";
+import { accessibleCompanyIds } from "@/lib/tenancy/workspace";
 import { z } from "zod";
 
 export const runtime = "nodejs";
@@ -30,11 +31,18 @@ export async function GET() {
     ) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
+    const companyIds = can(session.user.role, "processPayrollFinance")
+      ? await accessibleCompanyIds(
+          session.user.homeCompanyId,
+          session.user.role
+        )
+      : [session.user.companyId];
     const runs = await prisma.payrollRun.findMany({
-      where: { companyId: session.user.companyId },
+      where: { companyId: { in: companyIds } },
       include: {
         createdBy: { select: { name: true } },
         approvedBy: { select: { name: true } },
+        company: { select: { name: true } },
         _count: { select: { payslips: true } },
       },
       orderBy: [{ periodYear: "desc" }, { periodMonth: "desc" }],

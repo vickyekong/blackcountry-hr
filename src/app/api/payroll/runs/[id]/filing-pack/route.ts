@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAuth, handleApiError } from "@/lib/api-auth";
 import { can } from "@/lib/permissions";
 import { buildStatutoryFilingPack } from "@/lib/reports/filing-pack";
+import { findAccessiblePayrollRun } from "@/lib/tenancy/workspace";
 
 export async function GET(
   _req: Request,
@@ -17,10 +18,12 @@ export async function GET(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const pack = await buildStatutoryFilingPack(
-      session.user.companyId,
-      params.id
-    );
+    const run = await findAccessiblePayrollRun(session.user, params.id);
+    if (!run) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    const pack = await buildStatutoryFilingPack(run.companyId, params.id);
 
     return new NextResponse(Buffer.from(pack.zip), {
       headers: {

@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db";
 import type { UserRole } from "@prisma/client";
 import { isEmploymentEnded } from "@/lib/employees/status";
 import { canAccessCompany } from "@/lib/tenancy/workspace";
+import { nextAuthSecret } from "@/lib/env";
 
 declare module "next-auth" {
   interface Session {
@@ -40,7 +41,7 @@ declare module "next-auth/jwt" {
 }
 
 export const authOptions: NextAuthOptions = {
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: nextAuthSecret(),
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",

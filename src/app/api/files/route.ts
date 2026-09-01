@@ -23,7 +23,12 @@ export async function GET() {
     const files = await prisma.workspaceFile.findMany({
       where: { companyId: session.user.companyId },
       include: {
-        grants: { select: { employeeId: true } },
+        grants: {
+          select: {
+            employeeId: true,
+            employee: { select: { firstName: true, lastName: true } },
+          },
+        },
       },
       orderBy: { createdAt: "desc" },
     });
@@ -61,6 +66,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (body.visibility === "SPECIFIC" && !body.employeeIds?.length) {
+      return NextResponse.json(
+        { error: "Pick at least one person who can view this file" },
+        { status: 400 }
+      );
+    }
+
     const file = await prisma.workspaceFile.create({
       data: {
         companyId: session.user.companyId,
@@ -76,7 +88,14 @@ export async function POST(req: NextRequest) {
               }
             : undefined,
       },
-      include: { grants: { select: { employeeId: true } } },
+      include: {
+        grants: {
+          select: {
+            employeeId: true,
+            employee: { select: { firstName: true, lastName: true } },
+          },
+        },
+      },
     });
     return NextResponse.json(file, { status: 201 });
   } catch (error) {

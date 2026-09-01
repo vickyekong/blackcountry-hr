@@ -51,4 +51,14 @@ describe("five-portal roles", () => {
     expect(canReviewChangeType("HR_ADMIN", "BANK")).toBe(false);
     expect(canReviewChangeType("SUPER_ADMIN", "BANK")).toBe(true);
   });
+
+  it("does not let HR reverse Super Admin payroll sign-off", () => {
+    expect(can("HR_ADMIN", "approvePayroll")).toBe(false);
+    expect(can("SUPER_ADMIN", "approvePayroll")).toBe(true);
+  });
+
+  it("keeps payslips off the business head seat", () => {
+    expect(can("BUSINESS_HEAD", "viewPayslips")).toBe(false);
+    expect(can("HR_ADMIN", "viewPayslips")).toBe(true);
+  });
 });

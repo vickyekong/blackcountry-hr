@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { databaseUrl } from "./env";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -10,7 +11,7 @@ const globalForPrisma = globalThis as unknown as {
  * Bump pool timeout and allow a small limit when not using PgBouncer.
  */
 function datasourceUrl(): string | undefined {
-  const raw = process.env.DATABASE_URL;
+  const raw = databaseUrl();
   if (!raw) return undefined;
 
   try {

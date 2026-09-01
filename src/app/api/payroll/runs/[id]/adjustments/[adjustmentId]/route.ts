@@ -6,6 +6,7 @@ import {
   recalculatePayrollRun,
   PayrollRunError,
 } from "@/lib/payroll/run-service";
+import { findAccessiblePayrollRun } from "@/lib/tenancy/workspace";
 
 export async function DELETE(
   _req: NextRequest,
@@ -17,11 +18,15 @@ export async function DELETE(
       throw new AuthError("Forbidden", 403);
     }
 
+    const run = await findAccessiblePayrollRun(session.user, params.id);
+    if (!run) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
     const adjustment = await prisma.payrollAdjustment.findFirst({
       where: {
         id: params.adjustmentId,
-        payrollRunId: params.id,
-        payrollRun: { companyId: session.user.companyId },
+        payrollRunId: run.id,
       },
     });
 
@@ -29,10 +34,10 @@ export async function DELETE(
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    const run = await prisma.payrollRun.findUnique({
-      where: { id: params.id },
+    const payrollRun = await prisma.payrollRun.findUnique({
+      where: { id: run.id },
     });
-    if (run?.status !== "DRAFT") {
+    if (payrollRun?.status !== "DRAFT") {
       return NextResponse.json(
         { error: "Can only delete adjustments on draft runs" },
         { status: 400 }
@@ -41,13 +46,13 @@ export async function DELETE(
 
     await prisma.payrollAdjustment.delete({ where: { id: adjustment.id } });
 
-    await recalculatePayrollRun(run.id, session.user.companyId, {
+    await recalculatePayrollRun(run.id, run.companyId, {
       employeeId: adjustment.employeeId,
     });
 
     await prisma.auditLog.create({
       data: {
-        companyId: session.user.companyId,
+        companyId: run.companyId,
         action: "DELETE_ADJUSTMENT",
         entityType: "PayrollAdjustment",
         entityId: adjustment.id,

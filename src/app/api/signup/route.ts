@@ -5,6 +5,8 @@ import {
   TenancyError,
 } from "@/lib/tenancy/bootstrap-company";
 import { handleApiError } from "@/lib/api-auth";
+import { isSignupEnabled } from "@/lib/env";
+import { clientIp, consumeRateLimit } from "@/lib/rate-limit";
 
 const signupSchema = z.object({
   companyName: z.string().trim().min(2).max(120),
@@ -14,12 +16,35 @@ const signupSchema = z.object({
   adminPassword: z.string().min(8).max(128),
 });
 
+export async function GET() {
+  return NextResponse.json({ enabled: isSignupEnabled() });
+}
+
 /**
  * Public tenant signup. Creates company + NTA defaults + Super Admin.
  * Demo Blackcountry Group (seed-company / *@blackcountry.ng) is untouched.
+ * Closed in production unless SIGNUP_ENABLED=true.
  */
 export async function POST(req: NextRequest) {
   try {
+    if (!isSignupEnabled()) {
+      return NextResponse.json(
+        {
+          error:
+            "Public signup is closed. Ask your Super Admin for an invite.",
+        },
+        { status: 403 }
+      );
+    }
+
+    const ip = clientIp(req);
+    if (!consumeRateLimit(`signup:${ip}`, 5, 15 * 60 * 1000)) {
+      return NextResponse.json(
+        { error: "Too many signup attempts. Try again later." },
+        { status: 429 }
+      );
+    }
+
     const body = signupSchema.parse(await req.json());
     const result = await bootstrapCompany({
       companyName: body.companyName,

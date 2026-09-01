@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAuth, handleApiError } from "@/lib/api-auth";
 import { getPayrollPreflight } from "@/lib/payroll/preflight";
 import { can } from "@/lib/permissions";
+import { findAccessiblePayrollRun } from "@/lib/tenancy/workspace";
 
 export async function GET(
   _req: Request,
@@ -16,10 +17,12 @@ export async function GET(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const preflight = await getPayrollPreflight(
-      session.user.companyId,
-      params.id
-    );
+    const run = await findAccessiblePayrollRun(session.user, params.id);
+    if (!run) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    const preflight = await getPayrollPreflight(run.companyId, params.id);
     return NextResponse.json(preflight);
   } catch (error) {
     if (error instanceof Error && error.message === "Payroll run not found") {

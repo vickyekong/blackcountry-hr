@@ -461,7 +461,13 @@ export function scoreEmployeeNameMatch(
   const lastHit =
     a.some((t) => t === b[b.length - 1]) ||
     b.some((t) => t === a[a.length - 1]);
-  const firstHit = a[0] === b[0] || shared.includes(a[0]) || shared.includes(b[0]);
+  const firstFuzzy =
+    a[0] === b[0] ||
+    (a[0][0] === b[0][0] &&
+      editDistance(a[0], b[0]) <= 2 &&
+      Math.min(a[0].length, b[0].length) >= 5);
+  const firstHit =
+    firstFuzzy || shared.includes(a[0]) || shared.includes(b[0]);
   let score = jaccard + fuzzyBonus;
   if (firstHit && lastHit) score += 0.15;
   return Math.min(1, score);

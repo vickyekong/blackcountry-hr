@@ -9,6 +9,7 @@ import {
 } from "@/lib/hr-desk/classify";
 import type { HrDeskCategory } from "@prisma/client";
 import { PERMISSIONS } from "@/lib/permissions";
+import { getAppBaseUrl } from "@/lib/app-url";
 
 async function getGmailClient(companyId: string) {
   const integration = await prisma.googleDriveIntegration.findUnique({
@@ -127,7 +128,7 @@ async function notifyHrAdmins(options: {
     select: { id: true },
   });
 
-  const linkUrl = `${process.env.NEXTAUTH_URL?.replace(/\/$/, "") || ""}/hr-desk?id=${options.messageId}`;
+  const linkUrl = `${getAppBaseUrl()}/hr-desk?id=${options.messageId}`;
 
   await Promise.all(
     recipients.map((user) =>

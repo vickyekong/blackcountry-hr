@@ -8,6 +8,7 @@ import {
   PayrollRunError,
 } from "@/lib/payroll/run-service";
 import { serializeBigInts } from "@/lib/payroll/config-mapper";
+import { findAccessiblePayrollRun } from "@/lib/tenancy/workspace";
 import { z } from "zod";
 
 const adjustmentSchema = z.object({
@@ -35,9 +36,7 @@ export async function POST(
 
     const body = adjustmentSchema.parse(await req.json());
 
-    const run = await prisma.payrollRun.findFirst({
-      where: { id: params.id, companyId: session.user.companyId },
-    });
+    const run = await findAccessiblePayrollRun(session.user, params.id);
     if (!run) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
@@ -51,7 +50,7 @@ export async function POST(
     const employee = await prisma.employee.findFirst({
       where: {
         id: body.employeeId,
-        companyId: session.user.companyId,
+        companyId: run.companyId,
         status: "ACTIVE",
       },
     });
@@ -77,13 +76,13 @@ export async function POST(
       },
     });
 
-    await recalculatePayrollRun(run.id, session.user.companyId, {
+    await recalculatePayrollRun(run.id, run.companyId, {
       employeeId: body.employeeId,
     });
 
     await prisma.auditLog.create({
       data: {
-        companyId: session.user.companyId,
+        companyId: run.companyId,
         action: "ADD_ADJUSTMENT",
         entityType: "PayrollAdjustment",
         entityId: adjustment.id,
@@ -117,10 +116,7 @@ export async function DELETE(
       throw new AuthError("Forbidden", 403);
     }
 
-    const run = await prisma.payrollRun.findFirst({
-      where: { id: params.id, companyId: session.user.companyId },
-      select: { id: true, status: true },
-    });
+    const run = await findAccessiblePayrollRun(session.user, params.id);
     if (!run) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
@@ -136,12 +132,12 @@ export async function DELETE(
     });
 
     if (deleted.count > 0) {
-      await recalculatePayrollRun(run.id, session.user.companyId);
+      await recalculatePayrollRun(run.id, run.companyId);
     }
 
     await prisma.auditLog.create({
       data: {
-        companyId: session.user.companyId,
+        companyId: run.companyId,
         action: "DELETE_ALL_ADJUSTMENTS",
         entityType: "PayrollRun",
         entityId: run.id,

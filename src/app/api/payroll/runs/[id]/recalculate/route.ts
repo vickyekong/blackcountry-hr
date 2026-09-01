@@ -6,6 +6,7 @@ import {
   PayrollRunError,
 } from "@/lib/payroll/run-service";
 import { syncAttendanceIntoPayroll } from "@/lib/attendance/service";
+import { findAccessiblePayrollRun } from "@/lib/tenancy/workspace";
 import { z } from "zod";
 
 export const runtime = "nodejs";
@@ -22,6 +23,11 @@ export async function POST(
 ) {
   try {
     const session = await requirePermission("runPayroll");
+    const run = await findAccessiblePayrollRun(session.user, params.id);
+    if (!run) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+    const operatingCompanyId = run.companyId;
     let syncAttendance = false;
     try {
       const json = await req.json();
@@ -35,7 +41,7 @@ export async function POST(
     if (syncAttendance) {
       try {
         attendance = await syncAttendanceIntoPayroll({
-          companyId: session.user.companyId,
+          companyId: operatingCompanyId,
           payrollRunId: params.id,
         });
       } catch (err) {
@@ -43,14 +49,11 @@ export async function POST(
       }
     }
 
-    const result = await recalculatePayrollRun(
-      params.id,
-      session.user.companyId
-    );
+    const result = await recalculatePayrollRun(params.id, operatingCompanyId);
 
     await prisma.auditLog.create({
       data: {
-        companyId: session.user.companyId,
+        companyId: operatingCompanyId,
         action: "RECALCULATE",
         entityType: "PayrollRun",
         entityId: params.id,
