@@ -1,10 +1,22 @@
 /**
- * Runtime env access that Next.js webpack does not inline.
- * `process.env.FOO` is replaced at build with "" when the var is a Vercel
- * Sensitive secret (unavailable at build). Bracket + env() keeps a live lookup.
+ * Live process.env lookup that Next.js SWC/webpack cannot constant-fold.
+ * `process.env.FOO` and `process.env["FOO"]` are replaced at build with ""
+ * when the var is a Vercel Sensitive secret (unavailable at build). Walking
+ * keys on globalThis.process.env keeps a real runtime read.
  */
+function liveProcessEnv(): NodeJS.ProcessEnv {
+  return globalThis.process?.env ?? {};
+}
+
 export function env(name: string): string | undefined {
-  const value = process.env[name];
+  const runtime = liveProcessEnv();
+  let value: string | undefined;
+  for (const key of Object.keys(runtime)) {
+    if (key === name) {
+      value = runtime[key];
+      break;
+    }
+  }
   if (typeof value !== "string") return undefined;
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : undefined;

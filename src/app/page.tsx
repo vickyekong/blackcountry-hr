@@ -8,7 +8,12 @@ import { isSignupEnabled } from "@/lib/env";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const session = await getServerSession(authOptions);
+  let session = null;
+  try {
+    session = await getServerSession(authOptions);
+  } catch (error) {
+    console.error("[home] session lookup failed", error);
+  }
   if (session?.user?.role) {
     redirect(homePathForRole(session.user.role));
   }

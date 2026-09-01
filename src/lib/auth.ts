@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db";
 import type { UserRole } from "@prisma/client";
 import { isEmploymentEnded } from "@/lib/employees/status";
 import { canAccessCompany } from "@/lib/tenancy/workspace";
+import { ensureAuthUrlEnv } from "@/lib/app-url";
 import { nextAuthSecret } from "@/lib/env";
 
 declare module "next-auth" {
@@ -41,7 +42,12 @@ declare module "next-auth/jwt" {
 }
 
 export const authOptions: NextAuthOptions = {
-  secret: nextAuthSecret(),
+  // Getter so the secret is read per request, after Vercel runtime env is present.
+  // A one-shot `secret: nextAuthSecret()` is empty if the module loaded at build.
+  get secret() {
+    ensureAuthUrlEnv();
+    return nextAuthSecret();
+  },
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",

@@ -6,8 +6,10 @@ import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { prisma } from "@/lib/db";
 import { isEmploymentEnded } from "@/lib/employees/status";
+import { ensureAuthUrlEnv } from "@/lib/app-url";
 
 export async function getSession() {
+  ensureAuthUrlEnv();
   return getServerSession(authOptions);
 }
 

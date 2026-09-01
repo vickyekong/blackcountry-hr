@@ -33,6 +33,9 @@ const nextConfig = {
       "google-auth-library",
       "pdf-parse",
       "xlsx",
+      // Keep next-auth unbundled so `process.env.NEXTAUTH_SECRET` is a live
+      // runtime read, not an empty string inlined at build (Vercel Sensitive).
+      "next-auth",
     ],
   },
 };
