@@ -4,14 +4,61 @@ import { DEFAULT_NTA2025_TAX_BANDS } from "../src/lib/payroll/paye";
 
 const prisma = new PrismaClient();
 
+const GROUP_ADDRESS = "Venia Place, 8 Providence Street, Lekki Phase 1, Lagos";
+
+async function upsertSubCompany(parentId: string, opts: {
+  id: string;
+  name: string;
+  address: string;
+  bandPrefix: string;
+}) {
+  const sub = await prisma.company.upsert({
+    where: { id: opts.id },
+    update: { parentId, name: opts.name, address: opts.address },
+    create: {
+      id: opts.id,
+      name: opts.name,
+      address: opts.address,
+      parentId,
+    },
+  });
+
+  await prisma.statutoryConfig.upsert({
+    where: { companyId: sub.id },
+    update: {},
+    create: {
+      companyId: sub.id,
+      taxReliefMode: "NTA2025",
+    },
+  });
+
+  for (let i = 0; i < DEFAULT_NTA2025_TAX_BANDS.length; i++) {
+    const band = DEFAULT_NTA2025_TAX_BANDS[i];
+    await prisma.taxBand.upsert({
+      where: { id: `${opts.bandPrefix}-${i}` },
+      update: { companyId: sub.id },
+      create: {
+        id: `${opts.bandPrefix}-${i}`,
+        companyId: sub.id,
+        lowerBoundKobo: band.lowerBoundKobo,
+        upperBoundKobo: band.upperBoundKobo,
+        rateBps: band.rateBps,
+        sortOrder: i,
+      },
+    });
+  }
+
+  return sub;
+}
+
 async function main() {
   const company = await prisma.company.upsert({
     where: { id: "seed-company" },
-    update: { name: "Blackcountry Group" },
+    update: { name: "Blackcountry Group", address: GROUP_ADDRESS },
     create: {
       id: "seed-company",
       name: "Blackcountry Group",
-      address: "12 Victoria Island, Lagos",
+      address: GROUP_ADDRESS,
     },
   });
 
@@ -64,39 +111,31 @@ async function main() {
 
   // Legacy cleanup no longer deletes Finance — it is a first-class portal
 
-  const subsidiary = await prisma.company.upsert({
-    where: { id: "seed-subsidiary" },
-    update: { parentId: company.id, name: "Blackcountry Foods Ltd" },
-    create: {
-      id: "seed-subsidiary",
-      name: "Blackcountry Foods Ltd",
-      address: "8 Trans Amadi, Port Harcourt",
-      parentId: company.id,
-    },
+  const farms = await upsertSubCompany(company.id, {
+    id: "seed-subsidiary",
+    name: "Blackcountry Farms",
+    address: "Ogonmeri, Nigeria",
+    bandPrefix: "seed-sub-band",
   });
 
-  await prisma.statutoryConfig.upsert({
-    where: { companyId: subsidiary.id },
-    update: {},
-    create: {
-      companyId: subsidiary.id,
-      taxReliefMode: "NTA2025",
-    },
+  const engineering = await upsertSubCompany(company.id, {
+    id: "seed-engineering",
+    name: "Blackcountry Engineering",
+    address: "Ajah, Lagos",
+    bandPrefix: "seed-eng-band",
   });
 
-  for (let i = 0; i < DEFAULT_NTA2025_TAX_BANDS.length; i++) {
-    const band = DEFAULT_NTA2025_TAX_BANDS[i];
-    await prisma.taxBand.upsert({
-      where: { id: `seed-sub-band-${i}` },
-      update: {},
-      create: {
-        id: `seed-sub-band-${i}`,
-        companyId: subsidiary.id,
-        lowerBoundKobo: band.lowerBoundKobo,
-        upperBoundKobo: band.upperBoundKobo,
-        rateBps: band.rateBps,
-        sortOrder: i,
-      },
+  const engineeringBusinesses = [
+    { id: "seed-eng-design", name: "Blackcountry Design", bandPrefix: "seed-eng-design-band" },
+    { id: "seed-eng-interiors", name: "Blackcountry Interiors", bandPrefix: "seed-eng-interiors-band" },
+    { id: "seed-eng-construction", name: "Blackcountry Construction", bandPrefix: "seed-eng-construction-band" },
+    { id: "seed-eng-machinery", name: "Blackcountry Machinery", bandPrefix: "seed-eng-machinery-band" },
+    { id: "seed-eng-automation", name: "Blackcountry Automation", bandPrefix: "seed-eng-automation-band" },
+  ];
+  for (const child of engineeringBusinesses) {
+    await upsertSubCompany(engineering.id, {
+      ...child,
+      address: "Ajah, Lagos",
     });
   }
 
@@ -106,21 +145,21 @@ async function main() {
       role: "BUSINESS_HEAD",
       name: "Ifeanyi Okoro",
       passwordHash,
-      companyId: subsidiary.id,
+      companyId: farms.id,
     },
     create: {
       email: "head@blackcountry.africa",
       name: "Ifeanyi Okoro",
       role: "BUSINESS_HEAD",
       passwordHash,
-      companyId: subsidiary.id,
+      companyId: farms.id,
     },
   });
 
   const headEmployee = await prisma.employee.upsert({
     where: {
       companyId_employeeCode: {
-        companyId: subsidiary.id,
+        companyId: farms.id,
         employeeCode: "BF-001",
       },
     },
@@ -139,7 +178,7 @@ async function main() {
       basicSalaryKobo: 80000000n,
       housingAllowanceKobo: 20000000n,
       transportAllowanceKobo: 5000000n,
-      companyId: subsidiary.id,
+      companyId: farms.id,
       startDate: new Date("2024-01-15"),
       status: "ACTIVE",
       employmentType: "FULL_TIME",
@@ -151,7 +190,7 @@ async function main() {
     data: { employeeId: headEmployee.id },
   });
 
-  await prisma.project.upsert({
+  const hq = await prisma.project.upsert({
     where: {
       companyId_name: { companyId: company.id, name: "HQ operations" },
     },
@@ -163,17 +202,42 @@ async function main() {
     },
   });
 
-  await prisma.project.upsert({
+  const farmProject = await prisma.project.upsert({
     where: {
-      companyId_name: { companyId: subsidiary.id, name: "Plant line A" },
+      companyId_name: { companyId: farms.id, name: "Grainsland Ogonmeri" },
     },
     update: {},
     create: {
-      companyId: subsidiary.id,
-      name: "Plant line A",
-      code: "PLA",
+      companyId: farms.id,
+      name: "Grainsland Ogonmeri",
+      code: "FARM",
     },
   });
+
+  const engProject = await prisma.project.upsert({
+    where: {
+      companyId_name: { companyId: engineering.id, name: "Site works" },
+    },
+    update: {},
+    create: {
+      companyId: engineering.id,
+      name: "Site works",
+      code: "ENG",
+    },
+  });
+
+  async function ensureTasks(projectId: string, names: string[]) {
+    for (const name of names) {
+      await prisma.projectTask.upsert({
+        where: { projectId_name: { projectId, name } },
+        update: {},
+        create: { projectId, name },
+      });
+    }
+  }
+  await ensureTasks(hq.id, ["General", "Operations"]);
+  await ensureTasks(farmProject.id, ["Field work", "Harvest"]);
+  await ensureTasks(engProject.id, ["Site", "Design"]);
 
   const departmentNames = ["Engineering", "Finance", "HR", "Management"];
   for (const name of departmentNames) {
@@ -339,7 +403,7 @@ async function main() {
   console.log("Group Super Admin: admin@blackcountry.africa / password123");
   console.log("Group HR:          hr@blackcountry.africa / password123");
   console.log("Group Finance:     finance@blackcountry.africa / password123");
-  console.log("Business head:     head@blackcountry.africa / password123 (Blackcountry Foods)");
+  console.log("Business head:     head@blackcountry.africa / password123 (Blackcountry Farms)");
   console.log("Staff (full-time): adaeze@blackcountry.africa / password123");
   console.log("Contract (no login): EMP-004 Tunde Adeyemi");
 }

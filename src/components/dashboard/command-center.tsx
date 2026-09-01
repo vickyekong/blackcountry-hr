@@ -183,6 +183,7 @@ export function QuickWorkflows({
       ? [{ href: "/employees/new", label: "Onboard employee" }]
       : []),
     { href: "/timesheets", label: timesheetsLabel },
+    { href: "/projects", label: "Projects" },
     ...(showHrAsk
       ? [{ href: "/hr-ask", label: "Draft policy / query desk" }]
       : []),

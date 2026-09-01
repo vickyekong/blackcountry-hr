@@ -9,8 +9,8 @@ export default function StaffTimesheetsPage() {
       <div className="mb-8">
         <h1 className="text-2xl font-semibold text-ink">Timesheets</h1>
         <p className="mt-1 text-sm text-muted">
-          Log hours for the week. HR validates the week; after that you cannot
-          change it.
+          Log hours for the week against a project and task. HR validates the
+          week; after that you cannot change it.
         </p>
       </div>
       <WeeklyTimesheet />

@@ -306,7 +306,7 @@ export type CreateSubsidiaryInput = {
   address?: string | null;
 };
 
-/** Register a sub-company under a group. v1: one level only (no grandchildren). */
+/** Register a sub-company under a group company or another sub-company. */
 export async function createSubsidiary(input: CreateSubsidiaryInput) {
   const name = input.name.trim();
   if (name.length < 2) {
@@ -322,13 +322,7 @@ export async function createSubsidiary(input: CreateSubsidiaryInput) {
     },
   });
   if (!parent) {
-    throw new TenancyError("Group company not found", 404);
-  }
-  if (parent.parentId) {
-    throw new TenancyError(
-      "A sub-company cannot have its own subsidiaries in this version.",
-      400
-    );
+    throw new TenancyError("Parent company not found", 404);
   }
 
   const address = input.address?.trim() || null;

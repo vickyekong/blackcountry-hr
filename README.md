@@ -119,7 +119,7 @@ The build script runs `prisma generate` automatically before `next build`.
 
 ## Demo Accounts
 
-Blackcountry Group workspace plus Blackcountry Foods as a sub-company. Password is `password123` for all.
+Blackcountry Group workspace, Blackcountry Farms, and Blackcountry Engineering (with Design, Interiors, Construction, Machinery, and Automation under Engineering). Password is `password123` for all.
 
 | User | Email | Password |
 |------|-------|----------|
@@ -136,7 +136,9 @@ Blackcountry Group workspace plus Blackcountry Foods as a sub-company. Password 
 - **Payroll runs** — Draft → Under Review → Approved → Paid (immutable after approval)
 - **Payslips** — PDF generation with YTD summary (HR / Super Admin)
 - **Leave management** — Staff apply; HR can also record leave. Unpaid leave → payroll deductions
-- **Staff portal** — own details, leave, company requests, and approved payslips (no admin tools)
+- **Staff portal** — own details, leave, timesheets, projects, company requests, and approved payslips
+- **Projects** — Super Admin, HR, and business heads create projects and tasks; Staff can view; Finance cannot
+- **Timesheets** — weekly hours tied to a project and task; HR validates the week
 - **Reports** — remittances, department breakdown, employer cost
 - **Exports** — staff & payroll CSV download, optional Google Drive upload
 - **HR Ask / Desk** — policy queries, lifecycle, change-request review

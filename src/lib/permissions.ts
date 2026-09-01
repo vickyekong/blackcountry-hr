@@ -2,11 +2,11 @@ import type { UserRole } from "@prisma/client";
 
 /**
  * Five portals:
- *   Super Admin — payroll sign-off, sensitive change requests, Settings, group tree
+ *   Super Admin — payroll sign-off, sensitive change requests, Settings, full group tree
  *   HR — people ops; seeks Super Admin clearance on payroll & bank/tax updates
  *   Finance — processes approved payroll; does not hire or create logins
- *   Business head — one sub-company; files, projects, own weekly timesheets; not payroll approve
- *   Staff — own profile, leave, timesheets, and company requests only
+ *   Business head — home company plus nested sub-companies; files, projects, own weekly timesheets; not payroll approve
+ *   Staff — own profile, leave, timesheets, projects, and company requests only
  */
 export const PORTAL_ROLES = [
   "SUPER_ADMIN",
@@ -66,7 +66,7 @@ export const PERMISSIONS = {
   manageCompanySettings: ["SUPER_ADMIN", "HR_ADMIN"] as UserRole[],
   /** PAYE bands and statutory rates — Super Admin only */
   manageStatutoryRates: ["SUPER_ADMIN"] as UserRole[],
-  /** Register a sub-company under the group */
+  /** Register a sub-company under the group or another sub-company */
   manageGroupCompanies: ["SUPER_ADMIN"] as UserRole[],
   manageEmployees: ["SUPER_ADMIN", "HR_ADMIN"] as UserRole[],
   viewEmployees: ["SUPER_ADMIN", "HR_ADMIN", "BUSINESS_HEAD"] as UserRole[],
@@ -96,6 +96,9 @@ export const PERMISSIONS = {
   /** Staff portal — own record only */
   accessStaffPortal: ["EMPLOYEE"] as UserRole[],
   accessFinancePortal: ["FINANCE"] as UserRole[],
+  /** Company projects — all portals except Finance */
+  viewProjects: ["SUPER_ADMIN", "HR_ADMIN", "BUSINESS_HEAD", "EMPLOYEE"] as UserRole[],
+  /** Create and archive projects and tasks */
   manageProjects: ["SUPER_ADMIN", "HR_ADMIN", "BUSINESS_HEAD"] as UserRole[],
   /** Own weekly hours — Staff and Business head (linked staff record). */
   logTimesheets: ["EMPLOYEE", "BUSINESS_HEAD"] as UserRole[],

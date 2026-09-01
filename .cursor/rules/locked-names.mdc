@@ -14,8 +14,9 @@ alwaysApply: true
 - Repo folder: `blackcountry-hr`; user-facing strings use **Blackcountry HR System**
 
 ## Org language
-- **Group company** — parent / holding workspace
+- **Group company** — parent / holding workspace (Blackcountry Group)
 - **Sub-company** — separate legal employer under the group (not a department)
+- **Group tree:** Blackcountry Farms; Blackcountry Engineering, which itself has sub-companies (Design, Interiors, Construction, Machinery, Automation)
 
 ## Portal users
 - **Group CEO** — Super Admin of the group

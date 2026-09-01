@@ -72,6 +72,7 @@ export async function GET(req: NextRequest) {
           include: {
             employee: { select: employeeSelect },
             project: { select: { id: true, name: true, code: true } },
+            task: { select: { id: true, name: true } },
           },
           orderBy: [{ workDate: "asc" }, { createdAt: "asc" }],
         }),
@@ -99,12 +100,13 @@ export async function GET(req: NextRequest) {
           ? { status: { in: ["SUBMITTED", "DRAFT"] } }
           : {}),
       },
-      include: {
-        employee: { select: employeeSelect },
-        project: { select: { id: true, name: true, code: true } },
-      },
-      orderBy: [{ workDate: "desc" }],
-      take: 800,
+          include: {
+            employee: { select: employeeSelect },
+            project: { select: { id: true, name: true, code: true } },
+            task: { select: { id: true, name: true } },
+          },
+          orderBy: [{ workDate: "desc" }],
+          take: 800,
     });
 
     const weekStarts = [

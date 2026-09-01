@@ -1,17 +1,15 @@
 import type { UserRole } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { ensureGroupSchema } from "@/lib/ensure-group-schema";
-import { canSwitchAcrossGroup } from "@/lib/tenancy/group-access";
+import {
+  accessibleCompaniesForSeat,
+  ancestorCompanyIds,
+  type AccessibleCompany,
+} from "@/lib/tenancy/company-tree";
 
 export { canSwitchAcrossGroup } from "@/lib/tenancy/group-access";
 
-export type WorkspaceCompany = {
-  id: string;
-  name: string;
-  parentId: string | null;
-  isHome: boolean;
-  isGroup: boolean;
-};
+export type WorkspaceCompany = AccessibleCompany;
 
 export type WorkspaceActor = {
   role: UserRole;
@@ -24,40 +22,12 @@ export async function listAccessibleCompanies(
   role: UserRole
 ): Promise<WorkspaceCompany[]> {
   await ensureGroupSchema();
-  const home = await prisma.company.findUnique({
-    where: { id: homeCompanyId },
-    select: {
-      id: true,
-      name: true,
-      parentId: true,
-      subsidiaries: { select: { id: true, name: true, parentId: true } },
-    },
+  const all = await prisma.company.findMany({
+    select: { id: true, name: true, parentId: true },
   });
+  const home = all.find((c) => c.id === homeCompanyId);
   if (!home) return [];
-
-  const companies: WorkspaceCompany[] = [
-    {
-      id: home.id,
-      name: home.name,
-      parentId: home.parentId,
-      isHome: true,
-      isGroup: !home.parentId,
-    },
-  ];
-
-  if (canSwitchAcrossGroup(role) && !home.parentId) {
-    for (const child of home.subsidiaries) {
-      companies.push({
-        id: child.id,
-        name: child.name,
-        parentId: child.parentId,
-        isHome: false,
-        isGroup: false,
-      });
-    }
-  }
-
-  return companies;
+  return accessibleCompaniesForSeat(home, all, role);
 }
 
 export async function accessibleCompanyIds(
@@ -118,12 +88,8 @@ export async function payrollApproverCompanyIds(
   operatingCompanyId: string
 ): Promise<string[]> {
   await ensureGroupSchema();
-  const company = await prisma.company.findUnique({
-    where: { id: operatingCompanyId },
-    select: { id: true, parentId: true },
+  const all = await prisma.company.findMany({
+    select: { id: true, name: true, parentId: true },
   });
-  if (!company) return [operatingCompanyId];
-  return company.parentId
-    ? [company.id, company.parentId]
-    : [company.id];
+  return ancestorCompanyIds(operatingCompanyId, all);
 }

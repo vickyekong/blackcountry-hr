@@ -13,7 +13,8 @@ import {
   utcWeekStart,
 } from "@/lib/timesheets/period";
 
-type Project = { id: string; name: string; status: string };
+type ProjectTask = { id: string; name: string; status: string };
+type Project = { id: string; name: string; status: string; tasks: ProjectTask[] };
 type Entry = {
   id: string;
   workDate: string;
@@ -21,6 +22,7 @@ type Entry = {
   status: string;
   notes: string | null;
   project: { id: string; name: string };
+  task: { id: string; name: string };
 };
 
 type WeekMeta = {
@@ -70,6 +72,7 @@ export function WeeklyTimesheet({
   const [entries, setEntries] = useState<Entry[]>([]);
   const [week, setWeek] = useState<WeekMeta | null>(null);
   const [projectId, setProjectId] = useState("");
+  const [taskId, setTaskId] = useState("");
   const [hours, setHours] = useState<Record<string, string>>({});
   const [notes, setNotes] = useState("");
   const [error, setError] = useState("");
@@ -85,7 +88,13 @@ export function WeeklyTimesheet({
       .then((data) => {
         const list = Array.isArray(data) ? data : [];
         setProjects(list);
-        setProjectId((current) => current || list.find((p: Project) => p.status === "ACTIVE")?.id || "");
+        setProjectId((current) => {
+          const next =
+            current && list.some((p: Project) => p.id === current)
+              ? current
+              : list.find((p: Project) => p.status === "ACTIVE")?.id || "";
+          return next;
+        });
       });
     fetch(`/api/timesheets/weeks?${q.toString()}`)
       .then((r) => r.json())
@@ -100,6 +109,20 @@ export function WeeklyTimesheet({
   useEffect(() => {
     load();
   }, [load]);
+
+  const activeTasks = useMemo(
+    () =>
+      (projects.find((p) => p.id === projectId)?.tasks ?? []).filter(
+        (t) => t.status === "ACTIVE"
+      ),
+    [projects, projectId]
+  );
+
+  useEffect(() => {
+    if (!activeTasks.some((t) => t.id === taskId)) {
+      setTaskId(activeTasks[0]?.id ?? "");
+    }
+  }, [activeTasks, taskId]);
 
   const locked = Boolean(week?.locked);
   const totalHours = entries.reduce((sum, row) => sum + row.minutes, 0) / 60;
@@ -122,6 +145,7 @@ export function WeeklyTimesheet({
           body: JSON.stringify({
             ...(employeeId ? { employeeId } : {}),
             projectId,
+            taskId,
             workDate: iso,
             minutes: Math.round(value * 60),
             notes: notes || null,
@@ -198,8 +222,8 @@ export function WeeklyTimesheet({
         </p>
       ) : (
         <p className="mb-4 text-sm text-muted">
-          Log the week, then HR validates it. After validation you cannot change
-          this week.
+          Log the week against a project and task, then HR validates it. After
+          validation you cannot change this week.
         </p>
       )}
 
@@ -234,6 +258,24 @@ export function WeeklyTimesheet({
                   </select>
                 </div>
                 <div>
+                  <Label htmlFor="taskId">Task</Label>
+                  <select
+                    id="taskId"
+                    name="taskId"
+                    required
+                    value={taskId}
+                    onChange={(e) => setTaskId(e.target.value)}
+                    className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                  >
+                    <option value="">Select</option>
+                    {activeTasks.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="sm:col-span-2">
                   <Label htmlFor="notes">Notes (optional)</Label>
                   <Input
                     id="notes"
@@ -267,7 +309,7 @@ export function WeeklyTimesheet({
                   );
                 })}
               </div>
-              <Button type="submit" variant="brand" disabled={busy || !projectId}>
+              <Button type="submit" variant="brand" disabled={busy || !projectId || !taskId}>
                 {busy ? "Saving…" : "Save hours"}
               </Button>
             </form>
@@ -287,8 +329,8 @@ export function WeeklyTimesheet({
               className="flex items-center justify-between gap-3 px-4 py-3 text-sm"
             >
               <span>
-                {isoDateUtc(row.workDate)} · {row.project.name} ·{" "}
-                {(row.minutes / 60).toFixed(2)}h
+                {isoDateUtc(row.workDate)} · {row.project.name} /{" "}
+                {row.task?.name ?? "Task"} · {(row.minutes / 60).toFixed(2)}h
               </span>
               <span className="flex items-center gap-2">
                 <Badge>{row.status.replace(/_/g, " ")}</Badge>

@@ -8,6 +8,7 @@ type CompanyOption = {
   name: string;
   isHome: boolean;
   isGroup: boolean;
+  depth?: number;
 };
 
 export function WorkspaceSwitcher() {
@@ -52,9 +53,9 @@ export function WorkspaceSwitcher() {
       >
         {companies.map((c) => (
           <option key={c.id} value={c.id} className="text-ink">
-            {c.name}
-            {c.isGroup ? " (group)" : ""}
-            {c.isHome ? " · home" : ""}
+            {`${"\u00a0\u00a0".repeat(c.depth ?? 0)}${c.name}${
+              c.isGroup ? " (group)" : ""
+            }${c.isHome ? " · home" : ""}`}
           </option>
         ))}
       </select>

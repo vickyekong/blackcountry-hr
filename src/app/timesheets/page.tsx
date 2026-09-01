@@ -20,7 +20,14 @@ import { WeeklyTimesheet } from "@/components/timesheets/weekly-timesheet";
 import { can } from "@/lib/permissions";
 import type { UserRole } from "@prisma/client";
 
-type Project = { id: string; name: string; code: string | null; status: string };
+type ProjectTask = { id: string; name: string; status: string };
+type Project = {
+  id: string;
+  name: string;
+  code: string | null;
+  status: string;
+  tasks?: ProjectTask[];
+};
 type Employee = {
   id: string;
   firstName: string;
@@ -43,6 +50,7 @@ type WeekRow = {
     minutes: number;
     status: string;
     project: { name: string };
+    task?: { name: string };
   }>;
 };
 
@@ -55,6 +63,7 @@ export default function TimesheetsPage() {
 
   const [weeks, setWeeks] = useState<WeekRow[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [logProjectId, setLogProjectId] = useState("");
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -65,7 +74,13 @@ export default function TimesheetsPage() {
       .then((data) => setWeeks(Array.isArray(data.weeks) ? data.weeks : []));
     fetch("/api/projects")
       .then((r) => r.json())
-      .then((data) => setProjects(Array.isArray(data) ? data : []));
+      .then((data) => {
+        const list = Array.isArray(data) ? data : [];
+        setProjects(list);
+        setLogProjectId((current) =>
+          current || list.find((p: Project) => p.status === "ACTIVE")?.id || ""
+        );
+      });
     fetch("/api/employees")
       .then((r) => r.json())
       .then((data) => {
@@ -120,6 +135,7 @@ export default function TimesheetsPage() {
       body: JSON.stringify({
         employeeId: form.get("employeeId"),
         projectId: form.get("projectId"),
+        taskId: form.get("taskId"),
         workDate: form.get("workDate"),
         minutes: Math.round(hours * 60),
         notes: form.get("notes") || null,
@@ -141,8 +157,8 @@ export default function TimesheetsPage() {
         <h1 className="text-2xl font-semibold text-ink">Timesheets</h1>
         <p className="mt-1 text-sm text-muted">
           {validator
-            ? "Staff and business heads log a week. Validate it to lock the hours for payroll."
-            : "Log your hours for the week. After HR validates it, you cannot change that week."}
+            ? "Staff and business heads log a week against a project and task. Validate it to lock the hours for payroll."
+            : "Log your hours for the week against a project and task. After HR validates it, you cannot change that week."}
         </p>
       </div>
       {error && <p className="mb-4 text-sm text-signal">{error}</p>}
@@ -194,6 +210,8 @@ export default function TimesheetsPage() {
                     id="projectId"
                     name="projectId"
                     required
+                    value={logProjectId}
+                    onChange={(e) => setLogProjectId(e.target.value)}
                     className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
                   >
                     <option value="">Select</option>
@@ -202,6 +220,26 @@ export default function TimesheetsPage() {
                       .map((p) => (
                         <option key={p.id} value={p.id}>
                           {p.name}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+                <div>
+                  <Label htmlFor="taskId">Task</Label>
+                  <select
+                    id="taskId"
+                    name="taskId"
+                    required
+                    className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                  >
+                    <option value="">Select</option>
+                    {(
+                      projects.find((p) => p.id === logProjectId)?.tasks ?? []
+                    )
+                      .filter((t) => t.status === "ACTIVE")
+                      .map((t) => (
+                        <option key={t.id} value={t.id}>
+                          {t.name}
                         </option>
                       ))}
                   </select>
@@ -264,7 +302,9 @@ export default function TimesheetsPage() {
                       {row.entries
                         .map(
                           (entry) =>
-                            `${entry.project.name} ${(entry.minutes / 60).toFixed(2)}h`
+                            `${entry.project.name}${
+                              entry.task ? ` / ${entry.task.name}` : ""
+                            } ${(entry.minutes / 60).toFixed(2)}h`
                         )
                         .join(" · ")}
                     </TableCell>

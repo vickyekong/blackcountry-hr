@@ -161,7 +161,7 @@ export default function StaffHomePage() {
               need Super Admin clearance.
             </p>
             <p>Download approved payslips after Finance finishes processing.</p>
-            <p>Log a week of project hours on Timesheets. HR validates the week — after that those hours cannot be changed. Open Files for documents shared with you.</p>
+            <p>Log a week of hours on Timesheets against a project and task. HR validates the week — after that those hours cannot be changed. Open Projects to see the work you can log against, and Files for documents shared with you.</p>
           </CardContent>
         </Card>
         <Card>

@@ -67,7 +67,7 @@ model Company {
   brandAccentHex String?
   /// Sidebar / ink color (hex). Null = Blackcountry black #292929.
   brandInkHex    String?
-  /// Group company: null. Sub-company: parent group id.
+  /// Group company: null. Sub-company: parent group or parent sub-company id.
   parentId       String?
   parent         Company?  @relation("CompanyGroup", fields: [parentId], references: [id], onDelete: Restrict)
   subsidiaries   Company[] @relation("CompanyGroup")
@@ -704,9 +704,24 @@ model Project {
   createdAt  DateTime          @default(now())
   updatedAt  DateTime          @updatedAt
   timesheets TimesheetEntry[]
+  tasks      ProjectTask[]
 
   @@unique([companyId, name])
   @@index([companyId, status])
+}
+
+model ProjectTask {
+  id         String           @id @default(cuid())
+  projectId  String
+  project    Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name       String
+  status     String           @default("ACTIVE")
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  timesheets TimesheetEntry[]
+
+  @@unique([projectId, name])
+  @@index([projectId, status])
 }
 
 model TimesheetEntry {
@@ -717,6 +732,8 @@ model TimesheetEntry {
   employee   Employee        @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   projectId  String
   project    Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  taskId     String
+  task       ProjectTask     @relation(fields: [taskId], references: [id], onDelete: Cascade)
   workDate   DateTime
   minutes    Int
   notes      String?
@@ -724,9 +741,10 @@ model TimesheetEntry {
   createdAt  DateTime        @default(now())
   updatedAt  DateTime        @updatedAt
 
-  @@unique([employeeId, projectId, workDate])
+  @@unique([employeeId, projectId, taskId, workDate])
   @@index([companyId, workDate])
   @@index([employeeId, status])
+  @@index([taskId])
 }
 
 model TimesheetWeek {

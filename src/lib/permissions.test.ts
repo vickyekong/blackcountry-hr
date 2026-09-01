@@ -24,8 +24,19 @@ describe("five-portal roles", () => {
     expect(homePathForRole("FINANCE")).toBe("/finance");
     expect(portalLabel("FINANCE")).toBe("Finance");
     expect(can("FINANCE", "manageEmployees")).toBe(false);
+    expect(can("HR_ADMIN", "manageEmployees")).toBe(true);
     expect(can("FINANCE", "approvePayroll")).toBe(false);
     expect(can("FINANCE", "processPayrollFinance")).toBe(true);
+  });
+
+  it("lets Super Admin, HR, and business heads create projects; Staff can view; Finance cannot", () => {
+    expect(can("SUPER_ADMIN", "manageProjects")).toBe(true);
+    expect(can("HR_ADMIN", "manageProjects")).toBe(true);
+    expect(can("BUSINESS_HEAD", "manageProjects")).toBe(true);
+    expect(can("EMPLOYEE", "manageProjects")).toBe(false);
+    expect(can("FINANCE", "manageProjects")).toBe(false);
+    expect(can("EMPLOYEE", "viewProjects")).toBe(true);
+    expect(can("FINANCE", "viewProjects")).toBe(false);
   });
 
   it("gives Business head files and timesheets, not payroll approval", () => {

@@ -9,6 +9,7 @@ import { upsertOpenTimesheetWeek } from "@/lib/timesheets/weeks";
 const createSchema = z.object({
   employeeId: z.string().optional(),
   projectId: z.string(),
+  taskId: z.string(),
   workDate: z.string(),
   minutes: z.number().int().min(15).max(24 * 60),
   notes: z.string().trim().max(500).optional().nullable(),
@@ -71,6 +72,7 @@ export async function GET(req: NextRequest) {
           },
         },
         project: { select: { id: true, name: true, code: true } },
+        task: { select: { id: true, name: true } },
       },
       orderBy: [{ workDate: "desc" }, { createdAt: "desc" }],
       take: 400,
@@ -130,6 +132,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
+    const task = await prisma.projectTask.findFirst({
+      where: {
+        id: body.taskId,
+        projectId: project.id,
+        status: "ACTIVE",
+      },
+    });
+    if (!task) {
+      return NextResponse.json(
+        { error: "Pick a task on that project." },
+        { status: 400 }
+      );
+    }
+
     const workDate = utcDay(body.workDate);
     await upsertOpenTimesheetWeek({
       companyId: session.user.companyId,
@@ -139,9 +155,10 @@ export async function POST(req: NextRequest) {
 
     const entry = await prisma.timesheetEntry.upsert({
       where: {
-        employeeId_projectId_workDate: {
+        employeeId_projectId_taskId_workDate: {
           employeeId: employee.id,
           projectId: project.id,
+          taskId: task.id,
           workDate,
         },
       },
@@ -149,6 +166,7 @@ export async function POST(req: NextRequest) {
         companyId: session.user.companyId,
         employeeId: employee.id,
         projectId: project.id,
+        taskId: task.id,
         workDate,
         minutes: body.minutes,
         notes: body.notes ?? null,

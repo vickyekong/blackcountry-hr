@@ -80,11 +80,46 @@ export async function ensureGroupSchema() {
   `);
 
   await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "ProjectTask" (
+      "id" TEXT NOT NULL,
+      "projectId" TEXT NOT NULL,
+      "name" TEXT NOT NULL,
+      "status" TEXT NOT NULL DEFAULT 'ACTIVE',
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "updatedAt" TIMESTAMP(3) NOT NULL,
+      CONSTRAINT "ProjectTask_pkey" PRIMARY KEY ("id")
+    )
+  `);
+  await prisma.$executeRawUnsafe(
+    `CREATE UNIQUE INDEX IF NOT EXISTS "ProjectTask_projectId_name_key" ON "ProjectTask"("projectId", "name")`
+  );
+  await prisma.$executeRawUnsafe(
+    `CREATE INDEX IF NOT EXISTS "ProjectTask_projectId_status_idx" ON "ProjectTask"("projectId", "status")`
+  );
+  await prisma.$executeRawUnsafe(`
+    DO $$ BEGIN
+      ALTER TABLE "ProjectTask"
+        ADD CONSTRAINT "ProjectTask_projectId_fkey"
+        FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    EXCEPTION WHEN duplicate_object THEN NULL;
+    END $$;
+  `);
+  await prisma.$executeRawUnsafe(`
+    INSERT INTO "ProjectTask" ("id", "projectId", "name", "status", "createdAt", "updatedAt")
+    SELECT 'task-general-' || p."id", p."id", 'General', 'ACTIVE', NOW(), NOW()
+    FROM "Project" p
+    WHERE NOT EXISTS (
+      SELECT 1 FROM "ProjectTask" t WHERE t."projectId" = p."id"
+    )
+  `);
+
+  await prisma.$executeRawUnsafe(`
     CREATE TABLE IF NOT EXISTS "TimesheetEntry" (
       "id" TEXT NOT NULL,
       "companyId" TEXT NOT NULL,
       "employeeId" TEXT NOT NULL,
       "projectId" TEXT NOT NULL,
+      "taskId" TEXT NOT NULL,
       "workDate" TIMESTAMP(3) NOT NULL,
       "minutes" INTEGER NOT NULL,
       "notes" TEXT,
@@ -95,14 +130,62 @@ export async function ensureGroupSchema() {
     )
   `);
   await prisma.$executeRawUnsafe(
-    `CREATE UNIQUE INDEX IF NOT EXISTS "TimesheetEntry_employeeId_projectId_workDate_key" ON "TimesheetEntry"("employeeId", "projectId", "workDate")`
-  );
-  await prisma.$executeRawUnsafe(
     `CREATE INDEX IF NOT EXISTS "TimesheetEntry_companyId_workDate_idx" ON "TimesheetEntry"("companyId", "workDate")`
   );
   await prisma.$executeRawUnsafe(
     `CREATE INDEX IF NOT EXISTS "TimesheetEntry_employeeId_status_idx" ON "TimesheetEntry"("employeeId", "status")`
   );
+  await prisma.$executeRawUnsafe(
+    `ALTER TABLE "TimesheetEntry" ADD COLUMN IF NOT EXISTS "taskId" TEXT`
+  );
+  await prisma.$executeRawUnsafe(`
+    UPDATE "TimesheetEntry" e
+    SET "taskId" = t."id"
+    FROM "ProjectTask" t
+    WHERE e."taskId" IS NULL
+      AND t."projectId" = e."projectId"
+      AND t."name" = 'General'
+  `);
+  await prisma.$executeRawUnsafe(`
+    UPDATE "TimesheetEntry" e
+    SET "taskId" = (
+      SELECT t."id" FROM "ProjectTask" t
+      WHERE t."projectId" = e."projectId"
+      ORDER BY t."createdAt" ASC
+      LIMIT 1
+    )
+    WHERE e."taskId" IS NULL
+  `);
+  await prisma.$executeRawUnsafe(`
+    DELETE FROM "TimesheetEntry" WHERE "taskId" IS NULL
+  `);
+  await prisma.$executeRawUnsafe(`
+    DO $$ BEGIN
+      ALTER TABLE "TimesheetEntry" ALTER COLUMN "taskId" SET NOT NULL;
+    EXCEPTION WHEN others THEN NULL;
+    END $$;
+  `);
+  await prisma.$executeRawUnsafe(
+    `DROP INDEX IF EXISTS "TimesheetEntry_employeeId_projectId_workDate_key"`
+  );
+  await prisma.$executeRawUnsafe(`
+    ALTER TABLE "TimesheetEntry"
+    DROP CONSTRAINT IF EXISTS "TimesheetEntry_employeeId_projectId_workDate_key"
+  `);
+  await prisma.$executeRawUnsafe(
+    `CREATE UNIQUE INDEX IF NOT EXISTS "TimesheetEntry_employeeId_projectId_taskId_workDate_key" ON "TimesheetEntry"("employeeId", "projectId", "taskId", "workDate")`
+  );
+  await prisma.$executeRawUnsafe(
+    `CREATE INDEX IF NOT EXISTS "TimesheetEntry_taskId_idx" ON "TimesheetEntry"("taskId")`
+  );
+  await prisma.$executeRawUnsafe(`
+    DO $$ BEGIN
+      ALTER TABLE "TimesheetEntry"
+        ADD CONSTRAINT "TimesheetEntry_taskId_fkey"
+        FOREIGN KEY ("taskId") REFERENCES "ProjectTask"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    EXCEPTION WHEN duplicate_object THEN NULL;
+    END $$;
+  `);
   await prisma.$executeRawUnsafe(`
     DO $$ BEGIN
       CREATE TYPE "TimesheetWeekStatus" AS ENUM ('OPEN', 'SUBMITTED', 'VALIDATED', 'RETURNED');

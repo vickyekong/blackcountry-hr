@@ -22,6 +22,7 @@ const staffNavItems: Array<{ href: string; label: string }> = [
   { href: "/staff/profile", label: "My details" },
   { href: "/staff/leave", label: "Leave" },
   { href: "/staff/timesheets", label: "Timesheets" },
+  { href: "/staff/projects", label: "Projects" },
   { href: "/staff/files", label: "Files" },
   { href: "/staff/requests", label: "Requests" },
   { href: "/staff/payslips", label: "Payslips" },
@@ -168,7 +169,7 @@ function NavPanel({
                   : portal === "BUSINESS_HEAD"
                     ? "This company’s people, projects, and files"
                     : portal === "EMPLOYEE"
-                      ? "Your details, leave, timesheets, and requests"
+                      ? "Your details, leave, timesheets, projects, and requests"
                       : null}
           </p>
         )}

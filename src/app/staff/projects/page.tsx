@@ -3,10 +3,10 @@
 import { AppShell } from "@/components/layout/app-shell";
 import { ProjectsWorkspace } from "@/components/projects/projects-workspace";
 
-export default function ProjectsPage() {
+export default function StaffProjectsPage() {
   return (
     <AppShell>
-      <ProjectsWorkspace canManage />
+      <ProjectsWorkspace canManage={false} />
     </AppShell>
   );
 }
