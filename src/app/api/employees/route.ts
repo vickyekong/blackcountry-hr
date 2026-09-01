@@ -56,6 +56,7 @@ const employeeSchema = z.object({
   nextOfKinName: z.string().optional(),
   nextOfKinPhone: z.string().optional(),
   clockDeviceId: z.string().optional(),
+  applicationId: z.string().optional(),
 });
 
 export async function GET() {
@@ -135,6 +136,38 @@ export async function POST(req: NextRequest) {
         employeeId: employee.id,
         kind: "ONBOARDING",
       });
+    }
+
+    if (body.applicationId) {
+      const { ensureRecruitmentSchema } = await import(
+        "@/lib/ensure-recruitment-schema"
+      );
+      await ensureRecruitmentSchema();
+      const application = await prisma.jobApplication.findFirst({
+        where: {
+          id: body.applicationId,
+          companyId: session.user.companyId,
+        },
+      });
+      if (application) {
+        await prisma.jobApplication.update({
+          where: { id: application.id },
+          data: { status: "HIRED", hiredEmployeeId: employee.id },
+        });
+        await prisma.jobListing.update({
+          where: { id: application.listingId },
+          data: { status: "FILLED", closedAt: new Date() },
+        });
+        if (!employee.workEmail && application.email) {
+          await prisma.employee.update({
+            where: { id: employee.id },
+            data: {
+              workEmail: application.email,
+              phone: employee.phone || application.phone,
+            },
+          });
+        }
+      }
     }
 
     return NextResponse.json(serializeBigInts(employee), { status: 201 });

@@ -137,6 +137,7 @@ Blackcountry Group workspace, Blackcountry Farms, and Blackcountry Engineering (
 - **Payslips** — PDF generation with YTD summary (HR / Super Admin)
 - **Leave management** — Staff apply; HR can also record leave. Unpaid leave → payroll deductions
 - **Staff portal** — own details, leave, timesheets, projects, company requests, and approved payslips
+- **Recruitment** — HR / Super Admin job listings, board posting, public apply page, hire into a staff record
 - **Projects** — Super Admin, HR, and business heads create projects and tasks; Staff can view; Finance cannot
 - **Timesheets** — weekly hours tied to a project and task; HR validates the week
 - **Reports** — remittances, department breakdown, employer cost
@@ -173,6 +174,8 @@ src/
     leave/              # Leave requests
     reports/            # Charts & remittances
     staff/              # Staff portal (details, leave, requests, payslips)
+    recruitment/        # Job listings and applications
+    jobs/               # Public apply pages
     my/                 # Redirects to /staff
     settings/           # Statutory config (Super Admin)
 prisma/

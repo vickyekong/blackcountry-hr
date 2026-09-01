@@ -85,6 +85,7 @@ export default async function EmployeeDetailPage({
         portalEmail={
           employee.user?.role === "EMPLOYEE" ? employee.user.email : null
         }
+        suggestedEmail={employee.workEmail}
       />
 
       <div className="grid gap-4 md:grid-cols-2">

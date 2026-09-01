@@ -5,17 +5,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { generateTemporaryPassword } from "@/lib/auth/temp-password";
 
 export function StaffPortalCard({
   employeeId,
   portalEmail,
+  suggestedEmail,
   employmentType,
 }: {
   employeeId: string;
   portalEmail: string | null;
+  suggestedEmail?: string | null;
   employmentType: string;
 }) {
-  const [email, setEmail] = useState(portalEmail ?? "");
+  const [email, setEmail] = useState(portalEmail ?? suggestedEmail ?? "");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
@@ -95,15 +98,24 @@ export function StaffPortalCard({
             <Label htmlFor="portalPassword">
               {enabled ? "New password" : "Temporary password"}
             </Label>
-            <Input
-              id="portalPassword"
-              type="password"
-              required
-              minLength={8}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1"
-            />
+            <div className="mt-1 flex gap-2">
+              <Input
+                id="portalPassword"
+                type="text"
+                required
+                minLength={8}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="new-password"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setPassword(generateTemporaryPassword())}
+              >
+                Generate
+              </Button>
+            </div>
           </div>
           <div className="flex flex-wrap gap-2 sm:col-span-2">
             <Button type="submit" variant="brand" disabled={busy}>

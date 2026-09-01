@@ -315,6 +315,11 @@ export async function ensureGroupSchema() {
     END $$;
   `);
 
+  const { ensureRecruitmentSchema } = await import(
+    "@/lib/ensure-recruitment-schema"
+  );
+  await ensureRecruitmentSchema();
+
   const { ensureAppRls } = await import("@/lib/ensure-app-rls");
   await ensureAppRls();
 

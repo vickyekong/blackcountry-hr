@@ -34,6 +34,36 @@ enum EmploymentType {
   CONTRACT
 }
 
+enum JobListingStatus {
+  DRAFT
+  OPEN
+  CLOSED
+  FILLED
+}
+
+enum JobApplicationStatus {
+  NEW
+  REVIEWING
+  SHORTLISTED
+  REJECTED
+  HIRED
+}
+
+enum JobBoard {
+  CAREERS_PAGE
+  LINKEDIN
+  INDEED
+  JOBBERMAN
+  HOT_NIGERIAN_JOBS
+  OTHER
+}
+
+enum JobListingPostStatus {
+  READY
+  POSTED
+  FAILED
+}
+
 enum PayrollRunStatus {
   DRAFT
   UNDER_REVIEW
@@ -95,6 +125,8 @@ model Company {
   timesheetEntries      TimesheetEntry[]
   timesheetWeeks        TimesheetWeek[]
   workspaceFiles        WorkspaceFile[]
+  jobListings           JobListing[]
+  jobApplications       JobApplication[]
 
   @@index([parentId])
 }
@@ -188,6 +220,7 @@ model User {
   notifications       Notification[]
   hrDeskAssigned      HrDeskMessage[] @relation("HrDeskAssignee")
   timesheetWeeksValidated TimesheetWeek[] @relation("TimesheetWeekValidator")
+  jobListingsCreated      JobListing[]    @relation("JobListingCreator")
 }
 
 model Employee {
@@ -247,6 +280,7 @@ model Employee {
   timesheetEntries    TimesheetEntry[]
   timesheetWeeks      TimesheetWeek[]
   workspaceFileGrants WorkspaceFileGrant[]
+  hiredApplications   JobApplication[]
 
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
@@ -764,6 +798,69 @@ model TimesheetWeek {
 
   @@unique([employeeId, weekStart])
   @@index([companyId, status, weekStart])
+}
+
+model JobListing {
+  id             String           @id @default(cuid())
+  companyId      String
+  company        Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  title          String
+  department     String
+  location       String           @default("Nigeria")
+  employmentType EmploymentType   @default(FULL_TIME)
+  description    String
+  requirements   String?
+  status         JobListingStatus @default(DRAFT)
+  viewCount      Int              @default(0)
+  createdById    String?
+  createdBy      User?            @relation("JobListingCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  publishedAt    DateTime?
+  closedAt       DateTime?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  posts          JobListingPost[]
+  applications   JobApplication[]
+
+  @@index([companyId, status])
+}
+
+model JobListingPost {
+  id          String               @id @default(cuid())
+  listingId   String
+  listing     JobListing           @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  board       JobBoard
+  status      JobListingPostStatus @default(READY)
+  externalUrl String?
+  lastError   String?
+  postedAt    DateTime?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  @@unique([listingId, board])
+}
+
+model JobApplication {
+  id               String                @id @default(cuid())
+  companyId        String
+  company          Company               @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  listingId        String
+  listing          JobListing            @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  firstName        String
+  lastName         String
+  email            String
+  phone            String?
+  resumeUrl        String?
+  coverLetter      String?
+  source           JobBoard              @default(CAREERS_PAGE)
+  status           JobApplicationStatus  @default(NEW)
+  hiredEmployeeId  String?
+  hiredEmployee    Employee?             @relation(fields: [hiredEmployeeId], references: [id], onDelete: SetNull)
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+
+  @@unique([listingId, email])
+  @@index([listingId, status])
+  @@index([companyId, createdAt])
 }
 
 model WorkspaceFile {

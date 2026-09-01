@@ -25,6 +25,9 @@ describe("five-portal roles", () => {
     expect(portalLabel("FINANCE")).toBe("Finance");
     expect(can("FINANCE", "manageEmployees")).toBe(false);
     expect(can("HR_ADMIN", "manageEmployees")).toBe(true);
+    expect(can("HR_ADMIN", "manageRecruitment")).toBe(true);
+    expect(can("FINANCE", "manageRecruitment")).toBe(false);
+    expect(can("BUSINESS_HEAD", "manageRecruitment")).toBe(false);
     expect(can("FINANCE", "approvePayroll")).toBe(false);
     expect(can("FINANCE", "processPayrollFinance")).toBe(true);
   });

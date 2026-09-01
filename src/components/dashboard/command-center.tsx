@@ -180,7 +180,10 @@ export function QuickWorkflows({
 }) {
   const items = [
     ...(showOnboard
-      ? [{ href: "/employees/new", label: "Onboard employee" }]
+      ? [
+          { href: "/recruitment", label: "Recruitment" },
+          { href: "/employees/new", label: "Onboard employee" },
+        ]
       : []),
     { href: "/timesheets", label: timesheetsLabel },
     { href: "/projects", label: "Projects" },

@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,20 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function NewEmployeePage() {
+  return (
+    <AppShell>
+      <Suspense fallback={<p className="text-sm text-muted">Loading…</p>}>
+        <NewEmployeeForm />
+      </Suspense>
+    </AppShell>
+  );
+}
+
+function NewEmployeeForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const applicationId = searchParams.get("applicationId") ?? "";
+  const hireDepartment = searchParams.get("department") ?? "";
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [departments, setDepartments] = useState<Array<{ id: string; name: string }>>(
@@ -42,6 +55,8 @@ export default function NewEmployeePage() {
       bankName: form.get("bankName") || undefined,
       bankAccountNumber: form.get("bankAccountNumber") || undefined,
       tin: form.get("tin") || undefined,
+      employmentType: form.get("employmentType") || "FULL_TIME",
+      applicationId: form.get("applicationId") || undefined,
     };
 
     const res = await fetch("/api/employees", {
@@ -50,20 +65,35 @@ export default function NewEmployeePage() {
       body: JSON.stringify(payload),
     });
 
+    const data = await res.json().catch(() => ({}));
     setLoading(false);
     if (!res.ok) {
-      const data = await res.json();
       setError(data.error ?? "Failed to create employee");
       return;
     }
-    router.push("/employees");
+    router.push(`/employees/${data.id}`);
     router.refresh();
   }
 
+  const departmentOptions = departments.some((d) => d.name === hireDepartment)
+    ? departments
+    : hireDepartment
+      ? [{ id: "hire-dept", name: hireDepartment }, ...departments]
+      : departments;
+
   return (
-    <AppShell>
+    <>
       <div className="mb-8">
         <h1 className="text-2xl font-semibold text-stone-900">Add Employee</h1>
+        {applicationId ? (
+          <p className="mt-1 text-sm text-muted">
+            Hiring from an application
+            {searchParams.get("email")
+              ? ` (${searchParams.get("email")})`
+              : ""}
+            . After you save, issue a Staff portal login if they are full-time.
+          </p>
+        ) : null}
       </div>
 
       <Card className="max-w-2xl">
@@ -72,6 +102,9 @@ export default function NewEmployeePage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {applicationId ? (
+              <input type="hidden" name="applicationId" value={applicationId} />
+            ) : null}
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <Label htmlFor="employeeCode">Employee ID</Label>
@@ -83,11 +116,23 @@ export default function NewEmployeePage() {
               </div>
               <div>
                 <Label htmlFor="firstName">First name</Label>
-                <Input id="firstName" name="firstName" required className="mt-1" />
+                <Input
+                  id="firstName"
+                  name="firstName"
+                  required
+                  className="mt-1"
+                  defaultValue={searchParams.get("firstName") ?? ""}
+                />
               </div>
               <div>
                 <Label htmlFor="lastName">Last name</Label>
-                <Input id="lastName" name="lastName" required className="mt-1" />
+                <Input
+                  id="lastName"
+                  name="lastName"
+                  required
+                  className="mt-1"
+                  defaultValue={searchParams.get("lastName") ?? ""}
+                />
               </div>
               <div>
                 <Label htmlFor="sex">Sex</Label>
@@ -112,12 +157,12 @@ export default function NewEmployeePage() {
                   name="department"
                   required
                   className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
-                  defaultValue=""
+                  defaultValue={hireDepartment}
                 >
                   <option value="" disabled>
-                    {departments.length ? "Select…" : "Add departments first"}
+                    {departmentOptions.length ? "Select…" : "Add departments first"}
                   </option>
-                  {departments.map((d) => (
+                  {departmentOptions.map((d) => (
                     <option key={d.id} value={d.name}>
                       {d.name}
                     </option>
@@ -126,7 +171,25 @@ export default function NewEmployeePage() {
               </div>
               <div>
                 <Label htmlFor="jobTitle">Job title</Label>
-                <Input id="jobTitle" name="jobTitle" required className="mt-1" />
+                <Input
+                  id="jobTitle"
+                  name="jobTitle"
+                  required
+                  className="mt-1"
+                  defaultValue={searchParams.get("jobTitle") ?? ""}
+                />
+              </div>
+              <div>
+                <Label htmlFor="employmentType">Employment type</Label>
+                <select
+                  id="employmentType"
+                  name="employmentType"
+                  className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                  defaultValue={searchParams.get("employmentType") ?? "FULL_TIME"}
+                >
+                  <option value="FULL_TIME">Full-time</option>
+                  <option value="CONTRACT">Contract</option>
+                </select>
               </div>
             </div>
 
@@ -179,6 +242,6 @@ export default function NewEmployeePage() {
           </form>
         </CardContent>
       </Card>
-    </AppShell>
+    </>
   );
 }

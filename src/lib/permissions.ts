@@ -69,6 +69,8 @@ export const PERMISSIONS = {
   /** Register a sub-company under the group or another sub-company */
   manageGroupCompanies: ["SUPER_ADMIN"] as UserRole[],
   manageEmployees: ["SUPER_ADMIN", "HR_ADMIN"] as UserRole[],
+  /** Job listings, board posts, and applications — HR hires; Finance does not. */
+  manageRecruitment: ["SUPER_ADMIN", "HR_ADMIN"] as UserRole[],
   viewEmployees: ["SUPER_ADMIN", "HR_ADMIN", "BUSINESS_HEAD"] as UserRole[],
   /** Salary / allowance edits on staff records */
   manageCompensation: ["SUPER_ADMIN", "HR_ADMIN"] as UserRole[],
