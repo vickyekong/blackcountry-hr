@@ -74,7 +74,7 @@ export const PERMISSIONS = {
   viewEmployees: ["SUPER_ADMIN", "HR_ADMIN", "BUSINESS_HEAD"] as UserRole[],
   /** Salary / allowance edits on staff records */
   manageCompensation: ["SUPER_ADMIN", "HR_ADMIN"] as UserRole[],
-  /** Clock machine, shifts, attendance compile (legacy) */
+  /** Holidays and overtime requests (timesheet-based time) */
   manageAttendance: ["SUPER_ADMIN", "HR_ADMIN"] as UserRole[],
   /** Company inbox triage, assign, draft replies */
   manageHrDesk: ["SUPER_ADMIN", "HR_ADMIN"] as UserRole[],

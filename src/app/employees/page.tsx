@@ -11,6 +11,7 @@ import { EmployeesPageClient } from "@/components/employees/employees-page-clien
 import { OpenLifecycleQueue } from "@/components/employees/lifecycle-queue";
 import { serializeBigInts } from "@/lib/payroll/config-mapper";
 import { ensureOrgStructure } from "@/lib/org/ensure-org-structure";
+import { ensurePeopleSchema } from "@/lib/ensure-people-schema";
 import { redirect } from "next/navigation";
 import { can } from "@/lib/permissions";
 
@@ -23,6 +24,12 @@ export default async function EmployeesPage() {
   }
 
   const companyId = session.user.companyId;
+
+  try {
+    await ensurePeopleSchema();
+  } catch (error) {
+    console.error("People schema ensure skipped:", error);
+  }
 
   // Lightweight seed (cached per warm instance). Never block the directory on catalog upserts.
   try {
@@ -44,6 +51,7 @@ export default async function EmployeesPage() {
       jobTitle: true,
       status: true,
       sex: true,
+      managerId: true,
       basicSalaryKobo: true,
       housingAllowanceKobo: true,
       transportAllowanceKobo: true,
@@ -53,12 +61,29 @@ export default async function EmployeesPage() {
   const allDepartments = await prisma.department.findMany({
     where: { companyId },
     orderBy: { name: "asc" },
-    select: { id: true, name: true },
+    select: {
+      id: true,
+      name: true,
+      managerEmployeeId: true,
+      manager: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          employeeCode: true,
+        },
+      },
+    },
   });
   const allJobDescriptions = await prisma.jobDescription.findMany({
     where: { companyId },
     orderBy: { name: "asc" },
     select: { id: true, name: true },
+  });
+  const allSkills = await prisma.skill.findMany({
+    where: { companyId },
+    orderBy: { name: "asc" },
+    include: { _count: { select: { employees: true } } },
   });
 
   let driveConnected = false;
@@ -78,6 +103,7 @@ export default async function EmployeesPage() {
     jobTitle: emp.jobTitle,
     status: emp.status,
     sex: emp.sex,
+    managerId: emp.managerId,
     basicSalaryKobo: emp.basicSalaryKobo,
     housingAllowanceKobo: emp.housingAllowanceKobo,
     transportAllowanceKobo: emp.transportAllowanceKobo,
@@ -90,7 +116,7 @@ export default async function EmployeesPage() {
         <div>
           <h1 className="text-2xl font-semibold text-stone-900">Employees</h1>
           <p className="mt-1 text-sm text-stone-500">
-            Staff directory, onboarding / offboarding, and timesheets
+            Staff directory, departments, skills, org chart, and attendance
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -112,6 +138,12 @@ export default async function EmployeesPage() {
           employees={tableRows}
           initialDepartments={allDepartments}
           initialJobDescriptions={allJobDescriptions}
+          initialSkills={allSkills.map((skill) => ({
+            id: skill.id,
+            name: skill.name,
+            employeeCount: skill._count.employees,
+          }))}
+          canManage={can(session.user.role, "manageEmployees")}
         />
       </Suspense>
     </AppShell>

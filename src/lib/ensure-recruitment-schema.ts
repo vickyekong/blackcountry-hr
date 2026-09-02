@@ -165,5 +165,10 @@ export async function ensureRecruitmentSchema() {
     `);
   }
 
+  const { ensurePeopleSchema } = await import("@/lib/ensure-people-schema");
+  await ensurePeopleSchema();
+  const { ensureTalentSchema } = await import("@/lib/ensure-talent-schema");
+  await ensureTalentSchema();
+
   ensured = true;
 }

@@ -4,18 +4,18 @@ import { prisma } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { Badge, employeeStatusVariant } from "@/components/ui/badge";
-import { formatCurrency, employeeFullName, formatDate } from "@/lib/utils";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { employeeFullName } from "@/lib/utils";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   employeeSexLabel,
   employeeStatusLabel,
 } from "@/lib/employees/status";
-import { EmployeeLifecyclePanel } from "@/components/employees/lifecycle-panel";
-import { EmployeeDocumentsPanel } from "@/components/employees/employee-documents-panel";
 import { StaffPortalCard } from "@/components/employees/staff-portal-card";
+import { EmployeeRecordHub } from "@/components/employees/employee-record-hub";
 import { ensureStaffPortalSchema } from "@/lib/ensure-staff-portal-schema";
+import { ensurePeopleSchema } from "@/lib/ensure-people-schema";
+import { can } from "@/lib/permissions";
 
 export default async function EmployeeDetailPage({
   params,
@@ -24,21 +24,27 @@ export default async function EmployeeDetailPage({
 }) {
   const session = await getServerSession(authOptions);
   await ensureStaffPortalSchema();
+  await ensurePeopleSchema();
   const employee = await prisma.employee.findFirst({
     where: { id: params.id, companyId: session!.user.companyId },
     include: {
       leaveBalances: true,
       user: { select: { email: true, role: true } },
+      manager: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          employeeCode: true,
+          jobTitle: true,
+        },
+      },
     },
   });
 
   if (!employee) notFound();
 
-  const gross =
-    employee.basicSalaryKobo +
-    employee.housingAllowanceKobo +
-    employee.transportAllowanceKobo +
-    employee.otherTaxableAllowancesKobo;
+  const canManage = can(session!.user.role, "manageEmployees");
 
   return (
     <AppShell>
@@ -59,24 +65,11 @@ export default async function EmployeeDetailPage({
       </div>
 
       <div className="mb-6 flex flex-wrap gap-2">
-        <Button asChild variant="outline" size="sm">
-          <Link href={`/employees/${employee.id}/edit`}>Edit employee</Link>
-        </Button>
-      </div>
-
-      <div className="mb-8">
-        <h2 className="mb-1 text-lg font-semibold text-stone-900">
-          Onboarding &amp; offboarding
-        </h2>
-        <p className="mb-3 text-sm text-stone-500">
-          HR checklists for this staff member — start, track, and complete tasks
-          on their behalf
-        </p>
-        <EmployeeLifecyclePanel employeeId={employee.id} />
-      </div>
-
-      <div className="mb-8">
-        <EmployeeDocumentsPanel employeeId={employee.id} />
+        {canManage && (
+          <Button asChild variant="outline" size="sm">
+            <Link href={`/employees/${employee.id}/edit`}>Edit employee</Link>
+          </Button>
+        )}
       </div>
 
       <StaffPortalCard
@@ -88,86 +81,49 @@ export default async function EmployeeDetailPage({
         suggestedEmail={employee.workEmail}
       />
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Compensation</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            {[
-              ["Basic salary", employee.basicSalaryKobo],
-              ["Housing allowance", employee.housingAllowanceKobo],
-              ["Transport allowance", employee.transportAllowanceKobo],
-              ["Other taxable", employee.otherTaxableAllowancesKobo],
-            ].map(([label, amount]) => (
-              <div key={label as string} className="flex justify-between">
-                <span className="text-stone-500">{label}</span>
-                <span className="tabular-nums font-medium">
-                  {formatCurrency(amount as bigint)}
-                </span>
-              </div>
-            ))}
-            <div className="flex justify-between border-t border-stone-100 pt-2 font-medium">
-              <span>Monthly gross</span>
-              <span className="tabular-nums">{formatCurrency(gross)}</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Statutory & bank</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-stone-500">TIN</span>
-              <span>{employee.tin ?? "—"}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-stone-500">RSA PIN</span>
-              <span>{employee.rsaPin ?? "—"}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-stone-500">NHF number</span>
-              <span>{employee.nhfNumber ?? "—"}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-stone-500">Bank</span>
-              <span>
-                {employee.bankName
-                  ? `${employee.bankName} · ${employee.bankAccountNumber}`
-                  : "—"}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-stone-500">Start date</span>
-              <span>{formatDate(employee.startDate)}</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        {employee.leaveBalances.length > 0 && (
-          <Card className="md:col-span-2">
-            <CardHeader>
-              <CardTitle>Leave balances ({new Date().getFullYear()})</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-3 sm:grid-cols-3">
-                {employee.leaveBalances.map((b) => (
-                  <div
-                    key={b.id}
-                    className="rounded-md border border-stone-100 px-4 py-3 text-sm"
-                  >
-                    <p className="text-stone-500">{b.leaveType.replace("_", " ")}</p>
-                    <p className="mt-1 font-medium tabular-nums">
-                      {b.entitledDays - b.usedDays} / {b.entitledDays} days left
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+      <div className="mt-8">
+        <EmployeeRecordHub
+          canManage={canManage}
+          employee={{
+            id: employee.id,
+            firstName: employee.firstName,
+            lastName: employee.lastName,
+            department: employee.department,
+            jobTitle: employee.jobTitle,
+            employmentType: employee.employmentType,
+            status: employee.status,
+            sex: employee.sex,
+            startDate: employee.startDate.toISOString(),
+            endDate: employee.endDate?.toISOString() ?? null,
+            dateOfBirth: employee.dateOfBirth?.toISOString() ?? null,
+            probationEnd: employee.probationEnd?.toISOString() ?? null,
+            workLocation: employee.workLocation,
+            phone: employee.phone,
+            workEmail: employee.workEmail,
+            addressLine: employee.addressLine,
+            nextOfKinName: employee.nextOfKinName,
+            nextOfKinPhone: employee.nextOfKinPhone,
+            emergencyContactName: employee.emergencyContactName,
+            emergencyContactPhone: employee.emergencyContactPhone,
+            tin: employee.tin,
+            rsaPin: employee.rsaPin,
+            nhfNumber: employee.nhfNumber,
+            bankName: employee.bankName,
+            bankAccountNumber: employee.bankAccountNumber,
+            basicSalaryKobo: employee.basicSalaryKobo.toString(),
+            housingAllowanceKobo: employee.housingAllowanceKobo.toString(),
+            transportAllowanceKobo: employee.transportAllowanceKobo.toString(),
+            otherTaxableAllowancesKobo:
+              employee.otherTaxableAllowancesKobo.toString(),
+            manager: employee.manager,
+            leaveBalances: employee.leaveBalances.map((b) => ({
+              id: b.id,
+              leaveType: b.leaveType,
+              entitledDays: b.entitledDays,
+              usedDays: b.usedDays,
+            })),
+          }}
+        />
       </div>
     </AppShell>
   );

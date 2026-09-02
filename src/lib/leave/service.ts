@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { countWorkingDaysBetween } from "@/lib/leave/unpaid-leave";
+import { companyHolidayKeys } from "@/lib/time/holidays";
 import type { LeaveType } from "@prisma/client";
 
 export class LeaveServiceError extends Error {
@@ -32,9 +33,15 @@ export async function createLeaveRequest(options: {
     throw new LeaveServiceError("End date must be on or after start date");
   }
 
-  const computedDays = countWorkingDaysBetween(
+  const holidayKeys = await companyHolidayKeys(
+    options.companyId,
     options.startDate,
     options.endDate
+  );
+  const computedDays = countWorkingDaysBetween(
+    options.startDate,
+    options.endDate,
+    holidayKeys
   );
   if (computedDays < 1) {
     throw new LeaveServiceError("Leave must include at least one working day");

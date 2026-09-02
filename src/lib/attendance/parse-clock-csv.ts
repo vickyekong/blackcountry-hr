@@ -224,6 +224,21 @@ export function isWorkDay(workDays: string, date: Date): boolean {
   return workDays[monFirst] === "1";
 }
 
+/** Shift bitmask plus optional company holidays (holiday → not expected). */
+export function isExpectedWorkDay(
+  workDays: string,
+  date: Date,
+  holidayKeys?: Set<string>
+): boolean {
+  if (holidayKeys) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    if (holidayKeys.has(`${y}-${m}-${d}`)) return false;
+  }
+  return isWorkDay(workDays, date);
+}
+
 export function parseHm(hm: string): { hours: number; minutes: number } {
   const [h, m] = hm.split(":").map(Number);
   return { hours: h || 0, minutes: m || 0 };

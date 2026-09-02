@@ -402,7 +402,7 @@ export async function getPayrollPreflight(
       title: "Attendance penalties applied",
       detail: `${count} employee${count === 1 ? "" : "s"} have missed-shift penalties totaling ${formatCurrency(attendancePenaltyKobo)}.`,
       metric: formatCurrency(attendancePenaltyKobo),
-      href: "/employees?tab=attendance",
+      href: "/timesheets",
     });
   }
 

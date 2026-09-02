@@ -1,5 +1,16 @@
-/** Count Mon–Fri days inclusive between two dates. */
-export function countWorkingDaysBetween(start: Date, end: Date): number {
+import { localDateKey } from "@/lib/time/dates";
+
+function holidaySet(holidayKeys?: Iterable<string>): Set<string> | null {
+  if (!holidayKeys) return null;
+  return holidayKeys instanceof Set ? holidayKeys : new Set(holidayKeys);
+}
+
+/** Count Mon–Fri days inclusive between two dates, skipping company holidays. */
+export function countWorkingDaysBetween(
+  start: Date,
+  end: Date,
+  holidayKeys?: Iterable<string>
+): number {
   const from = new Date(start);
   from.setHours(0, 0, 0, 0);
   const to = new Date(end);
@@ -7,11 +18,14 @@ export function countWorkingDaysBetween(start: Date, end: Date): number {
 
   if (from > to) return 0;
 
+  const holidays = holidaySet(holidayKeys);
   let count = 0;
   const current = new Date(from);
   while (current <= to) {
     const day = current.getDay();
-    if (day !== 0 && day !== 6) count++;
+    if (day !== 0 && day !== 6) {
+      if (!holidays || !holidays.has(localDateKey(current))) count++;
+    }
     current.setDate(current.getDate() + 1);
   }
   return count;
@@ -37,7 +51,8 @@ export function unpaidWorkingDaysInPeriod(
   leaveStart: Date,
   leaveEnd: Date,
   periodStart: Date,
-  periodEnd: Date
+  periodEnd: Date,
+  holidayKeys?: Iterable<string>
 ): number {
   const overlap = getPeriodOverlap(
     leaveStart,
@@ -46,7 +61,7 @@ export function unpaidWorkingDaysInPeriod(
     periodEnd
   );
   if (!overlap) return 0;
-  return countWorkingDaysBetween(overlap.start, overlap.end);
+  return countWorkingDaysBetween(overlap.start, overlap.end, holidayKeys);
 }
 
 export interface LeaveRequestDates {
@@ -58,7 +73,8 @@ export interface LeaveRequestDates {
 export function sumUnpaidLeaveDaysInPeriod(
   requests: LeaveRequestDates[],
   periodStart: Date,
-  periodEnd: Date
+  periodEnd: Date,
+  holidayKeys?: Iterable<string>
 ): number {
   return requests.reduce(
     (total, req) =>
@@ -67,7 +83,8 @@ export function sumUnpaidLeaveDaysInPeriod(
         req.startDate,
         req.endDate,
         periodStart,
-        periodEnd
+        periodEnd,
+        holidayKeys
       ),
     0
   );

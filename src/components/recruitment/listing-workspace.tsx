@@ -6,6 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { JOB_BOARDS, JOB_BOARD_LABELS } from "@/lib/recruitment/boards";
+import {
+  PIPELINE_COLUMNS,
+  applicationStatusLabel,
+} from "@/lib/talent/labels";
 
 type Application = {
   id: string;
@@ -15,10 +19,13 @@ type Application = {
   phone: string | null;
   resumeUrl: string | null;
   coverLetter: string | null;
+  notes: string | null;
+  interviewAt: string | null;
   source: string;
   status: string;
   hiredEmployeeId: string | null;
   createdAt: string;
+  skillMatch?: { percent: number; matched: string[]; missing: string[] };
 };
 
 type ListingDetail = {
@@ -259,12 +266,86 @@ export function ListingWorkspace({ listingId }: { listingId: string }) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Applications</CardTitle>
+          <CardTitle>Hiring pipeline</CardTitle>
+          <p className="text-sm text-muted">
+            Move candidates through screening, interview, assessment, and offer.
+            Hiring does not close the listing until all openings are filled.
+          </p>
         </CardHeader>
         <CardContent className="space-y-4">
+          {listing.applications.length === 0 ? (
+            <p className="text-sm text-muted">No applications yet.</p>
+          ) : (
+            <div className="grid gap-3 lg:grid-cols-3 xl:grid-cols-4">
+              {PIPELINE_COLUMNS.map((column) => {
+                const apps = listing.applications.filter(
+                  (app) => app.status === column.id
+                );
+                return (
+                  <section
+                    key={column.id}
+                    className="rounded-lg border border-line bg-white p-3"
+                  >
+                    <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">
+                      {column.label} · {apps.length}
+                    </h3>
+                    <ul className="space-y-2">
+                      {apps.map((app) => (
+                        <li
+                          key={app.id}
+                          className="rounded-md border border-stone-100 px-2 py-2 text-sm"
+                        >
+                          <p className="font-medium text-ink">
+                            {app.firstName} {app.lastName}
+                          </p>
+                          {typeof app.skillMatch?.percent === "number" &&
+                            app.skillMatch.percent > 0 && (
+                              <p className="text-xs text-muted">
+                                Skill match {app.skillMatch.percent}%
+                                {app.skillMatch.missing.length > 0
+                                  ? ` · missing ${app.skillMatch.missing.join(", ")}`
+                                  : ""}
+                              </p>
+                            )}
+                          <select
+                            className="mt-2 h-8 w-full rounded-md border border-stone-300 px-2 text-xs"
+                            value={app.status}
+                            disabled={busy}
+                            onChange={(e) =>
+                              void setAppStatus(app.id, e.target.value)
+                            }
+                          >
+                            {PIPELINE_COLUMNS.map((opt) => (
+                              <option key={opt.id} value={opt.id}>
+                                {opt.label}
+                              </option>
+                            ))}
+                            <option value="REJECTED">Rejected</option>
+                          </select>
+                          {app.status !== "HIRED" && (
+                            <Button asChild size="sm" variant="brand" className="mt-2 w-full">
+                              <Link href={hireHref(app)}>Create staff profile</Link>
+                            </Button>
+                          )}
+                          {app.hiredEmployeeId && (
+                            <Button asChild size="sm" variant="outline" className="mt-2 w-full">
+                              <Link href={`/employees/${app.hiredEmployeeId}`}>
+                                Open staff record
+                              </Link>
+                            </Button>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                );
+              })}
+            </div>
+          )}
+
           {listing.applications.map((app) => (
             <div
-              key={app.id}
+              key={`detail-${app.id}`}
               className="rounded-lg border border-line px-4 py-3 text-sm"
             >
               <div className="flex flex-wrap items-start justify-between gap-2">
@@ -278,38 +359,15 @@ export function ListingWorkspace({ listingId }: { listingId: string }) {
                   </p>
                   <p className="mt-1 text-xs text-muted">
                     Via {JOB_BOARD_LABELS[app.source as keyof typeof JOB_BOARD_LABELS] ?? app.source}{" "}
-                    · {app.status.replace(/_/g, " ")}
+                    · {applicationStatusLabel(app.status)}
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {app.status !== "HIRED" && (
-                    <>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        disabled={busy}
-                        onClick={() => void setAppStatus(app.id, "SHORTLISTED")}
-                      >
-                        Shortlist
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        disabled={busy}
-                        onClick={() => void setAppStatus(app.id, "REJECTED")}
-                      >
-                        Reject
-                      </Button>
-                      <Button asChild size="sm" variant="brand">
-                        <Link href={hireHref(app)}>Create staff profile</Link>
-                      </Button>
-                    </>
-                  )}
-                  {app.hiredEmployeeId && (
+                  {app.resumeUrl && (
                     <Button asChild size="sm" variant="outline">
-                      <Link href={`/employees/${app.hiredEmployeeId}`}>
-                        Open staff record
-                      </Link>
+                      <a href={app.resumeUrl} target="_blank" rel="noreferrer">
+                        Resume
+                      </a>
                     </Button>
                   )}
                 </div>
@@ -317,21 +375,35 @@ export function ListingWorkspace({ listingId }: { listingId: string }) {
               {app.coverLetter && (
                 <p className="mt-2 whitespace-pre-wrap text-muted">{app.coverLetter}</p>
               )}
-              {app.resumeUrl && (
-                <a
-                  href={app.resumeUrl}
-                  className="mt-2 inline-block text-ok underline"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Resume
-                </a>
-              )}
+              <form
+                className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto]"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const form = e.currentTarget;
+                  const notes = String(
+                    (form.elements.namedItem("notes") as HTMLTextAreaElement)
+                      .value || ""
+                  );
+                  void fetch(`/api/recruitment/applications/${app.id}`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ notes }),
+                  }).then(() => load());
+                }}
+              >
+                <textarea
+                  name="notes"
+                  defaultValue={app.notes ?? ""}
+                  rows={2}
+                  placeholder="Interview notes — assistive only, never auto-hire"
+                  className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+                />
+                <Button type="submit" size="sm" variant="outline" disabled={busy}>
+                  Save notes
+                </Button>
+              </form>
             </div>
           ))}
-          {listing.applications.length === 0 && (
-            <p className="text-sm text-muted">No applications yet.</p>
-          )}
         </CardContent>
       </Card>
     </div>

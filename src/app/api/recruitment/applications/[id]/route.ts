@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { parseOptionalDate } from "@/lib/people/dates";
 import { prisma } from "@/lib/db";
 import { requirePermission, handleApiError } from "@/lib/api-auth";
 import { ensureRecruitmentSchema } from "@/lib/ensure-recruitment-schema";
+import { APPLICATION_STATUSES } from "@/lib/talent/labels";
 
 const patchSchema = z.object({
-  status: z
-    .enum(["NEW", "REVIEWING", "SHORTLISTED", "REJECTED", "HIRED"])
-    .optional(),
+  status: z.enum(APPLICATION_STATUSES).optional(),
   hiredEmployeeId: z.string().optional().nullable(),
+  notes: z.string().trim().max(4000).optional().nullable(),
+  interviewAt: z.string().nullable().optional(),
 });
 
 export async function GET(
@@ -69,6 +71,11 @@ export async function PATCH(
       where: { id: application.id },
       data: {
         status: body.status,
+        notes: body.notes === undefined ? undefined : body.notes,
+        interviewAt:
+          body.interviewAt !== undefined
+            ? parseOptionalDate(body.interviewAt)
+            : undefined,
         hiredEmployeeId:
           body.hiredEmployeeId === undefined
             ? undefined
@@ -77,10 +84,19 @@ export async function PATCH(
     });
 
     if (body.status === "HIRED") {
-      await prisma.jobListing.update({
+      const listing = await prisma.jobListing.findUnique({
         where: { id: application.listingId },
-        data: { status: "FILLED", closedAt: new Date() },
+        select: { openings: true },
       });
+      const hiredCount = await prisma.jobApplication.count({
+        where: { listingId: application.listingId, status: "HIRED" },
+      });
+      if (hiredCount >= (listing?.openings ?? 1)) {
+        await prisma.jobListing.update({
+          where: { id: application.listingId },
+          data: { status: "FILLED", closedAt: new Date() },
+        });
+      }
     }
 
     return NextResponse.json(updated);

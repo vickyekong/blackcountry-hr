@@ -20,6 +20,7 @@ export function aggregateAdjustments(
       record.amountKobo < 0n ? -record.amountKobo : record.amountKobo;
     switch (record.type) {
       case "BONUS":
+      case "OVERTIME":
         bonusKobo += abs;
         break;
       case "LOAN_DEDUCTION":

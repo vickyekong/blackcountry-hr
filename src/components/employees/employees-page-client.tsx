@@ -10,25 +10,26 @@ import {
   EmployeesTable,
   type EmployeeTableRow,
 } from "@/components/employees/employees-table";
-import { EmployeesAttendanceTab } from "@/components/employees/employees-attendance-tab";
 import { OrgChartPanel } from "@/components/employees/org-chart-panel";
+import { DepartmentsWorkspace, type DepartmentRow } from "@/components/employees/departments-workspace";
+import { SkillsCatalogPanel, type SkillCatalogItem } from "@/components/employees/skills-catalog-panel";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/cn";
 
-type TabId = "staff" | "jobs" | "departments" | "org" | "attendance";
+type TabId = "staff" | "jobs" | "departments" | "skills" | "org";
 
 const TABS: Array<{ id: TabId; label: string }> = [
   { id: "staff", label: "Staff directory" },
   { id: "jobs", label: "Job descriptions" },
   { id: "departments", label: "Departments" },
+  { id: "skills", label: "Skills" },
   { id: "org", label: "Org chart" },
-  { id: "attendance", label: "Clock machine & attendance" },
 ];
 
 function tabFromSearch(value: string | null): TabId {
-  if (value === "attendance") return "attendance";
   if (value === "jobs" || value === "job-descriptions") return "jobs";
   if (value === "departments") return "departments";
+  if (value === "skills") return "skills";
   if (value === "org" || value === "org-chart") return "org";
   return "staff";
 }
@@ -37,18 +38,22 @@ function hrefForTab(tab: TabId): string {
   if (tab === "staff") return "/employees";
   if (tab === "jobs") return "/employees?tab=jobs";
   if (tab === "departments") return "/employees?tab=departments";
-  if (tab === "org") return "/employees?tab=org";
-  return "/employees?tab=attendance";
+  if (tab === "skills") return "/employees?tab=skills";
+  return "/employees?tab=org";
 }
 
 export function EmployeesPageClient({
   employees,
   initialDepartments,
   initialJobDescriptions,
+  initialSkills,
+  canManage,
 }: {
   employees: EmployeeTableRow[];
-  initialDepartments: CatalogItem[];
+  initialDepartments: DepartmentRow[];
   initialJobDescriptions: CatalogItem[];
+  initialSkills: SkillCatalogItem[];
+  canManage: boolean;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -126,12 +131,9 @@ export function EmployeesPageClient({
       {tab === "departments" && (
         <Card>
           <CardContent className="pt-6">
-            <OrgCatalogManager
-              title="Departments"
-              description="Company departments (Admin, Finance, Floor Staffs, and more). Edit names or add new ones, then assign them on each employee row in Staff directory."
-              itemLabel="department"
-              items={departments}
-              apiBase="/api/departments"
+            <DepartmentsWorkspace
+              initialDepartments={departments}
+              canManage={canManage}
               onChange={(next) => {
                 setDepartments(next);
                 router.refresh();
@@ -141,9 +143,15 @@ export function EmployeesPageClient({
         </Card>
       )}
 
-      {tab === "org" && <OrgChartPanel employees={employees} />}
+      {tab === "skills" && (
+        <Card>
+          <CardContent className="pt-6">
+            <SkillsCatalogPanel items={initialSkills} canManage={canManage} />
+          </CardContent>
+        </Card>
+      )}
 
-      {tab === "attendance" && <EmployeesAttendanceTab />}
+      {tab === "org" && <OrgChartPanel employees={employees} />}
     </>
   );
 }

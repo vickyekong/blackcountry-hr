@@ -13,6 +13,7 @@ import { koboToNaira } from "@/lib/money";
 import { isShiftAttendanceExempt } from "@/lib/attendance/penalty-exempt";
 import { EMPLOYEE_STATUS_OPTIONS } from "@/lib/employees/status";
 import { can } from "@/lib/permissions";
+import { dateInputValue } from "@/lib/people/dates";
 
 interface EmployeeData {
   id: string;
@@ -37,6 +38,15 @@ interface EmployeeData {
   annualRentKobo: string;
   nextOfKinName: string | null;
   nextOfKinPhone: string | null;
+  emergencyContactName: string | null;
+  emergencyContactPhone: string | null;
+  dateOfBirth: string | null;
+  probationEnd: string | null;
+  workLocation: string | null;
+  managerId: string | null;
+  phone: string | null;
+  workEmail: string | null;
+  addressLine: string | null;
   clockDeviceId: string | null;
   shiftAssignment?: { shiftId: string } | null;
 }
@@ -59,6 +69,9 @@ export default function EditEmployeePage() {
   >([]);
   const [shifts, setShifts] = useState<Array<{ id: string; name: string }>>([]);
   const [department, setDepartment] = useState("");
+  const [colleagues, setColleagues] = useState<
+    Array<{ id: string; firstName: string; lastName: string; employeeCode: string }>
+  >([]);
 
   useEffect(() => {
     fetch(`/api/employees/${params.id}`)
@@ -84,6 +97,30 @@ export default function EditEmployeePage() {
         )
       )
       .catch(() => setShifts([]));
+    fetch("/api/employees")
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setColleagues(
+            data
+              .filter((emp: { id: string }) => emp.id !== params.id)
+              .map(
+                (emp: {
+                  id: string;
+                  firstName: string;
+                  lastName: string;
+                  employeeCode: string;
+                }) => ({
+                  id: emp.id,
+                  firstName: emp.firstName,
+                  lastName: emp.lastName,
+                  employeeCode: emp.employeeCode,
+                })
+              )
+          );
+        }
+      })
+      .catch(() => undefined);
   }, [params.id]);
 
   const shiftExempt = isShiftAttendanceExempt(department);
@@ -113,6 +150,15 @@ export default function EditEmployeePage() {
       nhfNumber: form.get("nhfNumber") || undefined,
       nextOfKinName: form.get("nextOfKinName") || undefined,
       nextOfKinPhone: form.get("nextOfKinPhone") || undefined,
+      emergencyContactName: String(form.get("emergencyContactName") || "") || null,
+      emergencyContactPhone: String(form.get("emergencyContactPhone") || "") || null,
+      dateOfBirth: String(form.get("dateOfBirth") || "") || null,
+      probationEnd: String(form.get("probationEnd") || "") || null,
+      workLocation: String(form.get("workLocation") || "") || null,
+      managerId: String(form.get("managerId") || "") || null,
+      phone: String(form.get("phone") || "") || null,
+      addressLine: String(form.get("addressLine") || "") || null,
+      workEmail: String(form.get("workEmail") || "") || null,
     };
 
     if (canEditPay) {
@@ -306,6 +352,79 @@ export default function EditEmployeePage() {
                   <option value="CONTRACT">Contract</option>
                 </select>
               </div>
+              <div>
+                <Label htmlFor="managerId">Line manager</Label>
+                <select
+                  id="managerId"
+                  name="managerId"
+                  defaultValue={employee.managerId ?? ""}
+                  className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                >
+                  <option value="">None</option>
+                  {colleagues.map((person) => (
+                    <option key={person.id} value={person.id}>
+                      {person.firstName} {person.lastName} ({person.employeeCode})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <Label htmlFor="dateOfBirth">Date of birth</Label>
+                <Input
+                  id="dateOfBirth"
+                  name="dateOfBirth"
+                  type="date"
+                  defaultValue={dateInputValue(employee.dateOfBirth)}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="probationEnd">Probation end</Label>
+                <Input
+                  id="probationEnd"
+                  name="probationEnd"
+                  type="date"
+                  defaultValue={dateInputValue(employee.probationEnd)}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="workLocation">Work location</Label>
+                <Input
+                  id="workLocation"
+                  name="workLocation"
+                  defaultValue={employee.workLocation ?? ""}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="phone">Phone</Label>
+                <Input
+                  id="phone"
+                  name="phone"
+                  defaultValue={employee.phone ?? ""}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="workEmail">Work email</Label>
+                <Input
+                  id="workEmail"
+                  name="workEmail"
+                  type="email"
+                  defaultValue={employee.workEmail ?? ""}
+                  className="mt-1"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <Label htmlFor="addressLine">Address</Label>
+                <Input
+                  id="addressLine"
+                  name="addressLine"
+                  defaultValue={employee.addressLine ?? ""}
+                  className="mt-1"
+                />
+              </div>
             </div>
 
             {canEditPay ? (
@@ -462,6 +581,24 @@ export default function EditEmployeePage() {
                     id="nextOfKinPhone"
                     name="nextOfKinPhone"
                     defaultValue={employee.nextOfKinPhone ?? ""}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="emergencyContactName">Emergency contact</Label>
+                  <Input
+                    id="emergencyContactName"
+                    name="emergencyContactName"
+                    defaultValue={employee.emergencyContactName ?? ""}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="emergencyContactPhone">Emergency phone</Label>
+                  <Input
+                    id="emergencyContactPhone"
+                    name="emergencyContactPhone"
+                    defaultValue={employee.emergencyContactPhone ?? ""}
                     className="mt-1"
                   />
                 </div>

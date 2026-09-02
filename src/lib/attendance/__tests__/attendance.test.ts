@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import * as XLSX from "xlsx";
 import {
   compileAttendanceStatus,
+  isExpectedWorkDay,
   isWorkDay,
   parseClockMachineCsv,
   shiftDurationMinutes,
@@ -100,6 +101,14 @@ describe("shift helpers", () => {
 
   it("computes duration", () => {
     expect(shiftDurationMinutes("08:00", "17:00")).toBe(540);
+  });
+
+  it("treats holidays as not expected", () => {
+    const monday = new Date(2026, 7, 3);
+    expect(isExpectedWorkDay("1111100", monday)).toBe(true);
+    expect(
+      isExpectedWorkDay("1111100", monday, new Set(["2026-08-03"]))
+    ).toBe(false);
   });
 });
 

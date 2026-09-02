@@ -14,6 +14,8 @@ import { ensureEmployeeStatusSchema } from "@/lib/ensure-employee-status-schema"
 import { ensureJobDescriptionName } from "@/lib/org/ensure-org-structure";
 import { can } from "@/lib/permissions";
 import { disableStaffPortal } from "@/lib/tenancy/bootstrap-company";
+import { parseOptionalDate } from "@/lib/people/dates";
+import { wouldCreateReportingCycle } from "@/lib/people/reporting-tree";
 import { z } from "zod";
 
 const realName = (label: string) =>
@@ -60,6 +62,12 @@ const updateSchema = z.object({
   phone: z.string().trim().max(30).nullable().optional(),
   addressLine: z.string().trim().max(400).nullable().optional(),
   workEmail: z.string().trim().email().max(180).nullable().optional(),
+  dateOfBirth: z.string().nullable().optional(),
+  probationEnd: z.string().nullable().optional(),
+  workLocation: z.string().trim().max(160).nullable().optional(),
+  managerId: z.string().nullable().optional(),
+  emergencyContactName: z.string().trim().max(120).nullable().optional(),
+  emergencyContactPhone: z.string().trim().max(30).nullable().optional(),
 });
 
 export async function GET(
@@ -76,6 +84,15 @@ export async function GET(
         documents: true,
         shiftAssignment: { include: { shift: true } },
         user: { select: { id: true, email: true, role: true } },
+        manager: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            employeeCode: true,
+            jobTitle: true,
+          },
+        },
       },
     });
     if (!employee) {
@@ -135,6 +152,47 @@ export async function PATCH(
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
+    let nextManagerId: string | null | undefined;
+    if (body.managerId !== undefined) {
+      if (!body.managerId) {
+        nextManagerId = null;
+      } else {
+        const manager = await prisma.employee.findFirst({
+          where: { id: body.managerId, companyId: session.user.companyId },
+          select: { id: true },
+        });
+        if (!manager) {
+          return NextResponse.json(
+            { error: "Line manager not found in this company" },
+            { status: 400 }
+          );
+        }
+        const companyReports = await prisma.employee.findMany({
+          where: { companyId: session.user.companyId },
+          select: { id: true, managerId: true },
+        });
+        const reportsTo = new Map(
+          companyReports.map((row) => [row.id, row.managerId])
+        );
+        if (wouldCreateReportingCycle(params.id, body.managerId, reportsTo)) {
+          return NextResponse.json(
+            { error: "That line manager would create a reporting cycle" },
+            { status: 400 }
+          );
+        }
+        nextManagerId = body.managerId;
+      }
+    }
+
+    const dateOfBirth =
+      body.dateOfBirth !== undefined
+        ? parseOptionalDate(body.dateOfBirth)
+        : undefined;
+    const probationEnd =
+      body.probationEnd !== undefined
+        ? parseOptionalDate(body.probationEnd)
+        : undefined;
+
     const employee = await prisma.employee.update({
       where: { id: params.id },
       data: {
@@ -164,6 +222,18 @@ export async function PATCH(
         ...(body.clockDeviceId !== undefined && {
           clockDeviceId: body.clockDeviceId?.trim() || null,
         }),
+        ...(body.workLocation !== undefined && {
+          workLocation: body.workLocation?.trim() || null,
+        }),
+        ...(body.emergencyContactName !== undefined && {
+          emergencyContactName: body.emergencyContactName?.trim() || null,
+        }),
+        ...(body.emergencyContactPhone !== undefined && {
+          emergencyContactPhone: body.emergencyContactPhone?.trim() || null,
+        }),
+        ...(body.dateOfBirth !== undefined && { dateOfBirth }),
+        ...(body.probationEnd !== undefined && { probationEnd }),
+        ...(nextManagerId !== undefined && { managerId: nextManagerId }),
       },
     });
 

@@ -15,8 +15,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatDate } from "@/lib/utils";
 import { countWorkingDaysBetween } from "@/lib/leave/unpaid-leave";
+import { localDateKey } from "@/lib/time/dates";
+import { holidayKindLabel } from "@/lib/time/labels";
+import { formatDate } from "@/lib/utils";
 
 interface LeaveRequest {
   id: string;
@@ -50,10 +52,18 @@ interface StaffOption {
   employeeCode: string;
 }
 
+type HolidayRow = {
+  id: string;
+  workDate: string;
+  name: string;
+  kind: string;
+};
+
 export default function LeavePage() {
   const [requests, setRequests] = useState<LeaveRequest[]>([]);
   const [balances, setBalances] = useState<LeaveBalance[]>([]);
   const [staff, setStaff] = useState<StaffOption[]>([]);
+  const [holidays, setHolidays] = useState<HolidayRow[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [computedDays, setComputedDays] = useState<number | null>(null);
   const [formError, setFormError] = useState("");
@@ -86,11 +96,21 @@ export default function LeavePage() {
           );
         }
       });
+    const year = new Date().getFullYear();
+    fetch(`/api/holidays?year=${year}`)
+      .then((r) => r.json())
+      .then((data) => setHolidays(Array.isArray(data) ? data : []));
   }
 
   useEffect(() => {
     load();
   }, []);
+
+  function holidayKeys() {
+    return holidays.map((h) =>
+      localDateKey(new Date(h.workDate))
+    );
+  }
 
   function updateComputedDays(start: string, end: string) {
     if (!start || !end) {
@@ -98,7 +118,7 @@ export default function LeavePage() {
       return;
     }
     setComputedDays(
-      countWorkingDaysBetween(new Date(start), new Date(end))
+      countWorkingDaysBetween(new Date(start), new Date(end), holidayKeys())
     );
   }
 
@@ -110,7 +130,7 @@ export default function LeavePage() {
     const endDate = form.get("endDate") as string;
     const days =
       computedDays ??
-      countWorkingDaysBetween(new Date(startDate), new Date(endDate));
+      countWorkingDaysBetween(new Date(startDate), new Date(endDate), holidayKeys());
 
     const res = await fetch("/api/leave", {
       method: "POST",
@@ -149,11 +169,34 @@ export default function LeavePage() {
         <div>
           <h1 className="text-2xl font-semibold text-stone-900">Leave</h1>
           <p className="mt-1 text-sm text-stone-500">
-            Record and approve leave for staff (HR portal)
+            Record and approve leave for staff (HR portal). Public holidays are
+            skipped in working-day counts.
           </p>
         </div>
         <Button onClick={() => setShowForm(!showForm)}>Record leave</Button>
       </div>
+
+      {holidays.length > 0 && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Holidays this year</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="grid gap-2 text-sm sm:grid-cols-2">
+              {holidays.slice(0, 8).map((holiday) => (
+                <li key={holiday.id} className="text-muted">
+                  <span className="font-medium text-ink">{holiday.name}</span>
+                  {" · "}
+                  {formatDate(holiday.workDate)} · {holidayKindLabel(holiday.kind)}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-3 text-xs text-muted">
+              Manage the calendar under Timesheets → Holidays.
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {balances.length > 0 && (
         <Card className="mb-6">

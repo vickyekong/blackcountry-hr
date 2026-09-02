@@ -9,10 +9,20 @@ const createSchema = z.object({
 
 export async function GET() {
   try {
-    const session = await requirePermission("manageEmployees");
+    const session = await requirePermission("viewEmployees");
     const departments = await prisma.department.findMany({
       where: { companyId: session.user.companyId },
       orderBy: { name: "asc" },
+      include: {
+        manager: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            employeeCode: true,
+          },
+        },
+      },
     });
     return NextResponse.json(departments);
   } catch (error) {

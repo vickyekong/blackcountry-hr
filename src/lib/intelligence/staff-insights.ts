@@ -1,4 +1,4 @@
-import { startOfMonth, endOfMonth, differenceInMonths, subMonths } from "date-fns";
+import { startOfMonth, endOfMonth, differenceInMonths, subMonths, addDays } from "date-fns";
 import { prisma } from "@/lib/db";
 import { formatCurrency, getMonthName } from "@/lib/utils";
 import {
@@ -14,6 +14,7 @@ import {
   isOmittedOrPlaceholderName,
   isPlaceholderLabel,
 } from "@/lib/employees/data-quality";
+import { EXPIRY_ALERT_DAYS, expiryAlert } from "@/lib/people/expiry";
 
 export type InsightSeverity = "critical" | "watch" | "info" | "good";
 
@@ -66,6 +67,11 @@ function scoreFlags(flags: string[]): number {
 }
 
 export async function getStaffIntelligence(companyId: string) {
+  const { ensurePeopleSchema } = await import("@/lib/ensure-people-schema");
+  await ensurePeopleSchema();
+  const { ensureTimeSchema } = await import("@/lib/ensure-time-schema");
+  await ensureTimeSchema();
+
   const now = new Date();
   const month = now.getMonth() + 1;
   const year = now.getFullYear();
@@ -83,10 +89,13 @@ export async function getStaffIntelligence(companyId: string) {
         firstName: true,
         lastName: true,
         department: true,
+        jobTitle: true,
         status: true,
         sex: true,
         employmentType: true,
         startDate: true,
+        endDate: true,
+        probationEnd: true,
         clockDeviceId: true,
         basicSalaryKobo: true,
         housingAllowanceKobo: true,
@@ -127,6 +136,8 @@ export async function getStaffIntelligence(companyId: string) {
     latestPayroll,
     hrDeskOpen,
     departments,
+    expiringCerts,
+    pendingOvertime,
   ] = await Promise.all([
     prisma.leaveRequest.findMany({
       where: {
@@ -176,6 +187,26 @@ export async function getStaffIntelligence(companyId: string) {
     prisma.department.findMany({
       where: { companyId },
       select: { name: true },
+    }),
+    prisma.employeeCertification.findMany({
+      where: {
+        expiresAt: { not: null, lte: addDays(now, EXPIRY_ALERT_DAYS) },
+        employee: {
+          companyId,
+          status: { notIn: ["FIRED", "RESIGNED"] },
+        },
+      },
+      select: {
+        name: true,
+        expiresAt: true,
+        employee: {
+          select: { id: true, firstName: true, lastName: true, employeeCode: true },
+        },
+      },
+      take: 25,
+    }),
+    prisma.overtimeRequest.count({
+      where: { companyId, status: "PENDING" },
     }),
   ]);
 
@@ -370,6 +401,18 @@ export async function getStaffIntelligence(companyId: string) {
     });
   }
 
+  if (pendingOvertime > 0) {
+    insights.push({
+      id: "pending-overtime",
+      severity: "watch",
+      title: `${pendingOvertime} overtime request${pendingOvertime === 1 ? "" : "s"} waiting`,
+      detail:
+        "Approve extra hours so they attach as overtime lines on the next draft payroll run.",
+      href: "/timesheets?tab=overtime",
+      metric: String(pendingOvertime),
+    });
+  }
+
   if (hrDeskOpen > 0) {
     insights.push({
       id: "hr-desk",
@@ -378,50 +421,6 @@ export async function getStaffIntelligence(companyId: string) {
       detail: "Assign to staff and respond so requests do not stall.",
       href: "/hr-desk",
       metric: String(hrDeskOpen),
-    });
-  }
-
-  if (totalAbsent > 0) {
-    insights.push({
-      id: "absences",
-      severity: totalAbsent >= 10 ? "critical" : "watch",
-      title: `${totalAbsent} missed shift${totalAbsent === 1 ? "" : "s"} this month`,
-      detail: `Estimated attendance penalties total ${formatCurrency(totalPenalty)}. Apply them on draft payroll if not yet deducted.`,
-      href: "/employees?tab=attendance",
-      metric: formatCurrency(totalPenalty),
-    });
-  } else if (staffWithAttendance > 0) {
-    insights.push({
-      id: "attendance-good",
-      severity: "good",
-      title: "No missed shifts compiled this month",
-      detail: "Attendance looks clean for staff with clock data and shifts.",
-      href: "/employees?tab=attendance",
-    });
-  }
-
-  if (avgAttendance != null) {
-    insights.push({
-      id: "attendance-rate",
-      severity: avgAttendance < 85 ? "critical" : avgAttendance < 95 ? "watch" : "good",
-      title: `Average attendance rate ${avgAttendance}%`,
-      detail:
-        avgAttendance < 95
-          ? "Follow up with high-absence staff on the watchlist below."
-          : "Workforce attendance is within a healthy range.",
-      href: "/employees?tab=attendance",
-      metric: `${avgAttendance}%`,
-    });
-  }
-
-  if (missingClock > 0 || missingShift > 0) {
-    insights.push({
-      id: "setup-gaps",
-      severity: "info",
-      title: "Attendance setup incomplete",
-      detail: `${missingClock} active staff missing clock machine ID · ${missingShift} missing shift assignment. Fix on employee edit so imports can analyse them.`,
-      href: "/employees",
-      metric: String(missingClock + missingShift),
     });
   }
 
@@ -492,6 +491,59 @@ export async function getStaffIntelligence(companyId: string) {
     });
   }
 
+  if (expiringCerts.length > 0) {
+    const expired = expiringCerts.filter(
+      (row) => row.expiresAt && expiryAlert(row.expiresAt, now) === "expired"
+    );
+    insights.push({
+      id: "certs-expiry",
+      severity: expired.length > 0 ? "critical" : "watch",
+      title:
+        expired.length > 0
+          ? `${expired.length} certification${expired.length === 1 ? "" : "s"} expired`
+          : `${expiringCerts.length} certification${expiringCerts.length === 1 ? "" : "s"} expire within ${EXPIRY_ALERT_DAYS} days`,
+      detail: expiringCerts
+        .slice(0, 3)
+        .map(
+          (row) =>
+            `${displayName(row.employee.firstName, row.employee.lastName, row.employee.employeeCode)}: ${row.name}`
+        )
+        .join(" · "),
+      href: "/employees",
+      metric: String(expiringCerts.length),
+    });
+  }
+
+  const onBooks = (status: string) =>
+    status !== "FIRED" && status !== "RESIGNED";
+  const expiringContracts = employees.filter(
+    (e) => onBooks(e.status) && expiryAlert(e.endDate, now)
+  );
+  if (expiringContracts.length > 0) {
+    insights.push({
+      id: "contracts-expiry",
+      severity: "watch",
+      title: `${expiringContracts.length} employee contract${expiringContracts.length === 1 ? "" : "s"} expire within ${EXPIRY_ALERT_DAYS} days`,
+      detail: "Review renewals on the employee record before the end date.",
+      href: "/employees",
+      metric: String(expiringContracts.length),
+    });
+  }
+
+  const probationDue = employees.filter(
+    (e) => onBooks(e.status) && expiryAlert(e.probationEnd, now)
+  );
+  if (probationDue.length > 0) {
+    insights.push({
+      id: "probation-due",
+      severity: "info",
+      title: `${probationDue.length} probation review${probationDue.length === 1 ? "" : "s"} due`,
+      detail: "Confirm confirmation or extension on the employee record.",
+      href: "/employees",
+      metric: String(probationDue.length),
+    });
+  }
+
   const topAbsenteeDept = departmentHealth.find((d) => d.absentDays > 0);
   if (topAbsenteeDept) {
     insights.push({
@@ -499,7 +551,7 @@ export async function getStaffIntelligence(companyId: string) {
       severity: "watch",
       title: `${topAbsenteeDept.department} leads missed shifts`,
       detail: `${topAbsenteeDept.absentDays} absent day(s) this month across ${topAbsenteeDept.headcount} staff.`,
-      href: "/employees?tab=attendance",
+      href: "/timesheets",
     });
   }
 
@@ -596,9 +648,7 @@ export async function getStaffIntelligence(companyId: string) {
 
   const briefingLines = [
     `As of ${getMonthName(month)} ${year}, you have ${employees.length} staff records (${active.length} active) across ${departments.length || deptMap.size} departments.`,
-    avgAttendance != null
-      ? `Compiled attendance averages ${avgAttendance}% with ${totalAbsent} missed shift(s) and ${totalLate} late/partial day(s).`
-      : "No attendance compiled yet — upload clock-machine data under Employees → Clock machine & attendance.",
+    "Time for payroll comes from validated weekly timesheets.",
     pendingLeaveRows.length || hrDeskOpen
       ? `Action queue: ${pendingLeaveRows.length} leave approval(s), ${hrDeskOpen} HR Desk item(s).`
       : "No leave or HR Desk items waiting.",

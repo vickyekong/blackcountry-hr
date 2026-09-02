@@ -10,9 +10,10 @@ describe("aggregateAdjustments", () => {
       { type: "LOAN_DEDUCTION", amountKobo: nairaToKobo(-20_000) },
       { type: "ADVANCE", amountKobo: nairaToKobo(-10_000) },
       { type: "UNPAID_LEAVE", amountKobo: nairaToKobo(-5_000) },
+      { type: "OVERTIME", amountKobo: nairaToKobo(12_000) },
     ]);
 
-    expect(result.bonusKobo).toBe(nairaToKobo(75_000));
+    expect(result.bonusKobo).toBe(nairaToKobo(87_000));
     expect(result.loanDeductionKobo).toBe(nairaToKobo(20_000));
     expect(result.advanceDeductionKobo).toBe(nairaToKobo(10_000));
     expect(result.unpaidLeaveDeductionKobo).toBe(nairaToKobo(5_000));

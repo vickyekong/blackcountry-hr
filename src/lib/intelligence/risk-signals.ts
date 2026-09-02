@@ -97,7 +97,7 @@ export function detectDepartmentPressure(
         parts.length > 0
           ? `${parts.join("; ")}. Review workload, staffing, and overtime culture.`
           : `Elevated absences/lates vs headcount (${cur.headcount}). Risk of burnout is elevated.`,
-      href: "/employees?tab=attendance",
+      href: "/timesheets",
       metric:
         absentDelta != null
           ? `${absentDelta >= 0 ? "+" : ""}${absentDelta}%`

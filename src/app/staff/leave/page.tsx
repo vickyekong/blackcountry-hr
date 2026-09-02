@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/table";
 import { formatDate } from "@/lib/utils";
 import { countWorkingDaysBetween } from "@/lib/leave/unpaid-leave";
+import { localDateKey } from "@/lib/time/dates";
 
 interface LeaveRequest {
   id: string;
@@ -39,6 +40,7 @@ interface LeaveBalance {
 export default function StaffLeavePage() {
   const [requests, setRequests] = useState<LeaveRequest[]>([]);
   const [balances, setBalances] = useState<LeaveBalance[]>([]);
+  const [holidayKeys, setHolidayKeys] = useState<string[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [computedDays, setComputedDays] = useState<number | null>(null);
   const [formError, setFormError] = useState("");
@@ -50,6 +52,17 @@ export default function StaffLeavePage() {
     fetch("/api/staff/leave/balances")
       .then((r) => r.json())
       .then((data) => setBalances(Array.isArray(data) ? data : []));
+    fetch(`/api/holidays?year=${new Date().getFullYear()}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setHolidayKeys(
+            data.map((h: { workDate: string }) =>
+              localDateKey(new Date(h.workDate))
+            )
+          );
+        }
+      });
   }
 
   useEffect(() => {
@@ -61,7 +74,7 @@ export default function StaffLeavePage() {
       setComputedDays(null);
       return;
     }
-    setComputedDays(countWorkingDaysBetween(new Date(start), new Date(end)));
+    setComputedDays(countWorkingDaysBetween(new Date(start), new Date(end), holidayKeys));
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -72,7 +85,7 @@ export default function StaffLeavePage() {
     const endDate = form.get("endDate") as string;
     const days =
       computedDays ??
-      countWorkingDaysBetween(new Date(startDate), new Date(endDate));
+      countWorkingDaysBetween(new Date(startDate), new Date(endDate), holidayKeys);
 
     const res = await fetch("/api/staff/leave", {
       method: "POST",

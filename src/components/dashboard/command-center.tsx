@@ -187,6 +187,8 @@ export function QuickWorkflows({
       : []),
     { href: "/timesheets", label: timesheetsLabel },
     { href: "/projects", label: "Projects" },
+    { href: "/training", label: "Training" },
+    { href: "/assets", label: "Assets" },
     ...(showHrAsk
       ? [{ href: "/hr-ask", label: "Draft policy / query desk" }]
       : []),

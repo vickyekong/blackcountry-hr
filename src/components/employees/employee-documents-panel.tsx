@@ -6,12 +6,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate } from "@/lib/utils";
+import {
+  DOCUMENT_CATEGORIES,
+  documentCategoryLabel,
+} from "@/lib/people/labels";
+import { expiryAlert } from "@/lib/people/expiry";
 
 interface DocRow {
   id: string;
   name: string;
   fileUrl: string;
   uploadedAt: string;
+  category?: string;
+  expiresAt?: string | null;
 }
 
 const MAX_BYTES = 900_000;
@@ -39,10 +46,18 @@ async function fileToDataUrl(file: File): Promise<string> {
   });
 }
 
-export function EmployeeDocumentsPanel({ employeeId }: { employeeId: string }) {
+export function EmployeeDocumentsPanel({
+  employeeId,
+  canManage = true,
+}: {
+  employeeId: string;
+  canManage?: boolean;
+}) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [docs, setDocs] = useState<DocRow[]>([]);
   const [name, setName] = useState("");
+  const [category, setCategory] = useState<(typeof DOCUMENT_CATEGORIES)[number]>("OTHER");
+  const [expiresAt, setExpiresAt] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -74,11 +89,18 @@ export function EmployeeDocumentsPanel({ employeeId }: { employeeId: string }) {
       const res = await fetch(`/api/employees/${employeeId}/documents`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: label, fileUrl }),
+        body: JSON.stringify({
+          name: label,
+          fileUrl,
+          category,
+          expiresAt: expiresAt || null,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Upload failed");
       setName("");
+      setExpiresAt("");
+      setCategory("OTHER");
       if (fileRef.current) fileRef.current.value = "";
       setMessage("Document saved.");
       load();
@@ -119,9 +141,10 @@ export function EmployeeDocumentsPanel({ employeeId }: { employeeId: string }) {
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
+        {canManage && (
         <form
           onSubmit={(e) => void handleUpload(e)}
-          className="grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end"
+          className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_1fr_auto] sm:items-end"
         >
           <div>
             <Label htmlFor="docName">Document name</Label>
@@ -131,6 +154,35 @@ export function EmployeeDocumentsPanel({ employeeId }: { employeeId: string }) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Employment contract"
+              disabled={loading}
+            />
+          </div>
+          <div>
+            <Label htmlFor="docCategory">Type</Label>
+            <select
+              id="docCategory"
+              className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+              value={category}
+              onChange={(e) =>
+                setCategory(e.target.value as (typeof DOCUMENT_CATEGORIES)[number])
+              }
+              disabled={loading}
+            >
+              {DOCUMENT_CATEGORIES.map((item) => (
+                <option key={item} value={item}>
+                  {documentCategoryLabel(item)}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <Label htmlFor="docExpires">Expiry (optional)</Label>
+            <Input
+              id="docExpires"
+              type="date"
+              className="mt-1"
+              value={expiresAt}
+              onChange={(e) => setExpiresAt(e.target.value)}
               disabled={loading}
             />
           </div>
@@ -149,6 +201,7 @@ export function EmployeeDocumentsPanel({ employeeId }: { employeeId: string }) {
             {loading ? "Saving…" : "Upload"}
           </Button>
         </form>
+        )}
 
         {message && (
           <p
@@ -172,7 +225,19 @@ export function EmployeeDocumentsPanel({ employeeId }: { employeeId: string }) {
                 <div className="min-w-0">
                   <p className="font-medium text-stone-900">{doc.name}</p>
                   <p className="text-xs text-stone-500">
-                    Uploaded {formatDate(new Date(doc.uploadedAt))}
+                    {documentCategoryLabel(doc.category ?? "OTHER")} · Uploaded{" "}
+                    {formatDate(new Date(doc.uploadedAt))}
+                    {doc.expiresAt
+                      ? ` · expires ${formatDate(new Date(doc.expiresAt))}`
+                      : ""}
+                    {expiryAlert(doc.expiresAt ? new Date(doc.expiresAt) : null) ===
+                    "expired"
+                      ? " · expired"
+                      : expiryAlert(
+                            doc.expiresAt ? new Date(doc.expiresAt) : null
+                          ) === "soon"
+                        ? " · due soon"
+                        : ""}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -186,6 +251,7 @@ export function EmployeeDocumentsPanel({ employeeId }: { employeeId: string }) {
                       Open
                     </a>
                   </Button>
+                  {canManage && (
                   <Button
                     type="button"
                     variant="outline"
@@ -195,6 +261,7 @@ export function EmployeeDocumentsPanel({ employeeId }: { employeeId: string }) {
                   >
                     Remove
                   </Button>
+                  )}
                 </div>
               </li>
             ))}

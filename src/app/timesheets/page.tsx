@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +18,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { WeeklyTimesheet } from "@/components/timesheets/weekly-timesheet";
+import { HolidaysPanel } from "@/components/time/holidays-panel";
+import { OvertimePanel } from "@/components/time/overtime-panel";
 import { can } from "@/lib/permissions";
+import { cn } from "@/lib/cn";
 import type { UserRole } from "@prisma/client";
 
 type ProjectTask = { id: string; name: string; status: string };
@@ -56,10 +60,17 @@ type WeekRow = {
 
 export default function TimesheetsPage() {
   const { data: session } = useSession();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const role = session?.user?.role as UserRole | undefined;
   const validator = role ? can(role, "validateTimesheets") : false;
   const logger = role ? can(role, "logTimesheets") : false;
   const hasLinkedRecord = Boolean(session?.user?.employeeId);
+  const tabParam = searchParams.get("tab");
+  const tab =
+    validator && (tabParam === "holidays" || tabParam === "overtime")
+      ? tabParam
+      : "hours";
 
   const [weeks, setWeeks] = useState<WeekRow[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -153,14 +164,48 @@ export default function TimesheetsPage() {
 
   return (
     <AppShell>
-      <div className="mb-8">
+      <div className="mb-6">
         <h1 className="text-2xl font-semibold text-ink">Timesheets</h1>
         <p className="mt-1 text-sm text-muted">
-          {validator
-            ? "Staff and business heads log a week against a project and task. Validate it to lock the hours for payroll."
-            : "Log your hours for the week against a project and task. After HR validates it, you cannot change that week."}
+          Weekly hours against a project and task are the source of time for
+          payroll. Validate a week to lock it. Holidays affect leave day
+          counts; extra overtime requests attach to the next draft run.
         </p>
       </div>
+      {validator ? (
+        <div className="mb-6 flex flex-wrap gap-1 border-b border-line">
+          {(
+            [
+              { id: "hours", label: "Hours" },
+              { id: "holidays", label: "Holidays" },
+              { id: "overtime", label: "Overtime" },
+            ] as const
+          ).map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() =>
+                router.push(
+                  item.id === "hours" ? "/timesheets" : `/timesheets?tab=${item.id}`
+                )
+              }
+              className={cn(
+                "-mb-px border-b-2 px-3 py-2 text-sm font-medium transition",
+                tab === item.id
+                  ? "border-stone-900 text-stone-900"
+                  : "border-transparent text-stone-500 hover:text-stone-800"
+              )}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      ) : null}
+
+      {tab === "holidays" && validator ? <HolidaysPanel /> : null}
+      {tab === "overtime" && validator ? <OvertimePanel /> : null}
+      {tab === "hours" ? (
+        <>
       {error && <p className="mb-4 text-sm text-signal">{error}</p>}
 
       {logger && hasLinkedRecord && (
@@ -345,6 +390,8 @@ export default function TimesheetsPage() {
           </div>
         </>
       )}
+        </>
+      ) : null}
     </AppShell>
   );
 }

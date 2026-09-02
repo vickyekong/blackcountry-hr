@@ -64,6 +64,20 @@ const ONBOARDING_TASKS: Array<{
     href: (id) => `/employees/${id}`,
     sortOrder: 8,
   },
+  {
+    key: "ASSIGN_IT_ASSETS",
+    title: "Assign IT / equipment",
+    description: "Laptop, phone, or access card from the assets register",
+    href: () => `/assets`,
+    sortOrder: 9,
+  },
+  {
+    key: "ENROLL_ORIENTATION",
+    title: "Enrol in orientation / required training",
+    description: "Assign required programmes from Training",
+    href: () => `/training`,
+    sortOrder: 10,
+  },
 ];
 
 const OFFBOARDING_TASKS: Array<{
@@ -96,15 +110,22 @@ const OFFBOARDING_TASKS: Array<{
   {
     key: "EXIT_DOCS",
     title: "Collect exit documents",
-    description: "Clearance form, asset return, exit interview notes",
+    description: "Clearance form, asset return on the Assets register, exit interview notes",
     href: (id) => `/employees/${id}`,
     sortOrder: 4,
+  },
+  {
+    key: "RETURN_ASSETS",
+    title: "Return company assets",
+    description: "Mark assigned equipment returned on the Assets register",
+    href: () => `/assets`,
+    sortOrder: 5,
   },
   {
     key: "NOTIFY_FINANCE_EXIT",
     title: "Notify Finance of exit",
     description: "Remove from remittance schedules after final pay",
-    sortOrder: 5,
+    sortOrder: 6,
   },
 ];
 
@@ -154,6 +175,7 @@ export async function startLifecycle(options: {
   });
 
   if (existing && !options.forceNew) {
+    await ensureTemplateTasks(existing.id, options.kind, options.employeeId);
     await syncLifecycleTaskHints(existing.id);
     return prisma.employeeLifecycle.findUniqueOrThrow({
       where: { id: existing.id },
@@ -195,6 +217,28 @@ export async function startLifecycle(options: {
   });
 }
 
+async function ensureTemplateTasks(
+  lifecycleId: string,
+  kind: LifecycleKind,
+  employeeId: string
+) {
+  const templates = kind === "ONBOARDING" ? ONBOARDING_TASKS : OFFBOARDING_TASKS;
+  for (const t of templates) {
+    await prisma.employeeLifecycleTask.upsert({
+      where: { lifecycleId_key: { lifecycleId, key: t.key } },
+      create: {
+        lifecycleId,
+        key: t.key,
+        title: t.title,
+        description: t.description,
+        href: t.href?.(employeeId) ?? null,
+        sortOrder: t.sortOrder,
+      },
+      update: {},
+    });
+  }
+}
+
 async function autoCompleteTask(lifecycleId: string, key: string) {
   await prisma.employeeLifecycleTask.updateMany({
     where: { lifecycleId, key, status: "PENDING" },
@@ -218,6 +262,8 @@ export async function syncLifecycleTaskHints(lifecycleId: string) {
           status: true,
           shiftAssignment: { select: { id: true } },
           leaveBalances: { select: { id: true }, take: 1 },
+          assignedAssets: { select: { id: true }, take: 1 },
+          trainingEnrollments: { select: { id: true }, take: 1 },
         },
       },
       tasks: true,
@@ -235,6 +281,8 @@ export async function syncLifecycleTaskHints(lifecycleId: string) {
   if (emp.rsaPin?.trim()) autoDone.add("COLLECT_RSA");
   if (emp.clockDeviceId && emp.shiftAssignment) autoDone.add("ASSIGN_SHIFT");
   if (emp.leaveBalances.length > 0) autoDone.add("LEAVE_BALANCES");
+  if (emp.assignedAssets.length > 0) autoDone.add("ASSIGN_IT_ASSETS");
+  if (emp.trainingEnrollments.length > 0) autoDone.add("ENROLL_ORIENTATION");
   if (emp.status === "FIRED" || emp.status === "RESIGNED") autoDone.add("STOP_PAYROLL");
 
   for (const key of autoDone) {
@@ -304,6 +352,7 @@ export async function getEmployeeLifecycles(
     orderBy: { startedAt: "desc" },
   });
   for (const lc of open.filter((l) => l.status === "OPEN")) {
+    await ensureTemplateTasks(lc.id, lc.kind, employeeId);
     await syncLifecycleTaskHints(lc.id);
   }
   return prisma.employeeLifecycle.findMany({
@@ -334,6 +383,7 @@ export async function listOpenLifecycles(companyId: string) {
   });
 
   for (const lc of open) {
+    await ensureTemplateTasks(lc.id, lc.kind, lc.employee.id);
     await syncLifecycleTaskHints(lc.id);
   }
 

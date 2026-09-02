@@ -29,6 +29,7 @@ export interface EmployeeTableRow {
   jobTitle: string;
   status: EmployeeStatusValue | string;
   sex: EmployeeSexValue | string | null;
+  managerId?: string | null;
   basicSalaryKobo: string | number | bigint;
   housingAllowanceKobo: string | number | bigint;
   transportAllowanceKobo: string | number | bigint;

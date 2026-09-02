@@ -304,9 +304,7 @@ export function PayrollWizard({
                 Full-time pay uses the contract salary; approved timesheet
                 hours above a standard month are overtime. Contract staff are
                 paid from approved hours (monthly basic as the full-month
-                rate). Clock attendance deductions are{" "}
-                <strong>proposed only after HR confirms</strong> via “Review
-                &amp; apply attendance”.
+                rate).
               </p>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -331,10 +329,10 @@ export function PayrollWizard({
                     against salaries
                   </p>
                   <Link
-                    href="/employees?tab=attendance"
+                    href="/timesheets"
                     className="mt-1 inline-block text-xs font-medium text-amber-900 underline"
                   >
-                    Review clock report →
+                    Review timesheets →
                   </Link>
                 </div>
               )}

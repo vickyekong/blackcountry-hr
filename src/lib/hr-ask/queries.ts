@@ -48,7 +48,7 @@ export async function runHrAskQuery(
         id: queryId,
         title: "Employees due for ~1-year appraisal",
         summary: `${due.length} staff near their hire anniversary this cycle`,
-        href: "/employees",
+        href: "/performance",
         rows: due.map((e) => ({
           code: e.employeeCode,
           name: displayName(e.firstName, e.lastName, e.employeeCode),
@@ -119,7 +119,6 @@ export async function runHrAskQuery(
     }
 
     case "birthdays-month": {
-      // No DOB field — use hire anniversary as proxy labelled clearly
       const month = now.getMonth();
       const employees = await prisma.employee.findMany({
         where: { companyId, status: { notIn: ["FIRED", "RESIGNED"] } },
@@ -129,24 +128,49 @@ export async function runHrAskQuery(
           lastName: true,
           department: true,
           startDate: true,
+          dateOfBirth: true,
         },
       });
-      const rows = employees
+      const birthdayRows = employees
+        .filter((e) => e.dateOfBirth && e.dateOfBirth.getMonth() === month)
+        .map((e) => ({
+          code: e.employeeCode,
+          name: displayName(e.firstName, e.lastName, e.employeeCode),
+          department: e.department,
+          birthday: formatDate(
+            new Date(
+              now.getFullYear(),
+              e.dateOfBirth!.getMonth(),
+              e.dateOfBirth!.getDate()
+            )
+          ),
+        }));
+      const anniversaryRows = employees
         .filter((e) => e.startDate.getMonth() === month)
         .map((e) => ({
           code: e.employeeCode,
           name: displayName(e.firstName, e.lastName, e.employeeCode),
           department: e.department,
           hireAnniversary: formatDate(
-            new Date(now.getFullYear(), e.startDate.getMonth(), e.startDate.getDate())
+            new Date(
+              now.getFullYear(),
+              e.startDate.getMonth(),
+              e.startDate.getDate()
+            )
           ),
         }));
       return {
         id: queryId,
-        title: "Hire anniversaries this month",
-        summary: `${rows.length} staff (DOB not stored — showing hire anniversary)`,
+        title:
+          birthdayRows.length > 0
+            ? "Birthdays and hire anniversaries this month"
+            : "Hire anniversaries this month",
+        summary:
+          birthdayRows.length > 0
+            ? `${birthdayRows.length} birthday(s), ${anniversaryRows.length} hire anniversary(ies)`
+            : `${anniversaryRows.length} staff with a hire anniversary this month`,
         href: "/employees",
-        rows,
+        rows: birthdayRows.length > 0 ? birthdayRows : anniversaryRows,
       };
     }
 
@@ -369,6 +393,41 @@ export async function runHrAskQuery(
       };
     }
 
+    case "overtime-pending": {
+      const rows = await prisma.overtimeRequest.findMany({
+        where: { companyId, status: "PENDING" },
+        include: {
+          employee: {
+            select: {
+              employeeCode: true,
+              firstName: true,
+              lastName: true,
+              department: true,
+            },
+          },
+        },
+        orderBy: { workDate: "asc" },
+        take: 50,
+      });
+      return {
+        id: queryId,
+        title: "Pending overtime requests",
+        summary: `${rows.length} request(s) waiting for HR approval`,
+        href: "/timesheets?tab=overtime",
+        rows: rows.map((row) => ({
+          code: row.employee.employeeCode,
+          name: displayName(
+            row.employee.firstName,
+            row.employee.lastName,
+            row.employee.employeeCode
+          ),
+          department: row.employee.department,
+          date: formatDate(row.workDate),
+          hours: (row.minutes / 60).toFixed(2),
+        })),
+      };
+    }
+
     default:
       throw new Error("Unknown query");
   }
@@ -393,8 +452,8 @@ export const HR_ASK_QUERIES: Array<{ id: string; label: string; hint: string }> 
     },
     {
       id: "birthdays-month",
-      label: "Hire anniversaries this month",
-      hint: "DOB not stored yet — anniversary proxy",
+      label: "Birthdays / hire anniversaries this month",
+      hint: "Uses date of birth when recorded, otherwise hire anniversary",
     },
     {
       id: "open-onboarding",
@@ -425,5 +484,10 @@ export const HR_ASK_QUERIES: Array<{ id: string; label: string; hint: string }> 
       id: "leave-this-month",
       label: "Leave this month",
       hint: "Approved and pending",
+    },
+    {
+      id: "overtime-pending",
+      label: "Pending overtime requests",
+      hint: "Extra hours waiting for approval",
     },
   ];

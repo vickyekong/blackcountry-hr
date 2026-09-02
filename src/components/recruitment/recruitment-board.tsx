@@ -73,6 +73,8 @@ export function RecruitmentBoard() {
         employmentType: form.get("employmentType"),
         description: form.get("description"),
         requirements: form.get("requirements") || null,
+        openings: Number(form.get("openings") || 1),
+        deadline: String(form.get("deadline") || "") || null,
         status: form.get("publish") === "on" ? "OPEN" : "DRAFT",
       }),
     });
@@ -131,6 +133,21 @@ export function RecruitmentBoard() {
                 <option value="FULL_TIME">Full-time</option>
                 <option value="CONTRACT">Contract</option>
               </select>
+            </div>
+            <div>
+              <Label htmlFor="openings">Openings</Label>
+              <Input
+                id="openings"
+                name="openings"
+                type="number"
+                min={1}
+                defaultValue={1}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="deadline">Application deadline</Label>
+              <Input id="deadline" name="deadline" type="date" className="mt-1" />
             </div>
             <div className="sm:col-span-2">
               <Label htmlFor="description">Listing copy</Label>

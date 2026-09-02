@@ -33,6 +33,7 @@ export async function getCommandCenterData(companyId: string) {
     paidRuns,
     missingTin,
     missingRsa,
+    pendingOvertime,
   ] = await Promise.all([
     prisma.employeeChangeRequest.count({
       where: { companyId, status: "PENDING" },
@@ -70,6 +71,9 @@ export async function getCommandCenterData(companyId: string) {
         OR: [{ rsaPin: null }, { rsaPin: "" }],
       },
     }),
+    prisma.overtimeRequest.count({
+      where: { companyId, status: "PENDING" },
+    }),
   ]);
 
   const priorPaid = paidRuns[1] ?? null;
@@ -97,6 +101,14 @@ export async function getCommandCenterData(companyId: string) {
       label: "Leave to record or approve",
       count: overview.kpis.pendingLeave,
       href: "/leave",
+    });
+  }
+  if (pendingOvertime > 0) {
+    actions.push({
+      id: "overtime",
+      label: "Overtime to approve",
+      count: pendingOvertime,
+      href: "/timesheets?tab=overtime",
     });
   }
   if (openOnboarding > 0) {

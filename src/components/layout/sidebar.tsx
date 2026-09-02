@@ -48,9 +48,24 @@ const navItems: Array<{
     roles: ["SUPER_ADMIN", "HR_ADMIN", "BUSINESS_HEAD"],
   },
   {
+    href: "/assets",
+    label: "Assets",
+    roles: ["SUPER_ADMIN", "HR_ADMIN", "BUSINESS_HEAD"],
+  },
+  {
     href: "/recruitment",
     label: "Recruitment",
     roles: ["SUPER_ADMIN", "HR_ADMIN"],
+  },
+  {
+    href: "/training",
+    label: "Training",
+    roles: ["SUPER_ADMIN", "HR_ADMIN", "BUSINESS_HEAD"],
+  },
+  {
+    href: "/performance",
+    label: "Performance",
+    roles: ["SUPER_ADMIN", "HR_ADMIN", "BUSINESS_HEAD"],
   },
   {
     href: "/hr-desk",

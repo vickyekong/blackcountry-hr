@@ -9,6 +9,10 @@ import {
   JOB_BOARD_LABELS,
   listingPerformance,
 } from "@/lib/recruitment/boards";
+import { parseOptionalDate } from "@/lib/people/dates";
+import { nairaToKobo } from "@/lib/money";
+import { serializeBigInts } from "@/lib/payroll/config-mapper";
+import { skillMatchPercent } from "@/lib/talent/skill-match";
 
 const patchSchema = z.object({
   title: z.string().trim().min(2).max(160).optional(),
@@ -17,6 +21,11 @@ const patchSchema = z.object({
   employmentType: z.enum(["FULL_TIME", "CONTRACT"]).optional(),
   description: z.string().trim().min(10).max(8000).optional(),
   requirements: z.string().trim().max(4000).optional().nullable(),
+  openings: z.number().int().min(1).max(50).optional(),
+  deadline: z.string().nullable().optional(),
+  salaryMinNaira: z.number().min(0).optional().nullable(),
+  salaryMaxNaira: z.number().min(0).optional().nullable(),
+  skillIds: z.array(z.string()).optional(),
   status: z.enum(["DRAFT", "OPEN", "CLOSED", "FILLED"]).optional(),
 });
 
@@ -32,6 +41,7 @@ export async function GET(
       include: {
         posts: { orderBy: { board: "asc" } },
         applications: { orderBy: { createdAt: "desc" } },
+        requiredSkills: { include: { skill: { select: { id: true, name: true } } } },
         _count: { select: { applications: true } },
       },
     });
@@ -45,25 +55,40 @@ export async function GET(
       bySource.set(app.source, (bySource.get(app.source) ?? 0) + 1);
       byStatus.set(app.status, (byStatus.get(app.status) ?? 0) + 1);
     }
+    const requiredNames = listing.requiredSkills.map((row) => row.skill.name);
+    const applications = listing.applications.map((app) => {
+      const match = skillMatchPercent(
+        requiredNames,
+        `${app.coverLetter ?? ""} ${app.resumeUrl ?? ""} ${app.notes ?? ""}`
+      );
+      return { ...app, skillMatch: match };
+    });
     const performance = listingPerformance({
       viewCount: listing.viewCount,
       applicationCount: listing._count.applications,
     });
-    return NextResponse.json({
-      ...listing,
-      applyUrl: applyUrlForListing(listing.id, origin),
-      applicationCount: listing._count.applications,
-      performance,
-      bySource: [...bySource.entries()].map(([source, count]) => ({
-        source,
-        label: JOB_BOARD_LABELS[source as keyof typeof JOB_BOARD_LABELS] ?? source,
-        count,
-      })),
-      byStatus: [...byStatus.entries()].map(([status, count]) => ({
-        status,
-        count,
-      })),
-    });
+    return NextResponse.json(
+      serializeBigInts({
+        ...listing,
+        applications,
+        requiredSkills: listing.requiredSkills.map((row) => ({
+          id: row.skill.id,
+          name: row.skill.name,
+        })),
+        applyUrl: applyUrlForListing(listing.id, origin),
+        applicationCount: listing._count.applications,
+        performance,
+        bySource: [...bySource.entries()].map(([source, count]) => ({
+          source,
+          label: JOB_BOARD_LABELS[source as keyof typeof JOB_BOARD_LABELS] ?? source,
+          count,
+        })),
+        byStatus: [...byStatus.entries()].map(([status, count]) => ({
+          status,
+          count,
+        })),
+      })
+    );
   } catch (error) {
     return handleApiError(error);
   }
@@ -94,6 +119,23 @@ export async function PATCH(
         description: body.description,
         requirements:
           body.requirements === undefined ? undefined : body.requirements,
+        openings: body.openings,
+        deadline:
+          body.deadline !== undefined
+            ? parseOptionalDate(body.deadline)
+            : undefined,
+        salaryMinKobo:
+          body.salaryMinNaira === undefined
+            ? undefined
+            : body.salaryMinNaira == null
+              ? null
+              : nairaToKobo(body.salaryMinNaira),
+        salaryMaxKobo:
+          body.salaryMaxNaira === undefined
+            ? undefined
+            : body.salaryMaxNaira == null
+              ? null
+              : nairaToKobo(body.salaryMaxNaira),
         status: nextStatus,
         publishedAt:
           nextStatus === "OPEN" && !existing.publishedAt
@@ -105,6 +147,19 @@ export async function PATCH(
             : null,
       },
     });
+    if (body.skillIds) {
+      await prisma.jobListingSkill.deleteMany({
+        where: { listingId: listing.id },
+      });
+      if (body.skillIds.length > 0) {
+        await prisma.jobListingSkill.createMany({
+          data: body.skillIds.map((skillId) => ({
+            listingId: listing.id,
+            skillId,
+          })),
+        });
+      }
+    }
     if (nextStatus === "OPEN") {
       await prisma.jobListingPost.upsert({
         where: {
@@ -130,7 +185,7 @@ export async function PATCH(
         changes: body,
       },
     });
-    return NextResponse.json(listing);
+    return NextResponse.json(serializeBigInts(listing));
   } catch (error) {
     return handleApiError(error);
   }

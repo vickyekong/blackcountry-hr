@@ -143,15 +143,13 @@ export function PeopleIntelligencePanel({
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-lg border border-stone-200 bg-white px-4 py-3">
           <p className="text-xs uppercase tracking-wide text-stone-500">
-            Attendance rate
+            Time
           </p>
           <p className="mt-1 text-2xl font-semibold tabular-nums">
-            {stats.avgAttendanceRate == null
-              ? "—"
-              : `${stats.avgAttendanceRate}%`}
+            Timesheets
           </p>
           <p className="mt-1 text-xs text-stone-500">
-            {stats.missedShifts} missed · {stats.lateOrPartialDays} late/partial
+            Weekly hours, validated by HR, drive payroll
           </p>
         </div>
         <div className="rounded-lg border border-stone-200 bg-white px-4 py-3">
@@ -287,8 +285,6 @@ export function PeopleIntelligencePanel({
                   <tr>
                     <th className="px-4 py-2 font-medium">Department</th>
                     <th className="px-2 py-2 font-medium text-right">Staff</th>
-                    <th className="px-2 py-2 font-medium text-right">Absent</th>
-                    <th className="px-2 py-2 font-medium text-right">Att%</th>
                     <th className="px-4 py-2 font-medium text-right">Basic</th>
                   </tr>
                 </thead>
@@ -300,14 +296,6 @@ export function PeopleIntelligencePanel({
                       </td>
                       <td className="px-2 py-2 text-right tabular-nums">
                         {d.active}/{d.headcount}
-                      </td>
-                      <td className="px-2 py-2 text-right tabular-nums">
-                        {d.absentDays}
-                      </td>
-                      <td className="px-2 py-2 text-right tabular-nums">
-                        {d.avgAttendanceRate == null
-                          ? "—"
-                          : `${d.avgAttendanceRate}%`}
                       </td>
                       <td className="px-4 py-2 text-right tabular-nums text-stone-700">
                         {formatCurrency(BigInt(d.payrollBasicKobo))}

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requirePermission, handleApiError } from "@/lib/api-auth";
+import { parseOptionalDate } from "@/lib/people/dates";
+import { DOCUMENT_CATEGORIES } from "@/lib/people/labels";
 import { z } from "zod";
 
 const MAX_DATA_URL_CHARS = 1_200_000; // ~0.9MB binary after base64
@@ -20,6 +22,8 @@ const createSchema = z.object({
           "File must be a URL or a small upload (PDF/image under ~1MB)",
       }
     ),
+  category: z.enum(DOCUMENT_CATEGORIES).optional(),
+  expiresAt: z.string().nullable().optional(),
 });
 
 async function loadEmployee(companyId: string, employeeId: string) {
@@ -34,7 +38,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await requirePermission("manageEmployees");
+    const session = await requirePermission("viewEmployees");
     const employee = await loadEmployee(session.user.companyId, params.id);
     if (!employee) {
       return NextResponse.json({ error: "Employee not found" }, { status: 404 });
@@ -69,6 +73,8 @@ export async function POST(
         employeeId: params.id,
         name: body.name,
         fileUrl: body.fileUrl,
+        category: body.category ?? "OTHER",
+        expiresAt: parseOptionalDate(body.expiresAt ?? undefined) ?? null,
       },
     });
 

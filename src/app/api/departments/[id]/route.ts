@@ -3,9 +3,15 @@ import { prisma } from "@/lib/db";
 import { requirePermission, handleApiError } from "@/lib/api-auth";
 import { z } from "zod";
 
-const updateSchema = z.object({
-  name: z.string().trim().min(1).max(80),
-});
+const updateSchema = z
+  .object({
+    name: z.string().trim().min(1).max(80).optional(),
+    managerEmployeeId: z.string().nullable().optional(),
+  })
+  .refine(
+    (body) => body.name !== undefined || body.managerEmployeeId !== undefined,
+    { message: "Provide a name or a department head" }
+  );
 
 export async function PATCH(
   req: NextRequest,
@@ -22,33 +28,61 @@ export async function PATCH(
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    const clash = await prisma.department.findFirst({
-      where: {
-        companyId: session.user.companyId,
-        name: body.name,
-        NOT: { id: params.id },
-      },
-    });
-    if (clash) {
-      return NextResponse.json(
-        { error: "Department already exists" },
-        { status: 409 }
-      );
+    if (body.name && body.name !== existing.name) {
+      const clash = await prisma.department.findFirst({
+        where: {
+          companyId: session.user.companyId,
+          name: body.name,
+          NOT: { id: params.id },
+        },
+      });
+      if (clash) {
+        return NextResponse.json(
+          { error: "Department already exists" },
+          { status: 409 }
+        );
+      }
+    }
+
+    let managerEmployeeId: string | null | undefined;
+    if (body.managerEmployeeId !== undefined) {
+      if (!body.managerEmployeeId) {
+        managerEmployeeId = null;
+      } else {
+        const head = await prisma.employee.findFirst({
+          where: {
+            id: body.managerEmployeeId,
+            companyId: session.user.companyId,
+          },
+          select: { id: true },
+        });
+        if (!head) {
+          return NextResponse.json(
+            { error: "Department head not found in this company" },
+            { status: 400 }
+          );
+        }
+        managerEmployeeId = body.managerEmployeeId;
+      }
     }
 
     const department = await prisma.department.update({
       where: { id: params.id },
-      data: { name: body.name },
+      data: {
+        ...(body.name && { name: body.name }),
+        ...(managerEmployeeId !== undefined && { managerEmployeeId }),
+      },
     });
 
-    // Keep employee department strings in sync when a department is renamed.
-    await prisma.employee.updateMany({
-      where: {
-        companyId: session.user.companyId,
-        department: existing.name,
-      },
-      data: { department: body.name },
-    });
+    if (body.name && body.name !== existing.name) {
+      await prisma.employee.updateMany({
+        where: {
+          companyId: session.user.companyId,
+          department: existing.name,
+        },
+        data: { department: body.name },
+      });
+    }
 
     await prisma.auditLog.create({
       data: {
@@ -57,7 +91,11 @@ export async function PATCH(
         entityType: "Department",
         entityId: department.id,
         performedById: session.user.id,
-        changes: { from: existing.name, to: body.name },
+        changes: {
+          from: existing.name,
+          to: department.name,
+          managerEmployeeId: department.managerEmployeeId,
+        },
       },
     });
 

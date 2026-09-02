@@ -16,7 +16,7 @@ import { ensurePayrollHardeningSchema } from "@/lib/ensure-payroll-hardening-sch
 import {
   combineDateAndTime,
   compileAttendanceStatus,
-  isWorkDay,
+  isExpectedWorkDay,
   parseClockMachineCsv,
   shiftDurationMinutes,
   type ParsedPunchRow,
@@ -30,14 +30,12 @@ import {
   scoreEmployeeNameMatch,
   type ParsedSheetDay,
 } from "@/lib/attendance/parse-attendance-sheet";
+import { ensureTimeSchema } from "@/lib/ensure-time-schema";
+import { localDateKey } from "@/lib/time/dates";
 
 /** Local calendar day key (avoid UTC shift from toISOString). */
 function dateKey(d: Date): string {
-  const x = startOfDay(d);
-  const y = x.getFullYear();
-  const m = String(x.getMonth() + 1).padStart(2, "0");
-  const day = String(x.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
+  return localDateKey(startOfDay(d));
 }
 
 function chunkArray<T>(items: T[], size: number): T[][] {
@@ -619,6 +617,7 @@ export async function compileAttendancePeriod(options: {
   periodEnd?: Date;
 }) {
   await ensureDefaultShiftCoverage(options.companyId);
+  await ensureTimeSchema();
 
   let periodStart: Date;
   let periodEnd: Date;
@@ -640,7 +639,7 @@ export async function compileAttendancePeriod(options: {
 
   const workingDays = await companyWorkingDays(options.companyId);
 
-  const [settings, employees, punches, leaveRequests, sheetDays] =
+  const [settings, employees, punches, leaveRequests, sheetDays, holidays, exceptions] =
     await Promise.all([
     prisma.attendanceSettings.upsert({
       where: { companyId: options.companyId },
@@ -681,6 +680,20 @@ export async function compileAttendancePeriod(options: {
       },
       select: { employeeId: true, workDate: true },
     }),
+    prisma.companyHoliday.findMany({
+      where: {
+        companyId: options.companyId,
+        workDate: { gte: periodStart, lte: periodEnd },
+      },
+      select: { workDate: true },
+    }),
+    prisma.shiftException.findMany({
+      where: {
+        companyId: options.companyId,
+        workDate: { gte: periodStart, lte: periodEnd },
+      },
+      include: { shift: true },
+    }),
   ]);
 
   const sheetDayKeys = new Set(
@@ -701,6 +714,11 @@ export async function compileAttendancePeriod(options: {
     list.push(l);
     leaveByEmployee.set(l.employeeId, list);
   }
+
+  const holidayKeys = new Set(holidays.map((h) => dateKey(h.workDate)));
+  const exceptionByEmployeeDay = new Map(
+    exceptions.map((row) => [`${row.employeeId}|${dateKey(row.workDate)}`, row] as const)
+  );
 
   const regulated = employees.filter(
     (e) =>
@@ -746,7 +764,17 @@ export async function compileAttendancePeriod(options: {
         continue;
       }
 
-      const expected = isWorkDay(shift.workDays, day);
+      const exception = exceptionByEmployeeDay.get(
+        `${employee.id}|${dateKey(day)}`
+      );
+      let activeShift = shift;
+      let expected = isExpectedWorkDay(shift.workDays, day, holidayKeys);
+      if (exception?.kind === "OFF") {
+        expected = false;
+      } else if (exception?.kind === "SHIFT" && exception.shift) {
+        activeShift = exception.shift;
+        expected = !holidayKeys.has(dateKey(day));
+      }
       const onLeave = leaves.some(
         (l) =>
           startOfDay(l.startDate) <= day && startOfDay(l.endDate) >= day
@@ -776,12 +804,12 @@ export async function compileAttendancePeriod(options: {
         }
       }
 
-      const shiftStart = combineDateAndTime(day, shift.startTime);
+      const shiftStart = combineDateAndTime(day, activeShift.startTime);
       const expectedMinutes = shiftDurationMinutes(
-        shift.startTime,
-        shift.endTime
+        activeShift.startTime,
+        activeShift.endTime
       );
-      const grace = shift.graceMinutes || settings.lateGraceMinutes;
+      const grace = activeShift.graceMinutes || settings.lateGraceMinutes;
 
       const compiled = compileAttendanceStatus({
         expected,
@@ -826,7 +854,7 @@ export async function compileAttendancePeriod(options: {
         companyId: options.companyId,
         employeeId: employee.id,
         workDate: dayStart,
-        shiftId: shift.id,
+        shiftId: activeShift.id,
         status: compiled.status,
         clockInAt,
         clockOutAt:

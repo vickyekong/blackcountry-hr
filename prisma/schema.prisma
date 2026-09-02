@@ -44,7 +44,10 @@ enum JobListingStatus {
 enum JobApplicationStatus {
   NEW
   REVIEWING
+  INTERVIEW
+  ASSESSMENT
   SHORTLISTED
+  OFFER
   REJECTED
   HIRED
 }
@@ -117,6 +120,9 @@ model Company {
   attendanceSettings    AttendanceSettings?
   attendancePunches     AttendancePunch[]
   attendanceDays        AttendanceDay[]
+  companyHolidays       CompanyHoliday[]
+  overtimeRequests      OvertimeRequest[]
+  shiftExceptions       ShiftException[]
   hrDeskMessages        HrDeskMessage[]
   employeeLifecycles    EmployeeLifecycle[]
   changeRequests        EmployeeChangeRequest[]
@@ -127,20 +133,28 @@ model Company {
   workspaceFiles        WorkspaceFile[]
   jobListings           JobListing[]
   jobApplications       JobApplication[]
+  skills                Skill[]
+  assets                CompanyAsset[]
+  trainingPrograms      TrainingProgram[]
+  performanceGoals      PerformanceGoal[]
+  performanceReviews    PerformanceReview[]
 
   @@index([parentId])
 }
 
 model Department {
-  id        String   @id @default(cuid())
-  companyId String
-  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                 String    @id @default(cuid())
+  companyId          String
+  company            Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name               String
+  managerEmployeeId  String?
+  manager            Employee? @relation("DepartmentHead", fields: [managerEmployeeId], references: [id], onDelete: SetNull)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
   @@unique([companyId, name])
   @@index([companyId])
+  @@index([managerEmployeeId])
 }
 
 model JobDescription {
@@ -216,6 +230,7 @@ model User {
   payrollRunsCreated  PayrollRun[] @relation("CreatedBy")
   payrollRunsApproved PayrollRun[] @relation("ApprovedBy")
   leaveApprovals      LeaveRequest[] @relation("LeaveApprover")
+  overtimeApprovals   OvertimeRequest[] @relation("OvertimeApprover")
   auditLogs           AuditLog[]
   notifications       Notification[]
   hrDeskAssigned      HrDeskMessage[] @relation("HrDeskAssignee")
@@ -257,6 +272,14 @@ model Employee {
 
   nextOfKinName       String?
   nextOfKinPhone      String?
+  emergencyContactName  String?
+  emergencyContactPhone String?
+  dateOfBirth         DateTime?
+  probationEnd        DateTime?
+  workLocation        String?
+  managerId           String?
+  manager             Employee?  @relation("EmployeeManager", fields: [managerId], references: [id], onDelete: SetNull)
+  reports             Employee[] @relation("EmployeeManager")
   /// Work / login email shown on the staff record (portal User.email is source of truth)
   workEmail           String?
   phone               String?
@@ -274,6 +297,8 @@ model Employee {
   shiftAssignment     EmployeeShiftAssignment?
   attendancePunches   AttendancePunch[]
   attendanceDays      AttendanceDay[]
+  overtimeRequests    OvertimeRequest[]
+  shiftExceptions     ShiftException[]
   hrDeskMessages      HrDeskMessage[]
   lifecycles          EmployeeLifecycle[]
   changeRequests      EmployeeChangeRequest[]
@@ -281,6 +306,13 @@ model Employee {
   timesheetWeeks      TimesheetWeek[]
   workspaceFileGrants WorkspaceFileGrant[]
   hiredApplications   JobApplication[]
+  skills              EmployeeSkill[]
+  certifications      EmployeeCertification[]
+  assignedAssets      CompanyAsset[]
+  managedDepartments  Department[] @relation("DepartmentHead")
+  trainingEnrollments TrainingEnrollment[]
+  performanceGoals    PerformanceGoal[]
+  performanceReviews  PerformanceReview[]
 
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
@@ -288,15 +320,82 @@ model Employee {
   @@unique([companyId, employeeCode])
   @@unique([companyId, clockDeviceId])
   @@index([companyId, status])
+  @@index([managerId])
 }
 
 model EmployeeDocument {
+  id         String    @id @default(cuid())
+  employeeId String
+  employee   Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  name       String
+  fileUrl    String
+  category   String    @default("OTHER")
+  expiresAt  DateTime?
+  uploadedAt DateTime  @default(now())
+}
+
+model Skill {
+  id          String            @id @default(cuid())
+  companyId   String
+  company     Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name        String
+  employees   EmployeeSkill[]
+  jobListings JobListingSkill[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@unique([companyId, name])
+  @@index([companyId])
+}
+
+model EmployeeSkill {
   id         String   @id @default(cuid())
   employeeId String
   employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  skillId    String
+  skill      Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  level      String   @default("INTERMEDIATE")
+
+  @@unique([employeeId, skillId])
+}
+
+model EmployeeCertification {
+  id         String    @id @default(cuid())
+  employeeId String
+  employee   Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   name       String
-  fileUrl    String
-  uploadedAt DateTime @default(now())
+  issuer     String?
+  issuedAt   DateTime?
+  expiresAt  DateTime?
+  fileUrl    String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([employeeId, expiresAt])
+}
+
+model CompanyAsset {
+  id                 String    @id @default(cuid())
+  companyId          String
+  company            Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  assetCode          String
+  name               String
+  assetType          String
+  status             String    @default("AVAILABLE")
+  serialNumber       String?
+  valueKobo          BigInt    @default(0)
+  purchasedAt        DateTime?
+  assignedEmployeeId String?
+  assignedEmployee   Employee? @relation(fields: [assignedEmployeeId], references: [id], onDelete: SetNull)
+  assignedAt         DateTime?
+  condition          String?
+  notes              String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@unique([companyId, assetCode])
+  @@index([companyId, status])
+  @@index([assignedEmployeeId])
 }
 
 model PayrollRun {
@@ -322,6 +421,7 @@ model PayrollRun {
 
   payslips    Payslip[]
   adjustments PayrollAdjustment[]
+  overtimeRequests OvertimeRequest[]
 
   @@unique([companyId, periodMonth, periodYear])
   @@index([companyId, status])
@@ -333,7 +433,7 @@ model PayrollAdjustment {
   payrollRun    PayrollRun @relation(fields: [payrollRunId], references: [id], onDelete: Cascade)
   employeeId    String
   employee      Employee   @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  type          String     // BONUS, LOAN_DEDUCTION, ADVANCE, UNPAID_LEAVE
+  type          String     // BONUS, LOAN_DEDUCTION, ADVANCE, UNPAID_LEAVE, OVERTIME, ATTENDANCE_PENALTY
   amountKobo    BigInt     // positive = earning, negative = deduction
   description   String?
   createdAt     DateTime   @default(now())
@@ -562,6 +662,7 @@ model ShiftTemplate {
 
   assignments   EmployeeShiftAssignment[]
   attendanceDays AttendanceDay[]
+  exceptions    ShiftException[]
 
   @@unique([companyId, name])
   @@index([companyId])
@@ -619,6 +720,65 @@ model AttendanceDay {
   @@unique([employeeId, workDate])
   @@index([companyId, workDate, status])
   @@index([companyId, status])
+}
+
+model CompanyHoliday {
+  id        String   @id @default(cuid())
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  workDate  DateTime
+  name      String
+  /// PUBLIC (national) or COMPANY (declared extra day)
+  kind      String   @default("PUBLIC")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([companyId, workDate])
+  @@index([companyId, workDate])
+}
+
+model OvertimeRequest {
+  id             String    @id @default(cuid())
+  companyId      String
+  company        Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  employeeId     String
+  employee       Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  workDate       DateTime
+  minutes        Int
+  reason         String?
+  status         String    @default("PENDING")
+  amountKobo     BigInt?
+  approvedById   String?
+  approvedBy     User?     @relation("OvertimeApprover", fields: [approvedById], references: [id])
+  approvedAt     DateTime?
+  payrollRunId   String?
+  payrollRun     PayrollRun? @relation(fields: [payrollRunId], references: [id], onDelete: SetNull)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([companyId, status])
+  @@index([employeeId, workDate])
+  @@index([payrollRunId])
+}
+
+model ShiftException {
+  id         String         @id @default(cuid())
+  companyId  String
+  company    Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  employeeId String
+  employee   Employee       @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  workDate   DateTime
+  /// OFF = not expected that day. SHIFT = cover a different template for that date.
+  kind       String
+  shiftId    String?
+  shift      ShiftTemplate? @relation(fields: [shiftId], references: [id], onDelete: SetNull)
+  notes      String?
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  @@unique([employeeId, workDate])
+  @@index([companyId, workDate])
+  @@index([shiftId])
 }
 
 enum LifecycleKind {
@@ -810,6 +970,10 @@ model JobListing {
   employmentType EmploymentType   @default(FULL_TIME)
   description    String
   requirements   String?
+  openings       Int              @default(1)
+  deadline       DateTime?
+  salaryMinKobo  BigInt?
+  salaryMaxKobo  BigInt?
   status         JobListingStatus @default(DRAFT)
   viewCount      Int              @default(0)
   createdById    String?
@@ -820,8 +984,18 @@ model JobListing {
   updatedAt      DateTime         @updatedAt
   posts          JobListingPost[]
   applications   JobApplication[]
+  requiredSkills JobListingSkill[]
 
   @@index([companyId, status])
+}
+
+model JobListingSkill {
+  listingId String
+  listing   JobListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  skillId   String
+  skill     Skill      @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([listingId, skillId])
 }
 
 model JobListingPost {
@@ -853,6 +1027,8 @@ model JobApplication {
   coverLetter      String?
   source           JobBoard              @default(CAREERS_PAGE)
   status           JobApplicationStatus  @default(NEW)
+  notes            String?
+  interviewAt      DateTime?
   hiredEmployeeId  String?
   hiredEmployee    Employee?             @relation(fields: [hiredEmployeeId], references: [id], onDelete: SetNull)
   createdAt        DateTime              @default(now())
@@ -886,5 +1062,74 @@ model WorkspaceFileGrant {
   employee   Employee      @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 
   @@unique([fileId, employeeId])
+}
+
+model TrainingProgram {
+  id          String                @id @default(cuid())
+  companyId   String
+  company     Company               @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  required    Boolean               @default(false)
+  enrollments TrainingEnrollment[]
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+
+  @@unique([companyId, name])
+  @@index([companyId])
+}
+
+model TrainingEnrollment {
+  id          String          @id @default(cuid())
+  programId   String
+  program     TrainingProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+  employeeId  String
+  employee    Employee        @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  status      String          @default("ASSIGNED")
+  assignedAt  DateTime        @default(now())
+  completedAt DateTime?
+  notes       String?
+
+  @@unique([programId, employeeId])
+  @@index([employeeId, status])
+}
+
+model PerformanceGoal {
+  id          String   @id @default(cuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  employeeId  String
+  employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  title       String
+  target      String
+  actual      String   @default("")
+  weight      Int      @default(100)
+  periodYear  Int
+  periodLabel String   @default("ANNUAL")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([employeeId, periodYear])
+  @@index([companyId, periodYear])
+}
+
+model PerformanceReview {
+  id            String   @id @default(cuid())
+  companyId     String
+  company       Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  employeeId    String
+  employee      Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  periodYear    Int
+  periodLabel   String   @default("ANNUAL")
+  status        String   @default("DRAFT")
+  selfNotes     String?
+  managerNotes  String?
+  selfScore     Int?
+  managerScore  Int?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([employeeId, periodYear, periodLabel])
+  @@index([companyId, periodYear, status])
 }
 

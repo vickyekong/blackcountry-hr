@@ -23,6 +23,11 @@ import type { PayrollAdjustments, StatutoryConfigInput } from "@/lib/payroll/typ
 import { ensurePayrollHardeningSchema } from "@/lib/ensure-payroll-hardening-schema";
 import { approvedTimesheetHoursForPeriod } from "@/lib/timesheets/period";
 import { applyTimesheetsToCompensation } from "@/lib/payroll/timesheet-pay";
+import { companyHolidayKeys } from "@/lib/time/holidays";
+import {
+  attachApprovedOvertimeToDraftRun,
+  detachOvertimeFromRun,
+} from "@/lib/time/overtime";
 
 export class PayrollRunError extends Error {
   constructor(
@@ -104,11 +109,17 @@ async function getUnpaidLeaveMap(
     map.set(req.employeeId, list);
   }
 
+  const holidayKeys = await companyHolidayKeys(
+    companyId,
+    periodStart,
+    periodEnd
+  );
+
   const result = new Map<string, number>();
   for (const [employeeId, requests] of map) {
     result.set(
       employeeId,
-      sumUnpaidLeaveDaysInPeriod(requests, periodStart, periodEnd)
+      sumUnpaidLeaveDaysInPeriod(requests, periodStart, periodEnd, holidayKeys)
     );
   }
   return result;
@@ -259,12 +270,22 @@ export async function recalculatePayrollRun(
     );
   }
 
+  await attachApprovedOvertimeToDraftRun({
+    run,
+    workingDaysPerMonth: config.workingDaysPerMonth,
+  });
+  const refreshed = await loadRunContext(runId, companyId, {
+    preferSnapshot: options?.preferSnapshot,
+  });
+  const runWithOt = refreshed.run;
+  const configWithOt = refreshed.config;
+
   const unpaidLeaveMap = await getUnpaidLeaveMap(
     companyId,
-    run.periodMonth,
-    run.periodYear
+    runWithOt.periodMonth,
+    runWithOt.periodYear
   );
-  const manualAdjustments = adjustmentsByEmployee(run);
+  const manualAdjustments = adjustmentsByEmployee(runWithOt);
 
   const employees = await prisma.employee.findMany({
     where: {
@@ -280,15 +301,15 @@ export async function recalculatePayrollRun(
 
   const ytdPrior = await loadYtdTotalsByEmployee(
     companyId,
-    run.periodYear,
-    run.periodMonth,
+    runWithOt.periodYear,
+    runWithOt.periodMonth,
     employees.map((e) => e.id)
   );
 
   const timesheetRows = await approvedTimesheetHoursForPeriod(
     companyId,
-    run.periodYear,
-    run.periodMonth
+    runWithOt.periodYear,
+    runWithOt.periodMonth
   );
   const timesheetMinutes = new Map(
     timesheetRows.map((row) => [row.employeeId, row.minutes])
@@ -298,7 +319,7 @@ export async function recalculatePayrollRun(
     const leaveAdj = buildLeaveAdjustments(
       employee,
       unpaidLeaveMap.get(employee.id) ?? 0,
-      config.workingDaysPerMonth
+      configWithOt.workingDaysPerMonth
     );
     const manualAdj = manualAdjustments.get(employee.id) ?? {};
     const adjustments = mergeAdjustments(leaveAdj, manualAdj);
@@ -306,7 +327,7 @@ export async function recalculatePayrollRun(
     const { compensation, timesheet } = applyTimesheetsToCompensation({
       employmentType: employee.employmentType,
       approvedMinutes: timesheetMinutes.get(employee.id) ?? 0,
-      workingDaysPerMonth: config.workingDaysPerMonth,
+      workingDaysPerMonth: configWithOt.workingDaysPerMonth,
       compensation: {
         basicSalaryKobo: employee.basicSalaryKobo,
         housingAllowanceKobo: employee.housingAllowanceKobo,
@@ -319,8 +340,8 @@ export async function recalculatePayrollRun(
 
     const breakdown = calculatePayroll(
       compensation,
-      config,
-      { month: run.periodMonth, year: run.periodYear },
+      configWithOt,
+      { month: runWithOt.periodMonth, year: runWithOt.periodYear },
       adjustments
     );
 
@@ -331,7 +352,7 @@ export async function recalculatePayrollRun(
     };
 
     return payslipDataFromBreakdown(
-      run.id,
+      runWithOt.id,
       employee.id,
       breakdown,
       {
@@ -351,7 +372,7 @@ export async function recalculatePayrollRun(
       await prisma.payslip.upsert({
         where: {
           payrollRunId_employeeId: {
-            payrollRunId: run.id,
+            payrollRunId: runWithOt.id,
             employeeId: row.employeeId,
           },
         },
@@ -361,7 +382,7 @@ export async function recalculatePayrollRun(
     }
   } else {
     // Full-run rewrite: 2 round-trips instead of N upserts (avoids Vercel timeouts).
-    await prisma.payslip.deleteMany({ where: { payrollRunId: run.id } });
+    await prisma.payslip.deleteMany({ where: { payrollRunId: runWithOt.id } });
     const chunkSize = 80;
     for (let i = 0; i < payslipRows.length; i += chunkSize) {
       await prisma.payslip.createMany({
@@ -373,9 +394,9 @@ export async function recalculatePayrollRun(
   // Freeze the statutory rules used for this draft calculation
   try {
     await prisma.payrollRun.update({
-      where: { id: run.id },
+      where: { id: runWithOt.id },
       data: {
-        statutorySnapshot: serializeBigInts(config) as object,
+        statutorySnapshot: serializeBigInts(configWithOt) as object,
       },
     });
   } catch (err) {
@@ -428,6 +449,7 @@ export async function reverseAndRegeneratePayrollRun(
   }
 
   await prisma.payslip.deleteMany({ where: { payrollRunId: run.id } });
+  await detachOvertimeFromRun(run.id);
 
   await prisma.payrollRun.update({
     where: { id: run.id },

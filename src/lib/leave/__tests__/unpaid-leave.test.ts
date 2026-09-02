@@ -25,6 +25,14 @@ describe("countWorkingDaysBetween", () => {
       countWorkingDaysBetween(new Date(2025, 5, 10), new Date(2025, 5, 2))
     ).toBe(0);
   });
+
+  it("skips company holidays on weekdays", () => {
+    const start = new Date(2025, 5, 2);
+    const end = new Date(2025, 5, 6);
+    expect(
+      countWorkingDaysBetween(start, end, ["2025-06-04"])
+    ).toBe(4);
+  });
 });
 
 describe("unpaidWorkingDaysInPeriod", () => {

@@ -320,6 +320,15 @@ export async function ensureGroupSchema() {
   );
   await ensureRecruitmentSchema();
 
+  const { ensurePeopleSchema } = await import("@/lib/ensure-people-schema");
+  await ensurePeopleSchema();
+
+  const { ensureTalentSchema } = await import("@/lib/ensure-talent-schema");
+  await ensureTalentSchema();
+
+  const { ensureTimeSchema } = await import("@/lib/ensure-time-schema");
+  await ensureTimeSchema();
+
   const { ensureAppRls } = await import("@/lib/ensure-app-rls");
   await ensureAppRls();
 
