@@ -79,7 +79,7 @@ export function EmployeeCertificationsPanel({
     <Card>
       <CardHeader>
         <CardTitle>Certifications</CardTitle>
-        <p className="text-sm text-stone-500">
+        <p className="text-sm text-muted">
           Professional certificates with optional expiry. Omni Co-Pilot flags
           those due within 60 days.
         </p>
@@ -116,9 +116,9 @@ export function EmployeeCertificationsPanel({
         )}
         {message && <p className="text-sm text-red-600">{message}</p>}
         {rows.length === 0 ? (
-          <p className="text-sm text-stone-500">No certifications recorded yet.</p>
+          <p className="text-sm text-muted">No certifications recorded yet.</p>
         ) : (
-          <ul className="divide-y divide-stone-100 rounded-md border border-stone-200">
+          <ul className="divide-y divide-line rounded-md border border-line">
             {rows.map((row) => {
               const alert = expiryAlert(
                 row.expiresAt ? new Date(row.expiresAt) : null
@@ -129,8 +129,8 @@ export function EmployeeCertificationsPanel({
                   className="flex flex-wrap items-center justify-between gap-3 px-3 py-2.5 text-sm"
                 >
                   <div>
-                    <p className="font-medium text-stone-900">{row.name}</p>
-                    <p className="text-xs text-stone-500">
+                    <p className="font-medium text-ink">{row.name}</p>
+                    <p className="text-xs text-muted">
                       {row.issuer ? `${row.issuer} · ` : ""}
                       {row.expiresAt
                         ? `Expires ${formatDate(row.expiresAt)}`

@@ -293,7 +293,7 @@ export function ListingWorkspace({ listingId }: { listingId: string }) {
                       {apps.map((app) => (
                         <li
                           key={app.id}
-                          className="rounded-md border border-stone-100 px-2 py-2 text-sm"
+                          className="rounded-md border border-line px-2 py-2 text-sm"
                         >
                           <p className="font-medium text-ink">
                             {app.firstName} {app.lastName}
@@ -308,7 +308,7 @@ export function ListingWorkspace({ listingId }: { listingId: string }) {
                               </p>
                             )}
                           <select
-                            className="mt-2 h-8 w-full rounded-md border border-stone-300 px-2 text-xs"
+                            className="mt-2 h-8 w-full rounded-md border border-line px-2 text-xs"
                             value={app.status}
                             disabled={busy}
                             onChange={(e) =>
@@ -396,7 +396,7 @@ export function ListingWorkspace({ listingId }: { listingId: string }) {
                   defaultValue={app.notes ?? ""}
                   rows={2}
                   placeholder="Interview notes — assistive only, never auto-hire"
-                  className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+                  className="w-full rounded-md border border-line px-3 py-2 text-sm"
                 />
                 <Button type="submit" size="sm" variant="outline" disabled={busy}>
                   Save notes

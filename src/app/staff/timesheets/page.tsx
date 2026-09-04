@@ -5,6 +5,8 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { WeeklyTimesheet } from "@/components/timesheets/weekly-timesheet";
 import { StaffOvertimePanel } from "@/components/time/staff-overtime-panel";
 import { AppShell } from "@/components/layout/app-shell";
+import { PageHeader } from "@/components/layout/page-header";
+import { Clock, Timer } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 function StaffTimesheetsInner() {
@@ -14,22 +16,20 @@ function StaffTimesheetsInner() {
 
   return (
     <AppShell>
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-ink">Timesheets</h1>
-        <p className="mt-1 text-sm text-muted">
-          Log weekly hours against a project and task. HR validates the week
-          before payroll uses it. Extra overtime is a separate request, not a
-          clock punch.
-        </p>
-      </div>
+      <PageHeader
+        icon={Clock}
+        title="Timesheets"
+        description="Log weekly hours against a project and task. HR validates the week before payroll uses it. Extra overtime is a separate request, not a clock punch."
+      />
       <div className="mb-6 flex flex-wrap gap-1 border-b border-line">
         {(
           [
-            { id: "hours", href: "/staff/timesheets", label: "Hours" },
+            { id: "hours", href: "/staff/timesheets", label: "Hours", icon: Clock },
             {
               id: "overtime",
               href: "/staff/timesheets?tab=overtime",
               label: "Overtime",
+              icon: Timer,
             },
           ] as const
         ).map((item) => (
@@ -38,12 +38,13 @@ function StaffTimesheetsInner() {
             type="button"
             onClick={() => router.push(item.href)}
             className={cn(
-              "-mb-px border-b-2 px-3 py-2 text-sm font-medium transition",
+              "-mb-px inline-flex items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium transition",
               tab === item.id
-                ? "border-stone-900 text-stone-900"
-                : "border-transparent text-stone-500 hover:text-stone-800"
+                ? "border-ink text-ink"
+                : "border-transparent text-muted hover:text-ink"
             )}
           >
+            <item.icon className="h-3.5 w-3.5" strokeWidth={1.75} />
             {item.label}
           </button>
         ))}

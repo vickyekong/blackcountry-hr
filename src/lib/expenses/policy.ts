@@ -102,5 +102,5 @@ export function approvalHint(amountKobo: Kobo) {
   if (isManagerBand(amountKobo)) {
     return "Line manager or HR can approve";
   }
-  return "HR can approve; Finance reimburses after approval";
+  return "HR can approve; Finance reimburses on the Finance portal";
 }

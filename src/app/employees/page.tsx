@@ -5,6 +5,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/layout/page-header";
+import { Users, UserPlus } from "lucide-react";
 import { ExportActions } from "@/components/exports/export-actions";
 import { getGoogleDriveStatus } from "@/lib/google-drive";
 import { EmployeesPageClient } from "@/components/employees/employees-page-client";
@@ -112,28 +114,30 @@ export default async function EmployeesPage() {
 
   return (
     <AppShell>
-      <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-stone-900">Employees</h1>
-          <p className="mt-1 text-sm text-stone-500">
-            Staff directory, departments, skills, org chart, and attendance
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
+      <PageHeader
+        icon={Users}
+        title="Employees"
+        description="Staff directory, departments, skills, org chart, and attendance"
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
           {can(session.user.role, "manageEmployees") && (
             <>
               <ExportActions kind="staff" driveConnected={driveConnected} />
               <Button asChild>
-                <Link href="/employees/new">Add employee</Link>
+                <Link href="/employees/new">
+                  <UserPlus className="mr-1.5 h-4 w-4" strokeWidth={1.75} />
+                  Add employee
+                </Link>
               </Button>
             </>
           )}
-        </div>
-      </div>
+          </div>
+        }
+      />
 
       <OpenLifecycleQueue />
 
-      <Suspense fallback={<p className="text-sm text-stone-500">Loading…</p>}>
+      <Suspense fallback={<p className="text-sm text-muted">Loading…</p>}>
         <EmployeesPageClient
           employees={tableRows}
           initialDepartments={allDepartments}

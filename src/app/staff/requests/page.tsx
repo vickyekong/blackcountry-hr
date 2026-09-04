@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate } from "@/lib/utils";
+import { PageHeader } from "@/components/layout/page-header";
+import { Send } from "lucide-react";
 
 interface StaffRequest {
   id: string;
@@ -97,20 +99,16 @@ export default function StaffRequestsPage() {
 
   return (
     <AppShell>
-      <div className="mb-8 flex items-center justify-between gap-4">
-        <div>
-          <h1 className="font-display text-2xl font-semibold text-ink">
-            Company requests
-          </h1>
-          <p className="mt-1 text-sm text-muted">
-            Ask HR for letters, bank or tax updates, and other company help. Bank
-            and tax-relief changes still need Super Admin clearance.
-          </p>
-        </div>
-        <Button onClick={() => setShowForm(!showForm)} variant="brand">
-          {showForm ? "Close" : "New request"}
-        </Button>
-      </div>
+      <PageHeader
+        icon={Send}
+        title="Company requests"
+        description="Ask HR for letters, bank or tax updates, and other company help. Bank and tax-relief changes still need Super Admin clearance."
+        actions={
+          <Button onClick={() => setShowForm(!showForm)} variant="brand">
+            {showForm ? "Close" : "New request"}
+          </Button>
+        }
+      />
 
       {showForm && (
         <Card className="mb-6 max-w-lg">

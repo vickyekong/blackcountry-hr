@@ -16,6 +16,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatDate } from "@/lib/utils";
+import { PageHeader } from "@/components/layout/page-header";
+import { CalendarDays } from "lucide-react";
 import { countWorkingDaysBetween } from "@/lib/leave/unpaid-leave";
 import { localDateKey } from "@/lib/time/dates";
 
@@ -119,17 +121,16 @@ export default function StaffLeavePage() {
 
   return (
     <AppShell>
-      <div className="mb-8 flex items-center justify-between gap-4">
-        <div>
-          <h1 className="font-display text-2xl font-semibold text-ink">Leave</h1>
-          <p className="mt-1 text-sm text-muted">
-            Apply for your own leave. HR or Super Admin will approve or send it back.
-          </p>
-        </div>
-        <Button onClick={() => setShowForm(!showForm)} variant="brand">
-          {showForm ? "Close" : "Apply for leave"}
-        </Button>
-      </div>
+      <PageHeader
+        icon={CalendarDays}
+        title="Leave"
+        description="Apply for your own leave. HR or Super Admin will approve or send it back."
+        actions={
+          <Button onClick={() => setShowForm(!showForm)} variant="brand">
+            {showForm ? "Close" : "Apply for leave"}
+          </Button>
+        }
+      />
 
       {balances.length > 0 && (
         <div className="mb-6 grid gap-3 sm:grid-cols-3">

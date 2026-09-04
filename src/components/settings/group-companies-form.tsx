@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { IconLabel } from "@/components/ui/icon-label";
+import { Building2 } from "lucide-react";
 
 type CompanyRow = {
   id: string;
@@ -76,7 +78,9 @@ export function GroupCompaniesForm() {
   return (
     <Card className="mb-6">
       <CardHeader>
-        <CardTitle>Sub-companies</CardTitle>
+        <CardTitle>
+          <IconLabel icon={Building2}>Sub-companies</IconLabel>
+        </CardTitle>
         <p className="text-sm text-muted">
           Each sub-company is a separate legal employer — own staff, payroll, and
           files. Engineering can hold its own sub-companies (Design, Interiors,
@@ -106,7 +110,7 @@ export function GroupCompaniesForm() {
               id="sub-parent"
               value={parentId}
               onChange={(e) => setParentId(e.target.value)}
-              className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm text-ink"
+              className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm text-ink"
             >
               {companies.map((c) => (
                 <option key={c.id} value={c.id}>

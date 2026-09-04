@@ -16,7 +16,7 @@ function severityStyles(severity: StaffInsight["severity"]) {
     case "good":
       return "border-emerald-200 bg-emerald-50";
     default:
-      return "border-stone-200 bg-white";
+      return "border-line bg-white";
   }
 }
 
@@ -68,31 +68,28 @@ export function PeopleIntelligencePanel({
     <section className="mb-8 space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-stone-900">
+          <h2 className="text-lg font-semibold tracking-tight text-ink">
             Omni Co-Pilot
           </h2>
-          <p className="text-sm text-stone-500">
+          <p className="text-sm text-muted">
             Auto stats, risk signals, and recommendations · {periodLabel}
           </p>
         </div>
         <div className="flex flex-wrap gap-3 text-sm">
-          <Link href="/copilot" className="text-stone-600 hover:text-stone-900">
+          <Link href="/copilot" className="text-ink-soft hover:text-ink">
             Ask Omni Co-Pilot →
           </Link>
-          <Link href="/reports" className="text-stone-600 hover:text-stone-900">
+          <Link href="/reports" className="text-ink-soft hover:text-ink">
             Equity & forecast →
           </Link>
-          <Link
-            href="/employees"
-            className="text-stone-600 hover:text-stone-900"
-          >
+          <Link href="/employees" className="text-ink-soft hover:text-ink">
             Staff directory →
           </Link>
         </div>
       </div>
 
-      <div className="rounded-xl border border-ink/20 bg-ink px-5 py-4 text-foam shadow-soft">
-        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-lagoon">
+      <div className="rounded-lg border border-rail bg-rail px-5 py-4 text-foam">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-lagoon">
           Briefing
         </p>
         <p className="mt-2 text-sm leading-relaxed text-lagoon-mist/90">
@@ -103,10 +100,10 @@ export function PeopleIntelligencePanel({
       {riskSignals.length > 0 && (
         <div className="rounded-lg border border-amber-200 bg-amber-50/60">
           <div className="border-b border-amber-100 px-4 py-3">
-            <h3 className="text-sm font-semibold text-stone-900">
+            <h3 className="text-sm font-semibold text-ink">
               Risk signals
             </h3>
-            <p className="text-xs text-stone-600">
+            <p className="text-xs text-muted">
               Rule-based burnout, leave-spike, and early attrition warnings
             </p>
           </div>
@@ -118,21 +115,21 @@ export function PeopleIntelligencePanel({
                     <p className="text-[10px] font-semibold uppercase tracking-wide text-amber-800">
                       {riskKindLabel(r.kind)} · {r.severity}
                     </p>
-                    <p className="mt-0.5 text-sm font-medium text-stone-900">
+                    <p className="mt-0.5 text-sm font-medium text-ink">
                       {r.title}
                     </p>
-                    <p className="mt-0.5 text-sm text-stone-600">{r.detail}</p>
+                    <p className="mt-0.5 text-sm text-muted">{r.detail}</p>
                     {r.href && (
                       <Link
                         href={r.href}
-                        className="mt-1 inline-block text-xs font-medium text-stone-800 hover:underline"
+                        className="mt-1 inline-block text-xs font-medium text-ink hover:underline"
                       >
                         Review →
                       </Link>
                     )}
                   </div>
                   {r.metric && (
-                    <span className="text-sm font-semibold tabular-nums text-stone-800">
+                    <span className="text-sm font-semibold tabular-nums text-ink">
                       {r.metric}
                     </span>
                   )}
@@ -144,47 +141,47 @@ export function PeopleIntelligencePanel({
       )}
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-lg border border-stone-200 bg-white px-4 py-3">
-          <p className="text-xs uppercase tracking-wide text-stone-500">
+        <div className="rounded-lg border border-line bg-white px-4 py-3">
+          <p className="text-xs uppercase tracking-wide text-muted">
             Time
           </p>
           <p className="mt-1 text-2xl font-semibold tabular-nums">
             Timesheets
           </p>
-          <p className="mt-1 text-xs text-stone-500">
+          <p className="mt-1 text-xs text-muted">
             Weekly hours, validated by HR, drive payroll
           </p>
         </div>
-        <div className="rounded-lg border border-stone-200 bg-white px-4 py-3">
-          <p className="text-xs uppercase tracking-wide text-stone-500">
+        <div className="rounded-lg border border-line bg-white px-4 py-3">
+          <p className="text-xs uppercase tracking-wide text-muted">
             Risk signals
           </p>
           <p className="mt-1 text-2xl font-semibold tabular-nums">
             {stats.riskSignalCount ?? riskSignals.length}
           </p>
-          <p className="mt-1 text-xs text-stone-500">
+          <p className="mt-1 text-xs text-muted">
             Burnout / attrition / leave patterns
           </p>
         </div>
-        <div className="rounded-lg border border-stone-200 bg-white px-4 py-3">
-          <p className="text-xs uppercase tracking-wide text-stone-500">
+        <div className="rounded-lg border border-line bg-white px-4 py-3">
+          <p className="text-xs uppercase tracking-wide text-muted">
             Active wage bill (basic+)
           </p>
           <p className="mt-1 text-2xl font-semibold tabular-nums">
             {formatCurrency(BigInt(stats.monthlyGrossishWageBillKobo || "0"))}
           </p>
-          <p className="mt-1 text-xs text-stone-500">
+          <p className="mt-1 text-xs text-muted">
             {stats.activeStaff} active · {stats.contractStaff} contract
           </p>
         </div>
-        <div className="rounded-lg border border-stone-200 bg-white px-4 py-3">
-          <p className="text-xs uppercase tracking-wide text-stone-500">
+        <div className="rounded-lg border border-line bg-white px-4 py-3">
+          <p className="text-xs uppercase tracking-wide text-muted">
             Leave & inbox
           </p>
           <p className="mt-1 text-2xl font-semibold tabular-nums">
             {stats.pendingLeave + stats.hrDeskOpen}
           </p>
-          <p className="mt-1 text-xs text-stone-500">
+          <p className="mt-1 text-xs text-muted">
             {stats.approvedLeaveDaysThisMonth} approved leave days this month
           </p>
         </div>
@@ -198,24 +195,24 @@ export function PeopleIntelligencePanel({
           >
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-[11px] font-medium uppercase tracking-wide text-stone-500">
+                <p className="text-[11px] font-medium uppercase tracking-wide text-muted">
                   {insight.severity}
                 </p>
-                <p className="mt-1 text-sm font-semibold text-stone-900">
+                <p className="mt-1 text-sm font-semibold text-ink">
                   {insight.title}
                 </p>
-                <p className="mt-1 text-sm text-stone-600">{insight.detail}</p>
+                <p className="mt-1 text-sm text-muted">{insight.detail}</p>
                 {insight.href && (
                   <Link
                     href={insight.href}
-                    className="mt-2 inline-block text-xs font-medium text-stone-800 hover:underline"
+                    className="mt-2 inline-block text-xs font-medium text-ink hover:underline"
                   >
                     Take action →
                   </Link>
                 )}
               </div>
               {insight.metric && (
-                <p className="shrink-0 text-sm font-semibold tabular-nums text-stone-800">
+                <p className="shrink-0 text-sm font-semibold tabular-nums text-ink">
                   {insight.metric}
                 </p>
               )}
@@ -225,42 +222,42 @@ export function PeopleIntelligencePanel({
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-lg border border-stone-200 bg-white">
-          <div className="border-b border-stone-100 px-4 py-3">
-            <h3 className="text-sm font-semibold text-stone-900">
+        <div className="rounded-lg border border-line bg-white">
+          <div className="border-b border-line px-4 py-3">
+            <h3 className="text-sm font-semibold text-ink">
               Staff watchlist
             </h3>
-            <p className="text-xs text-stone-500">
+            <p className="text-xs text-muted">
               Highest-priority people based on absences, setup gaps, and status
             </p>
           </div>
           {watchlist.length === 0 ? (
-            <p className="px-4 py-6 text-sm text-stone-500">
+            <p className="px-4 py-6 text-sm text-muted">
               No staff flagged right now.
             </p>
           ) : (
-            <ul className="divide-y divide-stone-100">
+            <ul className="divide-y divide-line">
               {watchlist.map((person) => (
                 <li key={person.employeeId} className="px-4 py-3">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <Link
                         href={`/employees/${person.employeeId}`}
-                        className="text-sm font-medium text-stone-900 hover:underline"
+                        className="text-sm font-medium text-ink hover:underline"
                       >
                         {person.name}
                       </Link>
-                      <p className="text-xs text-stone-500">
+                      <p className="text-xs text-muted">
                         {person.employeeCode} · {person.department}
                         {person.attendanceRate != null
                           ? ` · ${person.attendanceRate}% attendance`
                           : ""}
                       </p>
-                      <p className="mt-1 text-xs text-stone-600">
+                      <p className="mt-1 text-xs text-muted">
                         {person.flags.join(" · ")}
                       </p>
                     </div>
-                    <span className="rounded-full bg-stone-100 px-2 py-0.5 text-xs font-semibold tabular-nums text-stone-700">
+                    <span className="rounded-full bg-sand px-2 py-0.5 text-xs font-semibold tabular-nums text-ink-soft">
                       {person.score}
                     </span>
                   </div>
@@ -270,37 +267,37 @@ export function PeopleIntelligencePanel({
           )}
         </div>
 
-        <div className="rounded-lg border border-stone-200 bg-white">
-          <div className="border-b border-stone-100 px-4 py-3">
-            <h3 className="text-sm font-semibold text-stone-900">
+        <div className="rounded-lg border border-line bg-white">
+          <div className="border-b border-line px-4 py-3">
+            <h3 className="text-sm font-semibold text-ink">
               Department health
             </h3>
-            <p className="text-xs text-stone-500">
+            <p className="text-xs text-muted">
               Headcount, attendance, and basic wage bill by team
             </p>
           </div>
           {departmentHealth.length === 0 ? (
-            <p className="px-4 py-6 text-sm text-stone-500">No departments yet.</p>
+            <p className="px-4 py-6 text-sm text-muted">No departments yet.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="border-b border-stone-100 text-xs text-stone-500">
+                <thead className="border-b border-line text-xs text-muted">
                   <tr>
                     <th className="px-4 py-2 font-medium">Department</th>
                     <th className="px-2 py-2 font-medium text-right">Staff</th>
                     <th className="px-4 py-2 font-medium text-right">Basic</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-stone-50">
+                <tbody className="divide-y divide-line">
                   {departmentHealth.map((d) => (
                     <tr key={d.department}>
-                      <td className="px-4 py-2 font-medium text-stone-800">
+                      <td className="px-4 py-2 font-medium text-ink">
                         {d.department}
                       </td>
                       <td className="px-2 py-2 text-right tabular-nums">
                         {d.active}/{d.headcount}
                       </td>
-                      <td className="px-4 py-2 text-right tabular-nums text-stone-700">
+                      <td className="px-4 py-2 text-right tabular-nums text-ink-soft">
                         {formatCurrency(BigInt(d.payrollBasicKobo))}
                       </td>
                     </tr>

@@ -74,7 +74,7 @@ export function CostAnalyticsPanel({ year }: { year: number }) {
   }, [year]);
 
   if (!costs) {
-    return <p className="text-sm text-stone-500">Loading cost analytics…</p>;
+    return <p className="text-sm text-muted">Loading cost analytics…</p>;
   }
 
   const chart = costs.trend.map((row) => ({
@@ -94,7 +94,7 @@ export function CostAnalyticsPanel({ year }: { year: number }) {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-stone-500">
+        <p className="text-sm text-muted">
           Payroll employer cost is gross plus employer pension and NSITF — the
           same basis as the payroll summary. Overtime is already inside payroll;
           expenses and benefit run-rate sit beside it, not in the general
@@ -175,7 +175,7 @@ export function CostAnalyticsPanel({ year }: { year: number }) {
             <TableBody>
               {costs.byDepartment.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-stone-500">
+                  <TableCell colSpan={4} className="text-center text-muted">
                     No approved payroll or reimbursed expenses in {year}.
                   </TableCell>
                 </TableRow>

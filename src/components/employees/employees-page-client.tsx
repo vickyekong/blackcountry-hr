@@ -15,15 +15,16 @@ import { DepartmentsWorkspace, type DepartmentRow } from "@/components/employees
 import { SkillsCatalogPanel, type SkillCatalogItem } from "@/components/employees/skills-catalog-panel";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/cn";
+import { Users, Briefcase, Building2, Sparkles, Network } from "lucide-react";
 
 type TabId = "staff" | "jobs" | "departments" | "skills" | "org";
 
-const TABS: Array<{ id: TabId; label: string }> = [
-  { id: "staff", label: "Staff directory" },
-  { id: "jobs", label: "Job descriptions" },
-  { id: "departments", label: "Departments" },
-  { id: "skills", label: "Skills" },
-  { id: "org", label: "Org chart" },
+const TABS: Array<{ id: TabId; label: string; icon: typeof Users }> = [
+  { id: "staff", label: "Staff directory", icon: Users },
+  { id: "jobs", label: "Job descriptions", icon: Briefcase },
+  { id: "departments", label: "Departments", icon: Building2 },
+  { id: "skills", label: "Skills", icon: Sparkles },
+  { id: "org", label: "Org chart", icon: Network },
 ];
 
 function tabFromSearch(value: string | null): TabId {
@@ -84,19 +85,20 @@ export function EmployeesPageClient({
 
   return (
     <>
-      <div className="mb-6 flex flex-wrap gap-1 border-b border-stone-200">
+      <div className="mb-6 flex flex-wrap gap-1 border-b border-line">
         {TABS.map((item) => (
           <button
             key={item.id}
             type="button"
             onClick={() => selectTab(item.id)}
             className={cn(
-              "border-b-2 px-4 py-2.5 text-sm font-medium transition-colors",
+              "inline-flex items-center gap-1.5 border-b-2 px-4 py-2.5 text-sm font-medium transition-colors",
               tab === item.id
-                ? "border-stone-900 text-stone-900"
-                : "border-transparent text-stone-500 hover:text-stone-800"
+                ? "border-ink text-ink"
+                : "border-transparent text-muted hover:text-ink"
             )}
           >
+            <item.icon className="h-3.5 w-3.5" strokeWidth={1.75} />
             {item.label}
           </button>
         ))}

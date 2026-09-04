@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { EMPLOYEE_SEX_OPTIONS } from "@/lib/employees/status";
+import { PageHeader } from "@/components/layout/page-header";
+import { UserRound } from "lucide-react";
 
 interface StaffProfile {
   employeeCode: string;
@@ -114,13 +116,11 @@ export default function StaffProfilePage() {
 
   return (
     <AppShell>
-      <div className="mb-8">
-        <h1 className="font-display text-2xl font-semibold text-ink">My details</h1>
-        <p className="mt-1 text-sm text-muted">
-          Fill in what HR still needs. Job title and pay are read-only. Bank and tax
-          already on file need a request so Super Admin can clear the change.
-        </p>
-      </div>
+      <PageHeader
+        icon={UserRound}
+        title="My details"
+        description="Fill in what HR still needs. Job title and pay are read-only. Bank and tax already on file need a request so Super Admin can clear the change."
+      />
 
       <div className="mb-6 grid gap-4 md:grid-cols-2">
         <Card>

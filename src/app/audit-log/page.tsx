@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { AppShell } from "@/components/layout/app-shell";
+import { PageHeader } from "@/components/layout/page-header";
+import { ScrollText } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -114,23 +116,21 @@ export default function AuditLogPage() {
 
   return (
     <AppShell>
-      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-stone-900">Audit log</h1>
-          <p className="mt-1 text-sm text-stone-500">
-            Immutable record of payroll and HR actions
-          </p>
-        </div>
+      <PageHeader
+        icon={ScrollText}
+        title="Audit log"
+        description="Immutable record of payroll and HR actions"
+        actions={
         <div className="flex flex-wrap items-end gap-3">
           <div>
-            <Label htmlFor="entityFilter" className="text-xs text-stone-500">
+            <Label htmlFor="entityFilter" className="text-xs text-muted">
               Filter by entity
             </Label>
             <select
               id="entityFilter"
               value={entityType}
               onChange={(e) => setEntityType(e.target.value)}
-              className="mt-1 flex h-9 rounded-md border border-stone-300 px-3 text-sm"
+              className="mt-1 flex h-9 rounded-md border border-line px-3 text-sm"
             >
               <option value="">All entities</option>
               {ENTITY_TYPES.filter(Boolean).map((t) => (
@@ -141,7 +141,7 @@ export default function AuditLogPage() {
             </select>
           </div>
           <div>
-            <Label htmlFor="exportMonth" className="text-xs text-stone-500">
+            <Label htmlFor="exportMonth" className="text-xs text-muted">
               Export month
             </Label>
             <Input
@@ -160,10 +160,11 @@ export default function AuditLogPage() {
             {exporting ? "Exporting…" : "Export CSV"}
           </Button>
         </div>
-      </div>
+        }
+      />
 
       {banner && (
-        <p className="mb-4 rounded-md bg-stone-100 px-3 py-2 text-sm text-stone-700">
+        <p className="mb-4 rounded-md bg-sand px-3 py-2 text-sm text-ink-soft">
           {banner}
         </p>
       )}
@@ -186,7 +187,7 @@ export default function AuditLogPage() {
             <TableBody>
               {logs.map((log) => (
                 <TableRow key={log.id}>
-                  <TableCell className="whitespace-nowrap text-sm text-stone-600">
+                  <TableCell className="whitespace-nowrap text-sm text-muted">
                     {formatDate(log.timestamp)}{" "}
                     {new Date(log.timestamp).toLocaleTimeString("en-NG", {
                       hour: "2-digit",
@@ -195,7 +196,7 @@ export default function AuditLogPage() {
                   </TableCell>
                   <TableCell>
                     <p className="text-sm font-medium">{log.performedBy.name}</p>
-                    <p className="text-xs text-stone-400">
+                    <p className="text-xs text-muted">
                       {log.performedBy.role.replace("_", " ")}
                     </p>
                   </TableCell>
@@ -203,19 +204,19 @@ export default function AuditLogPage() {
                     <Badge variant="default">{log.action}</Badge>
                   </TableCell>
                   <TableCell className="text-sm">
-                    <span className="text-stone-500">{log.entityType}</span>
-                    <span className="mt-0.5 block truncate font-mono text-xs text-stone-400">
+                    <span className="text-muted">{log.entityType}</span>
+                    <span className="mt-0.5 block truncate font-mono text-xs text-muted">
                       {log.entityId.slice(0, 12)}…
                     </span>
                   </TableCell>
-                  <TableCell className="max-w-xs truncate text-xs text-stone-500">
+                  <TableCell className="max-w-xs truncate text-xs text-muted">
                     {formatChanges(log.changes)}
                   </TableCell>
                 </TableRow>
               ))}
               {logs.length === 0 && !loading && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-stone-500">
+                  <TableCell colSpan={5} className="text-center text-muted">
                     No audit entries yet
                   </TableCell>
                 </TableRow>

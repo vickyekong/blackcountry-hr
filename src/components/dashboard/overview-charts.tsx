@@ -33,7 +33,7 @@ function ChartCard({
   const total = data.reduce((sum, d) => sum + d.value, 0);
 
   return (
-    <div className="rounded-xl border border-line/80 bg-foam/95 p-5 shadow-soft">
+    <div className="rounded-lg border border-line bg-foam p-5 shadow-panel">
       <div className="mb-4">
         <h3 className="text-sm font-semibold text-ink">{title}</h3>
         {subtitle && (

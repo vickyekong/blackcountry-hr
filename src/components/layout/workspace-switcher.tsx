@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { cn } from "@/lib/cn";
 
 type CompanyOption = {
   id: string;
@@ -11,7 +12,11 @@ type CompanyOption = {
   depth?: number;
 };
 
-export function WorkspaceSwitcher() {
+export function WorkspaceSwitcher({
+  className,
+}: {
+  className?: string;
+}) {
   const { data: session, update } = useSession();
   const [companies, setCompanies] = useState<CompanyOption[]>([]);
   const [activeId, setActiveId] = useState(session?.user?.companyId ?? "");
@@ -40,7 +45,7 @@ export function WorkspaceSwitcher() {
   }
 
   return (
-    <div className="px-3 pb-2">
+    <div className={cn("min-w-0", className)}>
       <label className="sr-only" htmlFor="workspace-switcher">
         Company
       </label>
@@ -49,10 +54,10 @@ export function WorkspaceSwitcher() {
         value={activeId}
         disabled={busy}
         onChange={(e) => void switchTo(e.target.value)}
-        className="w-full rounded-lg border border-white/15 bg-white/5 px-2.5 py-2 text-xs text-foam"
+        className="h-9 max-w-full truncate rounded-md border border-line bg-foam px-2.5 text-xs font-medium text-ink"
       >
         {companies.map((c) => (
-          <option key={c.id} value={c.id} className="text-ink">
+          <option key={c.id} value={c.id}>
             {`${"\u00a0\u00a0".repeat(c.depth ?? 0)}${c.name}${
               c.isGroup ? " (group)" : ""
             }${c.isHome ? " · home" : ""}`}

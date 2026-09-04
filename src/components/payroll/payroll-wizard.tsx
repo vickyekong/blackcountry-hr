@@ -103,7 +103,7 @@ function severityBadge(s: string) {
 function severityRowClass(s: string) {
   if (s === "block") return "bg-red-50/80";
   if (s === "warn") return "bg-amber-50/60";
-  return "bg-stone-50/80";
+  return "bg-sand/80";
 }
 
 export function PayrollWizard({
@@ -300,7 +300,7 @@ export function PayrollWizard({
           <Card>
             <CardHeader>
               <CardTitle>Automated data aggregation</CardTitle>
-              <p className="text-sm text-stone-500">
+              <p className="text-sm text-muted">
                 Full-time pay uses the contract salary; approved timesheet
                 hours above a standard month are overtime. Contract staff are
                 paid from approved hours (monthly basic as the full-month
@@ -390,7 +390,7 @@ export function PayrollWizard({
                       id="employeeId"
                       name="employeeId"
                       required
-                      className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                      className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
                     >
                       <option value="">Select employee</option>
                       {run.payslips.map((p) => (
@@ -407,7 +407,7 @@ export function PayrollWizard({
                       id="type"
                       name="type"
                       required
-                      className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                      className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
                     >
                       <option value="BONUS">Bonus</option>
                       <option value="LOAN_DEDUCTION">Loan deduction</option>
@@ -502,7 +502,7 @@ export function PayrollWizard({
                         <TableCell className="text-right">
                           <TableCurrency value={adj.amountKobo} />
                         </TableCell>
-                        <TableCell className="text-stone-500">
+                        <TableCell className="text-muted">
                           {adj.description ?? "—"}
                         </TableCell>
                         {isDraft && (
@@ -532,16 +532,16 @@ export function PayrollWizard({
           <Card>
             <CardHeader>
               <CardTitle>Anomaly &amp; risk detection</CardTitle>
-              <p className="text-sm text-stone-500">
+              <p className="text-sm text-muted">
                 Omni Co-Pilot guardrails — fix High blockers before seeking Super
                 Admin approval
               </p>
             </CardHeader>
             <CardContent>
               {preflightLoading && !preflight ? (
-                <p className="text-sm text-stone-500">Running checks…</p>
+                <p className="text-sm text-muted">Running checks…</p>
               ) : !preflight ? (
-                <p className="text-sm text-stone-500">
+                <p className="text-sm text-muted">
                   Could not load pre-flight. Refresh from step 1.
                 </p>
               ) : (
@@ -559,14 +559,14 @@ export function PayrollWizard({
                       : `${preflight.blockers} high-severity blocker(s) must be fixed`}
                   </p>
                   {sortedExceptions.length === 0 ? (
-                    <p className="text-sm text-stone-500">
+                    <p className="text-sm text-muted">
                       No anomalies — figures look clean against the last paid
                       run.
                     </p>
                   ) : (
-                    <div className="overflow-x-auto rounded-md border border-stone-200">
+                    <div className="overflow-x-auto rounded-md border border-line">
                       <table className="w-full min-w-[40rem] text-left text-sm">
-                        <thead className="border-b border-stone-100 bg-stone-50 text-xs uppercase tracking-wide text-stone-500">
+                        <thead className="border-b border-line bg-sand text-xs uppercase tracking-wide text-muted">
                           <tr>
                             <th className="px-3 py-2 font-medium">Severity</th>
                             <th className="px-3 py-2 font-medium">Alert</th>
@@ -579,7 +579,7 @@ export function PayrollWizard({
                             <tr
                               key={ex.id}
                               className={cn(
-                                "border-b border-stone-100",
+                                "border-b border-line",
                                 severityRowClass(ex.severity)
                               )}
                             >
@@ -587,19 +587,19 @@ export function PayrollWizard({
                                 {severityBadge(ex.severity)}
                               </td>
                               <td className="px-3 py-2">{ex.title}</td>
-                              <td className="px-3 py-2 text-stone-600">
+                              <td className="px-3 py-2 text-muted">
                                 {ex.detail}
                               </td>
                               <td className="px-3 py-2">
                                 {ex.href ? (
                                   <Link
                                     href={ex.href}
-                                    className="text-stone-800 underline-offset-2 hover:underline"
+                                    className="text-ink underline-offset-2 hover:underline"
                                   >
                                     Review →
                                   </Link>
                                 ) : (
-                                  <span className="text-stone-400">—</span>
+                                  <span className="text-muted">—</span>
                                 )}
                               </td>
                             </tr>
@@ -626,7 +626,7 @@ export function PayrollWizard({
           <Card>
             <CardHeader>
               <CardTitle>Executive summary</CardTitle>
-              <p className="text-sm text-stone-500">
+              <p className="text-sm text-muted">
                 Financial and headcount snapshot before clearance
               </p>
             </CardHeader>
@@ -641,7 +641,7 @@ export function PayrollWizard({
             <Card>
               <CardHeader>
                 <CardTitle>Vs prior period</CardTitle>
-                <p className="text-sm text-stone-500">
+                <p className="text-sm text-muted">
                   Compared with {preflight.vsPrior.periodLabel}
                 </p>
               </CardHeader>
@@ -667,7 +667,7 @@ export function PayrollWizard({
           <Card>
             <CardHeader>
               <CardTitle>Department cost</CardTitle>
-              <p className="text-sm text-stone-500">
+              <p className="text-sm text-muted">
                 This run — side-by-side by department
               </p>
             </CardHeader>
@@ -701,9 +701,9 @@ export function PayrollWizard({
             </CardContent>
           </Card>
 
-          <div className="rounded-lg border border-stone-200 bg-white">
-            <div className="border-b border-stone-100 px-4 py-3">
-              <p className="text-sm font-semibold text-stone-900">
+          <div className="rounded-lg border border-line bg-white">
+            <div className="border-b border-line px-4 py-3">
+              <p className="text-sm font-semibold text-ink">
                 Payslip register
               </p>
             </div>
@@ -726,7 +726,7 @@ export function PayrollWizard({
                       <span className="font-medium">
                         {p.employee.firstName} {p.employee.lastName}
                       </span>
-                      <span className="ml-2 text-xs text-stone-400">
+                      <span className="ml-2 text-xs text-muted">
                         {p.employee.employeeCode}
                       </span>
                     </TableCell>
@@ -751,7 +751,7 @@ export function PayrollWizard({
                       {(run.status === "APPROVED" || run.status === "PAID") && (
                         <a
                           href={`/api/payslips/${p.id}/pdf`}
-                          className="text-sm text-stone-600 hover:text-stone-900"
+                          className="text-sm text-muted hover:text-ink"
                           target="_blank"
                           rel="noopener noreferrer"
                         >
@@ -765,7 +765,7 @@ export function PayrollWizard({
                   <TableRow>
                     <TableCell
                       colSpan={7}
-                      className="text-center text-stone-500"
+                      className="text-center text-muted"
                     >
                       No payslips — recalculate in step 1
                     </TableCell>
@@ -790,7 +790,7 @@ export function PayrollWizard({
             <Card className="border-amber-200 bg-amber-50">
               <CardHeader>
                 <CardTitle>Super Admin clearance</CardTitle>
-                <p className="text-sm text-stone-600">
+                <p className="text-sm text-muted">
                   HR submitted this run. Approve to lock figures or send back.
                 </p>
               </CardHeader>
@@ -821,7 +821,7 @@ export function PayrollWizard({
             <Card>
               <CardHeader>
                 <CardTitle>Submit for Super Admin approval</CardTitle>
-                <p className="text-sm text-stone-500">
+                <p className="text-sm text-muted">
                   {PRODUCT_NAME} notifies Super Admin with a review link. Figures
                   stay editable until they approve.
                 </p>
@@ -843,7 +843,7 @@ export function PayrollWizard({
                   Submit for Super Admin approval
                 </Button>
                 {!canSubmit && (
-                  <p className="w-full text-sm text-stone-500">
+                  <p className="w-full text-sm text-muted">
                     Resolve High blockers in step 2, then return here.
                   </p>
                 )}
@@ -852,7 +852,7 @@ export function PayrollWizard({
           )}
 
           {run.status === "UNDER_REVIEW" && !canApprove && (
-            <p className="text-sm text-stone-500">
+            <p className="text-sm text-muted">
               Submitted — waiting for Super Admin to approve.
             </p>
           )}
@@ -861,7 +861,7 @@ export function PayrollWizard({
             <Card className="border-emerald-200 bg-emerald-50">
               <CardHeader>
                 <CardTitle>Submitted for approval</CardTitle>
-                <p className="text-sm text-stone-600">
+                <p className="text-sm text-muted">
                   Super Admin was notified to approve this payroll.
                 </p>
               </CardHeader>
@@ -889,7 +889,7 @@ export function PayrollWizard({
                     </Button>
                   </div>
                 </div>
-                <ul className="space-y-1 text-sm text-stone-700">
+                <ul className="space-y-1 text-sm text-ink-soft">
                   {submitNotice.recipients.map((r) => (
                     <li key={r.email}>
                       {r.name} ({r.email}) · notified in-app
@@ -903,7 +903,7 @@ export function PayrollWizard({
           <Card>
             <CardHeader>
               <CardTitle>Distribution &amp; statutory filing</CardTitle>
-              <p className="text-sm text-stone-500">
+              <p className="text-sm text-muted">
                 Bank batch CSV, filing pack (PAYE / pension / NHF / NSITF), and
                 Drive sync
               </p>
@@ -929,7 +929,7 @@ export function PayrollWizard({
               )}
               {(run.status === "FORWARDED_TO_FINANCE" ||
                 run.status === "PROCESSING") && (
-                <p className="w-full text-sm text-stone-500">
+                <p className="w-full text-sm text-muted">
                   {run.status === "PROCESSING"
                     ? "Finance is processing this run."
                     : "Forwarded to Finance. They will process payment and notify HR when done."}
@@ -978,12 +978,12 @@ function Stat({
   hint?: string;
 }) {
   return (
-    <div className="rounded-lg border border-stone-200 bg-white px-4 py-3">
-      <p className="text-xs uppercase tracking-wide text-stone-500">{label}</p>
-      <p className="mt-1 text-lg font-semibold tabular-nums text-stone-900">
+    <div className="rounded-lg border border-line bg-white px-4 py-3">
+      <p className="text-xs uppercase tracking-wide text-muted">{label}</p>
+      <p className="mt-1 text-lg font-semibold tabular-nums text-ink">
         {value}
       </p>
-      {hint && <p className="mt-0.5 text-xs text-stone-500">{hint}</p>}
+      {hint && <p className="mt-0.5 text-xs text-muted">{hint}</p>}
     </div>
   );
 }

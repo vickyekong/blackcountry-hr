@@ -109,7 +109,7 @@ export function AdvancesPanel() {
               id="employeeId"
               name="employeeId"
               required
-              className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+              className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
             >
               <option value="">Select staff</option>
               {staff.map((s) => (

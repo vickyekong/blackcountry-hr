@@ -1,4 +1,5 @@
 import { DesktopSidebar, MobileNav } from "@/components/layout/sidebar";
+import { TopBar } from "@/components/layout/top-bar";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
@@ -6,8 +7,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <DesktopSidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <MobileNav />
+        <TopBar />
         <main className="flex-1 overflow-x-hidden overflow-y-auto">
-          <div className="mx-auto w-full max-w-6xl animate-fade-in px-4 py-5 sm:px-6 sm:py-7 lg:px-8 lg:py-8">
+          <div className="mx-auto w-full max-w-6xl animate-fade-in px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-7">
             {children}
           </div>
         </main>

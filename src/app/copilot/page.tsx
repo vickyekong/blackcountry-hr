@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
 import { can } from "@/lib/permissions";
 import { CopilotWorkspace } from "@/components/copilot/copilot-workspace";
+import { PageHeader } from "@/components/layout/page-header";
+import { Sparkles } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -15,13 +17,11 @@ export default async function CopilotPage() {
 
   return (
     <AppShell>
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-ink">Omni Co-Pilot</h1>
-        <p className="mt-1 text-sm text-muted">
-          Natural-language reporting over the engines you already use. It
-          respects this seat&apos;s permissions and this company&apos;s boundary.
-        </p>
-      </div>
+      <PageHeader
+        icon={Sparkles}
+        title="Omni Co-Pilot"
+        description="Natural-language reporting over the engines you already use. It respects this seat's permissions and this company's boundary."
+      />
       <CopilotWorkspace />
     </AppShell>
   );

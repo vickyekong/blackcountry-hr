@@ -45,7 +45,7 @@ function severityClass(severity: PreflightSeverity) {
     case "warn":
       return "border-amber-200 bg-amber-50";
     default:
-      return "border-stone-200 bg-stone-50";
+      return "border-line bg-sand";
   }
 }
 
@@ -71,7 +71,7 @@ export function PayrollPreflightPanel({
 }) {
   if (loading && !data) {
     return (
-      <div className="mb-6 rounded-lg border border-stone-200 bg-white px-5 py-6 text-sm text-stone-500">
+      <div className="mb-6 rounded-lg border border-line bg-white px-5 py-6 text-sm text-muted">
         Running pre-flight checks…
       </div>
     );
@@ -86,13 +86,13 @@ export function PayrollPreflightPanel({
     : `${data.blockers} blocker${data.blockers === 1 ? "" : "s"} must be fixed before submit`;
 
   return (
-    <section className="mb-6 rounded-lg border border-stone-200 bg-white">
-      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-stone-100 px-5 py-4">
+    <section className="mb-6 rounded-lg border border-line bg-white">
+      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-line px-5 py-4">
         <div>
-          <h2 className="text-sm font-semibold text-stone-900">
+          <h2 className="text-sm font-semibold text-ink">
             Pre-flight summary
           </h2>
-          <p className="mt-0.5 text-xs text-stone-500">
+          <p className="mt-0.5 text-xs text-muted">
             Exceptions before payment — bank, statutory IDs, pay variance, and
             auto deductions
           </p>
@@ -111,7 +111,7 @@ export function PayrollPreflightPanel({
             <button
               type="button"
               onClick={onRefresh}
-              className="text-xs text-stone-600 hover:text-stone-900"
+              className="text-xs text-muted hover:text-ink"
             >
               Refresh
             </button>
@@ -119,14 +119,14 @@ export function PayrollPreflightPanel({
         </div>
       </div>
 
-      <div className="grid gap-3 border-b border-stone-100 px-5 py-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 border-b border-line px-5 py-3 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <p className="text-xs text-stone-500">Payslips</p>
+          <p className="text-xs text-muted">Payslips</p>
           <p className="mt-0.5 text-sm font-medium tabular-nums">
             {data.payslipCount}
             {data.vsPrior.headcountDelta != null &&
               data.vsPrior.headcountDelta !== 0 && (
-                <span className="ml-1 text-stone-500">
+                <span className="ml-1 text-muted">
                   ({data.vsPrior.headcountDelta > 0 ? "+" : ""}
                   {data.vsPrior.headcountDelta} vs prior)
                 </span>
@@ -134,17 +134,17 @@ export function PayrollPreflightPanel({
           </p>
         </div>
         <div>
-          <p className="text-xs text-stone-500">Gross</p>
+          <p className="text-xs text-muted">Gross</p>
           <p className="mt-0.5 text-sm font-medium tabular-nums">
             {formatCurrency(BigInt(data.totals.grossKobo))}
           </p>
         </div>
         <div>
-          <p className="text-xs text-stone-500">Net</p>
+          <p className="text-xs text-muted">Net</p>
           <p className="mt-0.5 text-sm font-medium tabular-nums">
             {formatCurrency(BigInt(data.totals.netKobo))}
             {data.vsPrior.netDeltaKobo != null && (
-              <span className="ml-1 text-stone-500">
+              <span className="ml-1 text-muted">
                 ({Number(data.vsPrior.netDeltaKobo) >= 0 ? "+" : ""}
                 {formatCurrency(BigInt(data.vsPrior.netDeltaKobo))} vs prior)
               </span>
@@ -152,7 +152,7 @@ export function PayrollPreflightPanel({
           </p>
         </div>
         <div>
-          <p className="text-xs text-stone-500">PAYE</p>
+          <p className="text-xs text-muted">PAYE</p>
           <p className="mt-0.5 text-sm font-medium tabular-nums">
             {formatCurrency(BigInt(data.totals.payeKobo))}
           </p>
@@ -160,11 +160,11 @@ export function PayrollPreflightPanel({
       </div>
 
       {data.exceptions.length === 0 ? (
-        <p className="px-5 py-6 text-sm text-stone-500">
+        <p className="px-5 py-6 text-sm text-muted">
           No exceptions — figures look clean against the last paid run.
         </p>
       ) : (
-        <ul className="divide-y divide-stone-100">
+        <ul className="divide-y divide-line">
           {data.exceptions.map((ex) => (
             <li
               key={ex.id}
@@ -173,24 +173,24 @@ export function PayrollPreflightPanel({
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[10px] font-semibold uppercase tracking-wide text-stone-600">
+                    <span className="text-[10px] font-semibold uppercase tracking-wide text-muted">
                       {severityLabel(ex.severity)}
                     </span>
-                    <p className="text-sm font-medium text-stone-900">
+                    <p className="text-sm font-medium text-ink">
                       {ex.title}
                     </p>
                     {ex.metric && (
-                      <span className="text-xs tabular-nums text-stone-600">
+                      <span className="text-xs tabular-nums text-muted">
                         {ex.metric}
                       </span>
                     )}
                   </div>
-                  <p className="mt-0.5 text-sm text-stone-600">{ex.detail}</p>
+                  <p className="mt-0.5 text-sm text-muted">{ex.detail}</p>
                 </div>
                 {ex.href && (
                   <Link
                     href={ex.href}
-                    className="shrink-0 text-xs text-stone-700 underline-offset-2 hover:underline"
+                    className="shrink-0 text-xs text-ink-soft underline-offset-2 hover:underline"
                   >
                     Fix →
                   </Link>

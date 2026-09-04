@@ -21,10 +21,10 @@ export function PayrollClearanceBar({
     <div className="sticky top-[calc(3.25rem+env(safe-area-inset-top))] z-30 -mx-4 mb-5 border-b border-amber-200 bg-amber-50/95 px-4 py-3 shadow-soft backdrop-blur-md sm:-mx-6 sm:px-6 lg:top-0 lg:mx-0 lg:rounded-xl lg:border lg:px-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-stone-900">
+          <p className="text-sm font-semibold text-ink">
             Clearance needed — {getMonthName(periodMonth)} {periodYear}
           </p>
-          <p className="text-xs text-stone-600">
+          <p className="text-xs text-muted">
             HR submitted this run. Approve to lock figures or send it back.
           </p>
         </div>

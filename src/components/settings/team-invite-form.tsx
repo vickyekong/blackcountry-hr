@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { IconLabel } from "@/components/ui/icon-label";
+import { UserPlus } from "lucide-react";
 
 const ROLE_OPTIONS = [
   { value: "HR_ADMIN", label: "HR" },
@@ -50,7 +52,9 @@ export function TeamInviteForm() {
   return (
     <Card className="mb-6">
       <CardHeader>
-        <CardTitle>Invite team</CardTitle>
+        <CardTitle>
+          <IconLabel icon={UserPlus}>Invite team</IconLabel>
+        </CardTitle>
         <p className="text-sm text-muted">
           Super Admin only — create HR, Finance, a business head, or another Super
           Admin for the company you are in.
@@ -98,7 +102,7 @@ export function TeamInviteForm() {
               id="invite-role"
               value={role}
               onChange={(e) => setRole(e.target.value as InviteRole)}
-              className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+              className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
             >
               {ROLE_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>

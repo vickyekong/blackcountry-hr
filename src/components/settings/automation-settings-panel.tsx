@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { IconLabel } from "@/components/ui/icon-label";
+import { Bell } from "lucide-react";
 import {
   AUTOMATION_ALERT_KEYS,
   DEFAULT_AUTOMATION_SETTINGS,
@@ -60,8 +62,10 @@ export function AutomationSettingsPanel() {
   return (
     <Card className="mt-6">
       <CardHeader>
-        <CardTitle>Automation</CardTitle>
-        <p className="text-sm text-stone-500">
+        <CardTitle>
+          <IconLabel icon={Bell}>Automation</IconLabel>
+        </CardTitle>
+        <p className="text-sm text-muted">
           Reminder timing for the existing approval paths. Jobs write in-app
           notifications — they do not change payroll, leave, or expenses on
           their own.
@@ -124,7 +128,7 @@ export function AutomationSettingsPanel() {
           </div>
 
           <fieldset className="space-y-2">
-            <legend className="text-sm font-medium text-stone-700">
+            <legend className="text-sm font-medium text-ink-soft">
               Scheduled alerts
             </legend>
             {AUTOMATION_ALERT_KEYS.map((key) => (
@@ -144,8 +148,8 @@ export function AutomationSettingsPanel() {
             ))}
           </fieldset>
 
-          <div className="rounded-md border border-stone-200 p-3 text-xs text-stone-500">
-            <p className="font-medium text-stone-700">Existing paths</p>
+          <div className="rounded-md border border-line p-3 text-xs text-muted">
+            <p className="font-medium text-ink-soft">Existing paths</p>
             <p className="mt-1">
               {WORKFLOW_PLAYBOOKS.map((p) => p.title).join(" · ")}
             </p>
@@ -154,7 +158,7 @@ export function AutomationSettingsPanel() {
           <Button type="submit" disabled={busy}>
             Save automation
           </Button>
-          {message && <p className="text-sm text-stone-600">{message}</p>}
+          {message && <p className="text-sm text-muted">{message}</p>}
         </form>
       </CardContent>
     </Card>

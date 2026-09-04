@@ -17,12 +17,12 @@ function CtaLink({
 }) {
   const className =
     variant === "primary"
-      ? "inline-flex h-11 items-center justify-center rounded-lg bg-lagoon px-6 text-sm font-medium text-ink shadow-soft transition hover:bg-lagoon-deep"
+      ? "inline-flex h-11 items-center justify-center rounded-md bg-lagoon px-5 text-sm font-semibold text-ink transition hover:bg-lagoon-deep"
       : variant === "ink"
-        ? "inline-flex h-11 items-center justify-center rounded-lg bg-ink px-6 text-sm font-medium text-foam transition hover:bg-ink-soft"
+        ? "inline-flex h-11 items-center justify-center rounded-md bg-ink px-5 text-sm font-semibold text-foam transition hover:bg-ink-soft"
         : variant === "outline"
-          ? "inline-flex h-11 items-center justify-center rounded-lg border border-white/30 bg-white/10 px-6 text-sm font-medium text-foam backdrop-blur-sm transition hover:bg-white/15"
-          : "rounded-lg px-3 py-2 text-sm font-medium text-lagoon-mist transition hover:bg-white/10 hover:text-foam";
+          ? "inline-flex h-11 items-center justify-center rounded-md border border-white/20 bg-white/5 px-5 text-sm font-semibold text-foam transition hover:bg-white/10"
+          : "rounded-md px-3 py-2 text-sm font-medium text-white/70 transition hover:bg-white/10 hover:text-foam";
 
   return (
     <a href={href} className={className}>
@@ -118,19 +118,23 @@ const STATUTORY = [
 
 export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean }) {
   return (
-    <div className="min-h-screen min-h-dvh bg-ink text-foam">
-      <header className="relative z-30 flex items-center justify-between px-5 py-5 sm:px-8 lg:px-12">
-        <p className="font-display text-xl font-semibold tracking-tight text-foam sm:text-2xl">
+    <div className="min-h-screen min-h-dvh bg-mist text-ink">
+      <div className="h-1 w-full bg-lagoon" />
+      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-line bg-foam/90 px-5 py-3 backdrop-blur-md sm:px-8 lg:px-12">
+        <p className="text-sm font-semibold tracking-tight text-ink sm:text-base">
           {PRODUCT_NAME}
         </p>
         <nav className="flex items-center gap-2 sm:gap-3" aria-label="Account">
-          <CtaLink href="/login" variant="ghost">
+          <a
+            href="/login"
+            className="rounded-md px-3 py-2 text-sm font-medium text-ink-soft transition hover:bg-sand hover:text-ink"
+          >
             Sign in
-          </CtaLink>
+          </a>
           {signupEnabled ? (
             <a
               href="/signup"
-              className="rounded-lg bg-lagoon px-3.5 py-2 text-sm font-medium text-ink shadow-soft transition hover:bg-lagoon-deep"
+              className="rounded-md bg-ink px-3.5 py-2 text-sm font-semibold text-foam transition hover:bg-ink-soft"
             >
               Internal setup
             </a>
@@ -138,80 +142,56 @@ export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean 
         </nav>
       </header>
 
-      {/* Hero — readable type over soft atmosphere + contained motion */}
-      <section className="relative isolate overflow-hidden">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-login-atmosphere"
-        />
-        <div
-          aria-hidden
-          className="landing-plus-field pointer-events-none absolute inset-0"
-        />
-        <div
-          aria-hidden
-          className="animate-lagoon-breathe pointer-events-none absolute -right-16 top-[18%] h-[380px] w-[380px] rounded-full bg-lagoon/25 blur-3xl lg:h-[460px] lg:w-[460px]"
-        />
-        <div
-          aria-hidden
-          className="landing-hero-scrim pointer-events-none absolute inset-0"
-        />
-
-        <div className="relative z-10 mx-auto grid min-h-[calc(100dvh-4.5rem)] max-w-6xl items-center gap-12 px-5 pb-16 pt-8 sm:px-8 sm:pb-20 lg:grid-cols-12 lg:gap-12 lg:px-12 lg:pb-24">
-          <div className="animate-soft-rise relative lg:col-span-6 xl:col-span-7">
-            <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-lagoon-mist/75">
-              Private · Blackcountry Group
-            </p>
-            <h1 className="font-display mt-4 text-5xl font-semibold leading-[0.98] tracking-tight text-foam drop-shadow-[0_1px_12px_rgb(11_46_51_/_0.45)] sm:text-6xl md:text-7xl">
+      <section className="relative overflow-hidden">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-14 sm:px-8 sm:py-20 lg:grid-cols-12 lg:gap-12 lg:px-12 lg:py-24">
+          <div className="animate-soft-rise lg:col-span-7">
+            <p className="page-kicker">Private · Blackcountry Group</p>
+            <h1 className="font-marketing mt-4 text-4xl font-semibold leading-[1.02] tracking-tight text-ink sm:text-5xl md:text-6xl">
               {PRODUCT_NAME}
             </h1>
-            <p className="mt-5 max-w-lg text-xl font-medium leading-snug text-lagoon-mist sm:text-2xl">
+            <p className="mt-5 max-w-lg text-lg font-medium leading-snug text-ink-soft sm:text-xl">
               {PRODUCT_POSITIONING}
             </p>
-            <p className="mt-4 max-w-md text-base leading-relaxed text-lagoon-mist/90 sm:text-lg">
+            <p className="mt-4 max-w-md text-base leading-relaxed text-muted">
               Designed for the group company and its sub-companies — not for the
               general public. People, attendance, and payroll stay in one
               command center, with HR clearance before money moves.
             </p>
-            <div className="mt-9 flex flex-wrap gap-3">
+            <div className="mt-8 flex flex-wrap gap-3">
               {signupEnabled ? (
-                <CtaLink href="/signup" variant="primary">
+                <CtaLink href="/signup" variant="ink">
                   Internal setup
                 </CtaLink>
               ) : null}
-              <CtaLink href="/login" variant={signupEnabled ? "outline" : "primary"}>
+              <a
+                href="/login"
+                className="inline-flex h-11 items-center justify-center rounded-md bg-lagoon px-5 text-sm font-semibold text-ink transition hover:bg-lagoon-deep"
+              >
                 Sign in
-              </CtaLink>
+              </a>
             </div>
-            <p className="mt-5 text-xs text-lagoon-mist/70">
+            <p className="mt-4 text-xs text-muted">
               Access is by issued login only. If you do not have an account, ask
               HR or Super Admin.
             </p>
           </div>
 
           <div
-            className="animate-fade-up relative lg:col-span-6 xl:col-span-5"
-            style={{ animationDelay: "140ms" }}
+            className="animate-fade-up lg:col-span-5"
+            style={{ animationDelay: "80ms" }}
           >
-            <div className="relative">
-              <div className="pointer-events-none absolute -inset-6 -z-10 rounded-[2rem] bg-gradient-to-br from-ink/50 via-transparent to-lagoon/10 blur-xl" />
-              <LandingLottie
-                src="/lottie/salary-truth.json"
-                className="mx-auto mb-6 h-36 w-36 shrink-0 sm:h-40 sm:w-40"
-                speed={0.9}
-              />
-              <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-lagoon-mist/70">
+            <div className="rounded-xl bg-rail p-6 text-foam shadow-soft sm:p-7">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-lagoon">
                 This month · explained
               </p>
-              <p className="font-display mt-4 text-5xl font-semibold tracking-tight text-foam sm:text-6xl">
+              <p className="mt-4 text-4xl font-semibold tracking-tight tabular-nums sm:text-5xl">
                 ₦669,420
               </p>
-              <p className="mt-3 max-w-sm text-sm leading-relaxed text-lagoon-mist/85 sm:text-base">
+              <p className="mt-3 text-sm leading-relaxed text-white/60">
                 Take-home after truth — contract, attendance, and remittances in
                 one line of sight
               </p>
-
-              <dl className="mt-9 max-w-md space-y-0 border-t border-white/20" aria-hidden>
+              <dl className="mt-8 space-y-0 border-t border-white/10">
                 {[
                   { label: "Gross contract", value: "₦850,000" },
                   {
@@ -220,22 +200,17 @@ export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean 
                   },
                   { label: "Attendance confirmed by HR", value: "−₦38,180" },
                   { label: "Net on the slip", value: "₦669,420", emph: true },
-                ].map((row, i) => (
+                ].map((row) => (
                   <div
                     key={row.label}
-                    className={`animate-fade-up flex items-baseline justify-between gap-4 border-b border-white/15 py-3.5 text-sm ${
-                      row.emph ? "text-base" : "text-lagoon-mist/80"
-                    }`}
-                    style={{ animationDelay: `${220 + i * 70}ms` }}
+                    className="flex items-baseline justify-between gap-4 border-b border-white/10 py-3 text-sm"
                   >
-                    <dt className={row.emph ? "font-medium text-foam" : undefined}>
+                    <dt className={row.emph ? "font-medium text-foam" : "text-white/55"}>
                       {row.label}
                     </dt>
                     <dd
                       className={`tabular-nums ${
-                        row.emph
-                          ? "font-semibold text-lagoon-mist"
-                          : "font-medium text-foam"
+                        row.emph ? "font-semibold text-lagoon" : "font-medium text-foam"
                       }`}
                     >
                       {row.value}
@@ -246,69 +221,43 @@ export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean 
             </div>
           </div>
         </div>
-
-        {/* Soft handoff into light content — no hard bar */}
-        <div
-          aria-hidden
-          className="landing-fade-to-mist pointer-events-none absolute inset-x-0 bottom-0 h-36 sm:h-44"
-        />
       </section>
 
-      {/* Tagline bridge — continuous ink→mist wash */}
-      <section className="landing-tagline-bridge relative overflow-hidden px-5 py-12 text-ink sm:px-8 sm:py-14 lg:px-12">
-        <div
-          aria-hidden
-          className="landing-plus-field-bridge pointer-events-none absolute inset-0"
-        />
-        <LandingLottie
-          src="/lottie/flow-spark.json"
-          className="pointer-events-none absolute left-0 top-1/2 hidden h-16 w-16 -translate-y-1/2 opacity-15 lg:block"
-          speed={1.1}
-        />
-        <LandingLottie
-          src="/lottie/flow-spark.json"
-          className="pointer-events-none absolute right-0 top-1/2 hidden h-16 w-16 -translate-y-1/2 opacity-15 lg:block"
-          speed={0.95}
-        />
-        <p className="relative z-10 mx-auto max-w-3xl px-2 text-center text-lg font-medium leading-relaxed text-ink-soft sm:text-xl lg:px-20">
+      <section className="border-y border-line bg-foam px-5 py-10 sm:px-8 lg:px-12">
+        <p className="mx-auto max-w-3xl text-center text-base font-medium leading-relaxed text-ink-soft sm:text-lg">
           {PRODUCT_TAGLINE} — one system for the holding company and every
           sub-company under it, not a product for the open market.
         </p>
       </section>
 
-      <section className="bg-mist px-5 pb-20 text-ink sm:px-8 sm:pb-24 lg:px-12">
+      <section className="px-5 py-16 text-ink sm:px-8 sm:py-20 lg:px-12">
         <div className="mx-auto max-w-6xl">
-          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-ok">
-            Built for the group
-          </p>
-          <h2 className="font-display mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+          <p className="page-kicker">Built for the group</p>
+          <h2 className="font-marketing mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
             Payroll that explains itself
           </h2>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted sm:text-lg">
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted">
             {PRODUCT_NAME} was designed for Blackcountry Group, not the general
             public. It is the layer that makes every naira on the slip
             defensible — to staff, Super Admin, and month-end remittance.
           </p>
 
-          <div className="mt-14 grid gap-10 border-t border-line pt-10 md:grid-cols-3 md:gap-8 lg:gap-12">
-            {PILLARS.map((pillar, i) => (
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {PILLARS.map((pillar) => (
               <article
                 key={pillar.label}
-                className="animate-fade-up"
-                style={{ animationDelay: `${i * 80}ms` }}
+                className="rounded-lg border border-line bg-foam p-5 shadow-panel"
               >
                 <LandingLottie
                   src={pillar.lottie}
-                  className="mb-4 h-28 w-28 shrink-0 sm:h-32 sm:w-32"
-                  speed={0.9 + i * 0.05}
+                  className="mb-3 h-20 w-20 shrink-0"
+                  speed={0.9}
                 />
-                <p className="font-display text-sm font-medium text-ok">
-                  {pillar.label}
-                </p>
-                <h3 className="font-display mt-3 text-xl font-semibold tracking-tight text-ink sm:text-2xl">
+                <p className="text-xs font-bold text-ink/40">{pillar.label}</p>
+                <h3 className="mt-2 text-lg font-semibold tracking-tight text-ink">
                   {pillar.title}
                 </h3>
-                <p className="mt-3 text-sm leading-relaxed text-muted sm:text-[15px]">
+                <p className="mt-2 text-sm leading-relaxed text-muted">
                   {pillar.body}
                 </p>
               </article>
@@ -317,28 +266,26 @@ export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean 
         </div>
       </section>
 
-      <section className="border-t border-line bg-foam px-5 py-20 text-ink sm:px-8 sm:py-24 lg:px-12">
+      <section className="border-t border-line bg-foam px-5 py-16 sm:px-8 sm:py-20 lg:px-12">
         <div className="mx-auto max-w-6xl">
-          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-ok">
-            How it works
-          </p>
-          <h2 className="font-display mt-3 max-w-xl text-3xl font-semibold tracking-tight sm:text-4xl">
+          <p className="page-kicker">How it works</p>
+          <h2 className="font-marketing mt-3 max-w-xl text-3xl font-semibold tracking-tight sm:text-4xl">
             From roster to remittance in one group workspace
           </h2>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted sm:text-lg">
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted">
             Super Admin and HR share the command center across the group and
             each sub-company. Sensitive actions stay Super Admin–cleared.
             Finance processes approved pay. Staff use a separate portal — they
             never touch payroll.
           </p>
 
-          <ol className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
+          <ol className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {FLOW.map((item) => (
-              <li key={item.step} className="relative">
-                <div className="mb-4 flex h-36 items-center justify-center overflow-hidden rounded-xl bg-atmosphere ring-1 ring-line/60 sm:h-40">
+              <li key={item.step} className="rounded-lg border border-line bg-mist/50 p-4">
+                <div className="mb-3 flex h-28 items-center justify-center overflow-hidden rounded-md bg-foam ring-1 ring-line">
                   <LandingLottie
                     src={item.lottie}
-                    className="h-32 w-32 sm:h-36 sm:w-36"
+                    className="h-24 w-24"
                     tone={
                       item.lottie.includes("money-cycle") ||
                       item.lottie.includes("hr-team") ||
@@ -349,51 +296,39 @@ export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean 
                     speed={0.85}
                   />
                 </div>
-                <span className="font-display text-3xl font-semibold text-ok/35">
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-lagoon text-xs font-bold text-ink">
                   {item.step}
                 </span>
-                <h3 className="mt-2 text-base font-semibold text-ink">
-                  {item.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted">
-                  {item.body}
-                </p>
+                <h3 className="mt-2 text-base font-semibold text-ink">{item.title}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-muted">{item.body}</p>
               </li>
             ))}
           </ol>
         </div>
       </section>
 
-      <section className="relative overflow-hidden border-t border-line bg-atmosphere px-5 py-20 text-ink sm:px-8 sm:py-24 lg:px-12">
-        <div className="relative z-10 mx-auto max-w-6xl">
-          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-ok">
-            Inside the product
-          </p>
-          <h2 className="font-display mt-3 max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">
+      <section className="border-t border-line px-5 py-16 sm:px-8 sm:py-20 lg:px-12">
+        <div className="mx-auto max-w-6xl">
+          <p className="page-kicker">Inside the product</p>
+          <h2 className="font-marketing mt-3 max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">
             Everything the group needs before payday
           </h2>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted sm:text-lg">
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted">
             People ops, statutory payroll, compliance, and exports — one
             Blackcountry Group workspace instead of a folder of conflicting
             files.
           </p>
 
-          <div className="mt-14 grid gap-12 md:grid-cols-3 md:gap-10">
+          <div className="mt-12 grid gap-8 md:grid-cols-3">
             {CAPABILITIES.map((group) => (
-              <div key={group.title}>
-                <h3 className="font-display text-xl font-semibold tracking-tight text-ink">
+              <div key={group.title} className="rounded-lg border border-line bg-foam p-5 shadow-panel">
+                <h3 className="text-lg font-semibold tracking-tight text-ink">
                   {group.title}
                 </h3>
-                <ul className="mt-5 space-y-3">
+                <ul className="mt-4 space-y-2.5">
                   {group.items.map((item) => (
-                    <li
-                      key={item}
-                      className="flex gap-3 text-sm leading-relaxed text-muted"
-                    >
-                      <span
-                        aria-hidden
-                        className="mt-2 h-1.5 w-1.5 shrink-0 rounded-sm bg-ok"
-                      />
+                    <li key={item} className="flex gap-2.5 text-sm leading-relaxed text-muted">
+                      <span aria-hidden className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-sm bg-lagoon" />
                       <span>{item}</span>
                     </li>
                   ))}
@@ -404,61 +339,47 @@ export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean 
         </div>
       </section>
 
-      <section className="relative overflow-hidden border-t border-line bg-ink px-5 py-20 sm:px-8 sm:py-24 lg:px-12">
-        <div
-          aria-hidden
-          className="landing-plus-field pointer-events-none absolute inset-0 opacity-[0.18]"
-        />
-        <div className="relative z-10 mx-auto max-w-6xl">
+      <section className="bg-rail px-5 py-16 text-foam sm:px-8 sm:py-20 lg:px-12">
+        <div className="mx-auto max-w-6xl">
           <div className="flex items-start justify-between gap-10">
             <div className="max-w-2xl">
-              <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-lagoon-mist/75">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-lagoon">
                 Statutory core
               </p>
-              <h2 className="font-display mt-3 text-3xl font-semibold tracking-tight text-foam sm:text-4xl">
+              <h2 className="font-marketing mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
                 Nigerian remittances without a second set of books
               </h2>
-              <p className="mt-4 text-base leading-relaxed text-lagoon-mist/90 sm:text-lg">
+              <p className="mt-4 text-base leading-relaxed text-white/65">
                 Every run snapshots the rules it used. Remittance packs and payslips
                 stay aligned — so month-end filing is a handoff, not a rebuild.
               </p>
             </div>
             <LandingLottie
               src="/lottie/remittance-pack.json"
-              className="hidden h-36 w-36 shrink-0 xl:block"
+              className="hidden h-28 w-28 shrink-0 xl:block"
               speed={0.8}
             />
           </div>
 
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {STATUTORY.map((item, i) => (
-              <div
-                key={item.name}
-                className="animate-fade-up border-t border-white/20 pt-5"
-                style={{ animationDelay: `${i * 60}ms` }}
-              >
-                <p className="font-display text-2xl font-semibold text-foam">
-                  {item.name}
-                </p>
-                <p className="mt-2 text-sm leading-relaxed text-lagoon-mist/75">
-                  {item.detail}
-                </p>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {STATUTORY.map((item) => (
+              <div key={item.name} className="rounded-lg border border-white/10 bg-white/5 p-4">
+                <p className="text-xl font-semibold text-foam">{item.name}</p>
+                <p className="mt-1.5 text-sm leading-relaxed text-white/55">{item.detail}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="bg-mist px-5 py-20 text-ink sm:px-8 sm:py-24 lg:px-12">
-        <div className="mx-auto flex max-w-6xl flex-col gap-12 lg:flex-row lg:items-center lg:justify-between">
+      <section className="px-5 py-16 sm:px-8 sm:py-20 lg:px-12">
+        <div className="mx-auto flex max-w-6xl flex-col gap-10 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-xl">
-            <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-ok">
-              Who it&apos;s for
-            </p>
-            <h2 className="font-display mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
+            <p className="page-kicker">Who it&apos;s for</p>
+            <h2 className="font-marketing mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
               Blackcountry Group officers and staff
             </h2>
-            <p className="mt-4 text-base leading-relaxed text-muted sm:text-lg">
+            <p className="mt-4 text-base leading-relaxed text-muted">
               Super Admin, HR, Finance, and Business heads of the group and its
               sub-companies. Staff get a portal for details, leave, timesheets,
               and requests — no admin tools. Accounts are issued inside the
@@ -472,7 +393,7 @@ export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean 
               ) : null}
               <a
                 href="/login"
-                className="inline-flex h-11 items-center justify-center rounded-lg border border-line bg-foam px-6 text-sm font-medium text-ink transition hover:border-ok/40 hover:bg-ok/10"
+                className="inline-flex h-11 items-center justify-center rounded-md border border-line bg-foam px-5 text-sm font-semibold text-ink transition hover:bg-sand"
               >
                 Sign in
               </a>
@@ -480,37 +401,24 @@ export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean 
           </div>
           <LandingLottie
             src="/lottie/approval.json"
-            className="mx-auto h-40 w-40 shrink-0 sm:h-48 sm:w-48 lg:mx-0"
+            className="mx-auto h-36 w-36 shrink-0 sm:h-40 sm:w-40 lg:mx-0"
             tone="mist"
             speed={0.9}
           />
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-ink px-5 py-24 sm:px-8 lg:px-12">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-login-atmosphere"
-        />
-        <div
-          aria-hidden
-          className="landing-plus-field-cta pointer-events-none absolute inset-0"
-        />
-        <div className="relative z-10 mx-auto max-w-3xl text-center">
-          <LandingLottie
-            src="/lottie/approval.json"
-            className="mx-auto mb-6 h-20 w-20 shrink-0 sm:h-24 sm:w-24"
-            tone="ink"
-          />
-          <h2 className="font-display text-3xl font-semibold tracking-tight text-foam sm:text-5xl">
+      <section className="border-t border-line bg-ink px-5 py-20 sm:px-8 lg:px-12">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="font-marketing text-3xl font-semibold tracking-tight text-foam sm:text-4xl">
             Sign in to the group workspace
           </h2>
-          <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-lagoon-mist/90">
+          <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-white/60">
             {PRODUCT_NAME} is a private system for Blackcountry Group. It is
             not offered to the public. Sign in with the account you were
             issued.
           </p>
-          <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             {signupEnabled ? (
               <CtaLink href="/signup" variant="primary">
                 Internal setup
@@ -523,11 +431,9 @@ export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean 
         </div>
       </section>
 
-      <footer className="border-t border-white/10 bg-ink px-5 py-8 sm:px-8 lg:px-12">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 text-xs text-lagoon-mist/55 sm:flex-row">
-          <p className="font-display text-sm text-lagoon-mist/80">
-            {PRODUCT_NAME}
-          </p>
+      <footer className="border-t border-white/10 bg-rail px-5 py-6 sm:px-8 lg:px-12">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 text-xs text-white/40 sm:flex-row">
+          <p className="text-sm font-medium text-white/70">{PRODUCT_NAME}</p>
           <p>
             © {new Date().getFullYear()} {PRODUCT_NAME} · Private workspace for
             Blackcountry Group

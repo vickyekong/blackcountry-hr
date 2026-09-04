@@ -72,10 +72,10 @@ export function SkillsCatalogPanel({
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-base font-semibold text-stone-900">
+        <h3 className="text-base font-semibold text-ink">
           Skills catalog
         </h3>
-        <p className="mt-1 text-sm text-stone-500">
+        <p className="mt-1 text-sm text-muted">
           Company skills. Assign levels on each employee record.
         </p>
       </div>
@@ -99,18 +99,18 @@ export function SkillsCatalogPanel({
       )}
       {error && <p className="text-sm text-red-600">{error}</p>}
       {rows.length === 0 ? (
-        <p className="text-sm text-stone-500">No skills in the catalog yet.</p>
+        <p className="text-sm text-muted">No skills in the catalog yet.</p>
       ) : (
-        <ul className="divide-y divide-stone-100 rounded-md border border-stone-200">
+        <ul className="divide-y divide-line rounded-md border border-line">
           {rows.map((row) => (
             <li
               key={row.id}
               className="flex flex-wrap items-center justify-between gap-3 px-3 py-2.5 text-sm"
             >
               <div>
-                <p className="font-medium text-stone-900">{row.name}</p>
+                <p className="font-medium text-ink">{row.name}</p>
                 {typeof row.employeeCount === "number" && (
-                  <p className="text-xs text-stone-500">
+                  <p className="text-xs text-muted">
                     {row.employeeCount}{" "}
                     {row.employeeCount === 1 ? "person" : "people"}
                   </p>

@@ -150,7 +150,7 @@ export function ShiftExceptionsPanel() {
               id="employeeId"
               name="employeeId"
               required
-              className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+              className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
             >
               <option value="">Select staff</option>
               {staff.map((s) => (
@@ -169,7 +169,7 @@ export function ShiftExceptionsPanel() {
             <select
               id="kind"
               name="kind"
-              className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+              className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
               value={kind}
               onChange={(e) =>
                 setKind(e.target.value as (typeof SHIFT_EXCEPTION_KINDS)[number])
@@ -189,7 +189,7 @@ export function ShiftExceptionsPanel() {
                 id="shiftId"
                 name="shiftId"
                 required
-                className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
               >
                 <option value="">Select shift</option>
                 {shifts.map((shift) => (

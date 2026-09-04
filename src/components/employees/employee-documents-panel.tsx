@@ -135,7 +135,7 @@ export function EmployeeDocumentsPanel({
     <Card>
       <CardHeader>
         <CardTitle>Documents</CardTitle>
-        <p className="text-sm text-stone-500">
+        <p className="text-sm text-muted">
           Contracts, IDs, and letters for this staff member. Keep files under
           ~900KB (PDF or image).
         </p>
@@ -161,7 +161,7 @@ export function EmployeeDocumentsPanel({
             <Label htmlFor="docCategory">Type</Label>
             <select
               id="docCategory"
-              className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+              className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
               value={category}
               onChange={(e) =>
                 setCategory(e.target.value as (typeof DOCUMENT_CATEGORIES)[number])
@@ -214,17 +214,17 @@ export function EmployeeDocumentsPanel({
         )}
 
         {docs.length === 0 ? (
-          <p className="text-sm text-stone-500">No documents yet.</p>
+          <p className="text-sm text-muted">No documents yet.</p>
         ) : (
-          <ul className="divide-y divide-stone-100 rounded-md border border-stone-200">
+          <ul className="divide-y divide-line rounded-md border border-line">
             {docs.map((doc) => (
               <li
                 key={doc.id}
                 className="flex flex-wrap items-center justify-between gap-3 px-3 py-2.5 text-sm"
               >
                 <div className="min-w-0">
-                  <p className="font-medium text-stone-900">{doc.name}</p>
-                  <p className="text-xs text-stone-500">
+                  <p className="font-medium text-ink">{doc.name}</p>
+                  <p className="text-xs text-muted">
                     {documentCategoryLabel(doc.category ?? "OTHER")} · Uploaded{" "}
                     {formatDate(new Date(doc.uploadedAt))}
                     {doc.expiresAt

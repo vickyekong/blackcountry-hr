@@ -12,6 +12,8 @@ import {
 } from "@/lib/company-brand";
 import { useCompanyBrand } from "@/components/brand/company-brand-provider";
 import { PRODUCT_NAME } from "@/lib/brand";
+import { IconLabel } from "@/components/ui/icon-label";
+import { Palette } from "lucide-react";
 
 type BrandingData = {
   name: string;
@@ -132,7 +134,9 @@ export function BrandingSettingsForm() {
     <form onSubmit={handleSubmit} className="mb-8 space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Company branding</CardTitle>
+          <CardTitle>
+            <IconLabel icon={Palette}>Company branding</IconLabel>
+          </CardTitle>
           <p className="text-sm text-muted">
             Show your company name, logo, and colors in the {PRODUCT_NAME}{" "}
             workspace. Product name stays {PRODUCT_NAME}.

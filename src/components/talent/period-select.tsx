@@ -5,7 +5,7 @@ import {
 } from "@/lib/performance/labels";
 
 const selectClass =
-  "mt-1 h-9 w-full rounded-md border border-stone-300 bg-white px-2 text-sm";
+  "mt-1 h-9 w-full rounded-md border border-line bg-white px-2 text-sm";
 
 export function PeriodSelect({
   name,

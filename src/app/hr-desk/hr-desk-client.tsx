@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
+import { PageHeader } from "@/components/layout/page-header";
+import { Headset } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -198,23 +200,12 @@ export default function HrDeskClient() {
 
   return (
     <AppShell>
-      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-stone-900">HR Desk</h1>
-          <p className="mt-1 text-sm text-stone-500">
-            Company inbox — triage, assign to HR and staff, use reply templates,
-            approve/reject with Gmail drafts
-          </p>
-          <p className="mt-2 text-xs text-stone-500">
-            {connected
-              ? `Mailbox: ${mailbox ?? "connected"}`
-              : "Google Workspace not connected"}
-            {lastSyncAt
-              ? ` · Last sync ${new Date(lastSyncAt).toLocaleString()}`
-              : ""}
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
+      <PageHeader
+        icon={Headset}
+        title="HR Desk"
+        description="Company inbox — triage, assign to HR and staff, use reply templates, approve/reject with Gmail drafts"
+        actions={
+          <div className="flex flex-wrap gap-2">
           <Button asChild variant="outline">
             <Link href="/settings">Google settings</Link>
           </Button>
@@ -224,12 +215,21 @@ export default function HrDeskClient() {
           >
             {loading ? "Working…" : "Sync inbox"}
           </Button>
-        </div>
-      </div>
+          </div>
+        }
+      />
+      <p className="-mt-4 mb-6 text-xs text-muted">
+        {connected
+          ? `Mailbox: ${mailbox ?? "connected"}`
+          : "Google Workspace not connected"}
+        {lastSyncAt
+          ? ` · Last sync ${new Date(lastSyncAt).toLocaleString()}`
+          : ""}
+      </p>
 
       {!connected && (
         <Card className="mb-6 border-amber-200 bg-amber-50">
-          <CardContent className="pt-6 text-sm text-stone-700">
+          <CardContent className="pt-6 text-sm text-ink-soft">
             Connect Google Workspace in Settings using the company HR email,
             then reconnect once so Gmail read + draft permissions are granted.
           </CardContent>
@@ -237,7 +237,7 @@ export default function HrDeskClient() {
       )}
 
       {banner && (
-        <p className="mb-4 rounded-md bg-stone-100 px-3 py-2 text-sm text-stone-700">
+        <p className="mb-4 rounded-md bg-sand px-3 py-2 text-sm text-ink-soft">
           {banner}
         </p>
       )}
@@ -246,7 +246,7 @@ export default function HrDeskClient() {
         <div>
           <Label>Category</Label>
           <select
-            className="mt-1 flex h-9 rounded-md border border-stone-300 bg-white px-2 text-sm"
+            className="mt-1 flex h-9 rounded-md border border-line bg-white px-2 text-sm"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
           >
@@ -262,7 +262,7 @@ export default function HrDeskClient() {
         <div>
           <Label>Status</Label>
           <select
-            className="mt-1 flex h-9 rounded-md border border-stone-300 bg-white px-2 text-sm"
+            className="mt-1 flex h-9 rounded-md border border-line bg-white px-2 text-sm"
             value={status}
             onChange={(e) => setStatus(e.target.value)}
           >
@@ -280,13 +280,13 @@ export default function HrDeskClient() {
       <div className="grid gap-4 lg:grid-cols-[22rem_minmax(0,1fr)]">
         <div className="max-h-[42vh] overflow-auto rounded-xl border border-line/80 bg-foam/95 shadow-soft lg:max-h-[70vh]">
           {messages.length === 0 ? (
-            <p className="p-4 text-sm text-stone-500">
+            <p className="p-4 text-sm text-muted">
               {loading
                 ? "Loading…"
                 : "No messages yet. Sync the company inbox."}
             </p>
           ) : (
-            <ul className="divide-y divide-stone-100">
+            <ul className="divide-y divide-line">
               {messages.map((m) => (
                 <li key={m.id}>
                   <button
@@ -296,7 +296,7 @@ export default function HrDeskClient() {
                       setDraftPreview(null);
                       setNotes(m.notes ?? "");
                     }}
-                    className={`w-full px-4 py-3 text-left hover:bg-stone-50 ${
+                    className={`w-full px-4 py-3 text-left hover:bg-sand ${
                       selectedId === m.id ? "bg-amber-50/70" : ""
                     }`}
                   >
@@ -304,14 +304,14 @@ export default function HrDeskClient() {
                       <Badge variant={categoryVariant(m.category)}>
                         {m.category.replace(/_/g, " ")}
                       </Badge>
-                      <span className="text-[11px] text-stone-400">
+                      <span className="text-[11px] text-muted">
                         {new Date(m.receivedAt).toLocaleDateString()}
                       </span>
                     </div>
-                    <p className="mt-1 truncate text-sm font-medium text-stone-900">
+                    <p className="mt-1 truncate text-sm font-medium text-ink">
                       {m.subject}
                     </p>
-                    <p className="mt-0.5 truncate text-xs text-stone-500">
+                    <p className="mt-0.5 truncate text-xs text-muted">
                       {m.status}
                       {m.assigneeUser ? ` · ${m.assigneeUser.name}` : ""}
                     </p>
@@ -324,7 +324,7 @@ export default function HrDeskClient() {
 
         <Card>
           {!selected ? (
-            <CardContent className="pt-6 text-sm text-stone-500">
+            <CardContent className="pt-6 text-sm text-muted">
               Select a mail to triage.
             </CardContent>
           ) : (
@@ -337,13 +337,13 @@ export default function HrDeskClient() {
                   <Badge variant="default">{selected.status}</Badge>
                 </div>
                 <CardTitle className="mt-2 text-xl">{selected.subject}</CardTitle>
-                <p className="text-sm text-stone-500">
+                <p className="text-sm text-muted">
                   From {selected.fromName || selected.fromEmail} ·{" "}
                   {new Date(selected.receivedAt).toLocaleString()}
                 </p>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="max-h-64 overflow-auto whitespace-pre-wrap rounded-md border border-stone-100 bg-stone-50 p-3 text-sm text-stone-700">
+                <div className="max-h-64 overflow-auto whitespace-pre-wrap rounded-md border border-line bg-sand p-3 text-sm text-ink-soft">
                   {selected.bodyText || selected.snippet}
                 </div>
 
@@ -351,7 +351,7 @@ export default function HrDeskClient() {
                   <div>
                     <Label>Sort category</Label>
                     <select
-                      className="mt-1 flex h-9 w-full rounded-md border border-stone-300 bg-white px-2 text-sm"
+                      className="mt-1 flex h-9 w-full rounded-md border border-line bg-white px-2 text-sm"
                       value={selected.category}
                       onChange={(e) =>
                         void setCategoryForSelected(e.target.value)
@@ -368,7 +368,7 @@ export default function HrDeskClient() {
                   <div>
                     <Label>Assign to requesting staff</Label>
                     <select
-                      className="mt-1 flex h-9 w-full rounded-md border border-stone-300 bg-white px-2 text-sm"
+                      className="mt-1 flex h-9 w-full rounded-md border border-line bg-white px-2 text-sm"
                       value={selected.employeeId ?? ""}
                       onChange={(e) => void assignStaff(e.target.value)}
                     >
@@ -383,7 +383,7 @@ export default function HrDeskClient() {
                   <div>
                     <Label>Assign to HR user</Label>
                     <select
-                      className="mt-1 flex h-9 w-full rounded-md border border-stone-300 bg-white px-2 text-sm"
+                      className="mt-1 flex h-9 w-full rounded-md border border-line bg-white px-2 text-sm"
                       value={selected.assigneeUserId ?? ""}
                       onChange={(e) => void assignHrUser(e.target.value)}
                     >
@@ -424,7 +424,7 @@ export default function HrDeskClient() {
                   <Label htmlFor="replyTemplate">Reply template</Label>
                   <select
                     id="replyTemplate"
-                    className="mt-1 flex h-9 w-full rounded-md border border-stone-300 bg-white px-2 text-sm"
+                    className="mt-1 flex h-9 w-full rounded-md border border-line bg-white px-2 text-sm"
                     value={templateId}
                     onChange={(e) =>
                       setTemplateId(e.target.value as ReplyTemplateId)
@@ -436,7 +436,7 @@ export default function HrDeskClient() {
                       </option>
                     ))}
                   </select>
-                  <pre className="mt-2 max-h-28 overflow-auto whitespace-pre-wrap rounded-md border border-stone-100 bg-stone-50 p-2 text-[11px] text-stone-600">
+                  <pre className="mt-2 max-h-28 overflow-auto whitespace-pre-wrap rounded-md border border-line bg-sand p-2 text-[11px] text-muted">
                     {previewTemplateBody(templateId, selected.category)}
                   </pre>
                 </div>
@@ -447,7 +447,7 @@ export default function HrDeskClient() {
                   </Label>
                   <textarea
                     id="hrNotes"
-                    className="mt-1 min-h-[72px] w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-sm"
+                    className="mt-1 min-h-[72px] w-full rounded-md border border-line bg-white px-3 py-2 text-sm"
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                   />
@@ -478,16 +478,16 @@ export default function HrDeskClient() {
 
                 {draftPreview && (
                   <div className="rounded-md border border-emerald-200 bg-emerald-50 p-3">
-                    <p className="text-sm font-medium text-stone-900">
+                    <p className="text-sm font-medium text-ink">
                       Draft created in Gmail
                     </p>
-                    <p className="mt-2 text-xs font-medium text-stone-600">
+                    <p className="mt-2 text-xs font-medium text-muted">
                       Subject: {draftPreview.subject}
                     </p>
-                    <pre className="mt-2 whitespace-pre-wrap text-xs text-stone-700">
+                    <pre className="mt-2 whitespace-pre-wrap text-xs text-ink-soft">
                       {draftPreview.body}
                     </pre>
-                    <p className="mt-2 text-xs text-stone-500">
+                    <p className="mt-2 text-xs text-muted">
                       Open Gmail Drafts to review and send.
                     </p>
                   </div>

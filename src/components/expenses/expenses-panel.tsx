@@ -77,7 +77,7 @@ function statusVariant(status: string) {
 export function ExpensesPanel({
   variant,
 }: {
-  variant: "review" | "reimburse" | "staff";
+  variant: "review" | "reimburse" | "staff" | "watch";
 }) {
   const { data: session } = useSession();
   const role = session?.user?.role;
@@ -187,14 +187,18 @@ export function ExpensesPanel({
             row.status === "REIMBURSED" ||
             row.reimbursementMethod === "PAYROLL"
         )
-      : rows;
+      : variant === "watch"
+        ? rows.filter((row) => row.status === "PENDING")
+        : rows;
 
   const title =
     variant === "staff"
       ? "Expense claims"
       : variant === "reimburse"
-        ? "Reimbursements"
-        : "Claims";
+        ? "Ready to pay"
+        : variant === "watch"
+          ? "Waiting on approval"
+          : "Claims";
 
   return (
     <Card>
@@ -204,10 +208,12 @@ export function ExpensesPanel({
       <CardContent>
         <p className="mb-4 text-sm text-muted">
           {variant === "staff"
-            ? "Upload a receipt. Amounts up to ₦100,000 can be cleared by your line manager or HR; above ₦500,000 needs Super Admin."
+            ? "Upload a receipt. Amounts up to ₦100,000 can be cleared by your line manager or HR; above ₦500,000 needs Super Admin. Finance pays approved claims."
             : variant === "reimburse"
               ? "Pay approved claims by bank transfer or cash, or queue them on the next payroll as a non-taxable reimbursement. Super Admin still signs off that payroll run."
-              : "Approve or send back pending claims. Finance marks payment after approval — this is separate from payroll sign-off."}
+              : variant === "watch"
+                ? "These claims still need HR, Super Admin, or the line manager. You cannot approve them here — you pay after they are cleared."
+                : "Expense reports land with HR and Super Admin. Approve or send back — Finance pays on the Finance portal."}
         </p>
         {(variant === "staff" || canCreate) && (
           <form
@@ -221,7 +227,7 @@ export function ExpensesPanel({
                   id="employeeId"
                   name="employeeId"
                   required
-                  className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                  className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
                 >
                   <option value="">Select staff</option>
                   {staff.map((person) => (
@@ -239,7 +245,7 @@ export function ExpensesPanel({
                 id="category"
                 name="category"
                 required
-                className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
                 defaultValue="OTHER"
               >
                 {EXPENSE_CATEGORIES.map((kind) => (
@@ -376,7 +382,7 @@ export function ExpensesPanel({
                       <select
                         name="method"
                         required
-                        className="flex h-9 rounded-md border border-stone-300 px-2 text-sm"
+                        className="flex h-9 rounded-md border border-line px-2 text-sm"
                         defaultValue="BANK_TRANSFER"
                       >
                         {REIMBURSEMENT_METHODS.map((method) => (

@@ -192,8 +192,8 @@ export function DepartmentsWorkspace({
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-base font-semibold text-stone-900">Departments</h3>
-        <p className="mt-1 text-sm text-stone-500">
+        <h3 className="text-base font-semibold text-ink">Departments</h3>
+        <p className="mt-1 text-sm text-muted">
           Company departments. Assign a head here; staff still pick the
           department name on their record.
         </p>
@@ -221,9 +221,9 @@ export function DepartmentsWorkspace({
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       {rows.length === 0 ? (
-        <p className="text-sm text-stone-500">No departments yet.</p>
+        <p className="text-sm text-muted">No departments yet.</p>
       ) : (
-        <ul className="divide-y divide-stone-100 rounded-md border border-stone-200">
+        <ul className="divide-y divide-line rounded-md border border-line">
           {rows.map((row) => (
             <li key={row.id} className="space-y-2 px-3 py-3 text-sm">
               <div className="flex flex-wrap items-center justify-between gap-3">
@@ -251,7 +251,7 @@ export function DepartmentsWorkspace({
                     </Button>
                   </div>
                 ) : (
-                  <p className="font-medium text-stone-900">{row.name}</p>
+                  <p className="font-medium text-ink">{row.name}</p>
                 )}
                 {canManage && editingId !== row.id && (
                   <div className="flex gap-2">
@@ -277,11 +277,11 @@ export function DepartmentsWorkspace({
                   </div>
                 )}
               </div>
-              <div className="flex flex-wrap items-center gap-2 text-xs text-stone-500">
+              <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
                 <span>Head:</span>
                 {canManage ? (
                   <select
-                    className="h-8 rounded-md border border-stone-300 px-2 text-sm text-stone-800"
+                    className="h-8 rounded-md border border-line px-2 text-sm text-ink"
                     value={row.managerEmployeeId ?? row.manager?.id ?? ""}
                     disabled={loading}
                     onChange={(e) => void setHead(row.id, e.target.value)}
@@ -295,7 +295,7 @@ export function DepartmentsWorkspace({
                     ))}
                   </select>
                 ) : (
-                  <span className="text-stone-800">
+                  <span className="text-ink">
                     {row.manager
                       ? employeeFullName(
                           row.manager.firstName,

@@ -40,14 +40,14 @@ export function PayrollExportPanel({
     <Card className="mb-6">
       <CardHeader>
         <CardTitle>Export payroll</CardTitle>
-        <p className="text-sm text-stone-500">
+        <p className="text-sm text-muted">
           Download a CSV, save it to Google Drive, or sync the payroll Sheet for
           the selected run.
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
         {runs.length === 0 ? (
-          <p className="text-sm text-stone-500">
+          <p className="text-sm text-muted">
             Create a payroll run first, then export it from here.
           </p>
         ) : (
@@ -56,7 +56,7 @@ export function PayrollExportPanel({
               <Label htmlFor="exportPayrollRun">Payroll run</Label>
               <select
                 id="exportPayrollRun"
-                className="mt-1 flex h-9 w-full rounded-md border border-stone-300 bg-white px-3 text-sm text-stone-900"
+                className="mt-1 flex h-9 w-full rounded-md border border-line bg-white px-3 text-sm text-ink"
                 value={selectedRunId}
                 onChange={(e) => setSelectedRunId(e.target.value)}
               >

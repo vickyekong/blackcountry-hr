@@ -1,4 +1,6 @@
 import { AppShell } from "@/components/layout/app-shell";
+import { PageHeader } from "@/components/layout/page-header";
+import { Settings } from "lucide-react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
@@ -26,14 +28,15 @@ export default async function SettingsPage() {
 
   return (
     <AppShell>
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-ink">Settings</h1>
-        <p className="mt-1 text-sm text-muted">
-          {canEditStatutory
+      <PageHeader
+        icon={Settings}
+        title="Settings"
+        description={
+          canEditStatutory
             ? "Company branding, team, statutory rates, and Google / Microsoft workspace sync"
-            : "Company branding and workspace sync — statutory rates are Super Admin only"}
-        </p>
-      </div>
+            : "Company branding and workspace sync — statutory rates are Super Admin only"
+        }
+      />
       <BrandingSettingsForm />
       {isSuperAdmin && <GroupCompaniesForm />}
       {isSuperAdmin && <TeamInviteForm />}

@@ -64,7 +64,7 @@ export function PeopleAnalyticsPanel({ year }: { year: number }) {
   }, [year]);
 
   if (!people) {
-    return <p className="text-sm text-stone-500">Loading people analytics…</p>;
+    return <p className="text-sm text-muted">Loading people analytics…</p>;
   }
 
   const chart = people.monthly.map((row) => ({
@@ -77,7 +77,7 @@ export function PeopleAnalyticsPanel({ year }: { year: number }) {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-stone-500">
+        <p className="text-sm text-muted">
           Live headcount, demographics, hires, exits, and turnover for {year}.
           This is not a payroll run snapshot.
         </p>
@@ -136,12 +136,12 @@ export function PeopleAnalyticsPanel({ year }: { year: number }) {
           <CardContent className="space-y-2 text-sm">
             {people.byStatus.map((row) => (
               <div key={row.key} className="flex justify-between">
-                <span className="text-stone-500">{row.label}</span>
+                <span className="text-muted">{row.label}</span>
                 <span className="tabular-nums font-medium">{row.count}</span>
               </div>
             ))}
             {people.byStatus.length === 0 && (
-              <p className="text-stone-500">No staff on the books.</p>
+              <p className="text-muted">No staff on the books.</p>
             )}
           </CardContent>
         </Card>
@@ -152,7 +152,7 @@ export function PeopleAnalyticsPanel({ year }: { year: number }) {
           <CardContent className="space-y-2 text-sm">
             {people.bySex.map((row) => (
               <div key={row.key} className="flex justify-between">
-                <span className="text-stone-500">{row.label}</span>
+                <span className="text-muted">{row.label}</span>
                 <span className="tabular-nums font-medium">{row.count}</span>
               </div>
             ))}

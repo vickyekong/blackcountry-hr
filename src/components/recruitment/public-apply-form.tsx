@@ -75,7 +75,7 @@ export function PublicApplyForm({ listingId }: { listingId: string }) {
         <select
           id="source"
           name="source"
-          className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+          className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
           defaultValue="CAREERS_PAGE"
         >
           {JOB_BOARDS.map((board) => (
@@ -91,7 +91,7 @@ export function PublicApplyForm({ listingId }: { listingId: string }) {
           id="coverLetter"
           name="coverLetter"
           rows={4}
-          className="mt-1 w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+          className="mt-1 w-full rounded-md border border-line px-3 py-2 text-sm"
         />
       </div>
       {error && <p className="text-sm text-signal">{error}</p>}

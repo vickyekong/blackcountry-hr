@@ -190,11 +190,11 @@ export function EmployeePerformancePanel({
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-end gap-3">
-        <label className="text-sm text-stone-600">
+        <label className="text-sm text-muted">
           Year{" "}
           <input
             type="number"
-            className="ml-2 h-9 w-24 rounded-md border border-stone-300 px-2"
+            className="ml-2 h-9 w-24 rounded-md border border-line px-2"
             value={year}
             onChange={(e) => setYear(Number(e.target.value) || year)}
           />
@@ -206,7 +206,7 @@ export function EmployeePerformancePanel({
             onChange={setPeriodLabel}
           />
         </div>
-        <p className="text-sm text-stone-500">
+        <p className="text-sm text-muted">
           Weighted KPI: {pct(kpi)}
         </p>
       </div>
@@ -250,13 +250,13 @@ export function EmployeePerformancePanel({
             </form>
           )}
           {goals.length === 0 ? (
-            <p className="text-sm text-stone-500">No goals this cycle.</p>
+            <p className="text-sm text-muted">No goals this cycle.</p>
           ) : (
-            <ul className="divide-y divide-stone-100 rounded-md border border-stone-200">
+            <ul className="divide-y divide-line rounded-md border border-line">
               {goals.map((goal) => (
                 <li key={goal.id} className="px-3 py-2.5 text-sm">
-                  <p className="font-medium text-stone-900">{goal.title}</p>
-                  <p className="text-xs text-stone-500">
+                  <p className="font-medium text-ink">{goal.title}</p>
+                  <p className="text-xs text-muted">
                     {GOAL_SCOPE_LABELS[goal.scope as GoalScope] ?? goal.scope}
                     {" · "}
                     {reviewPeriodLabel(goal.periodLabel)}
@@ -276,13 +276,13 @@ export function EmployeePerformancePanel({
       <Card>
         <CardHeader>
           <CardTitle>Appraisal</CardTitle>
-          <p className="text-sm text-stone-500">
+          <p className="text-sm text-muted">
             Scores are 1–5. Completing a review does not change pay.
           </p>
         </CardHeader>
         <CardContent>
           {current && (
-            <p className="mb-3 text-sm text-stone-600">
+            <p className="mb-3 text-sm text-muted">
               {current.periodYear} {reviewPeriodLabel(current.periodLabel)}:{" "}
               {current.status}
               {current.suggestedFinalScore
@@ -326,7 +326,7 @@ export function EmployeePerformancePanel({
                   id="selfNotes"
                   name="selfNotes"
                   rows={2}
-                  className="mt-1 w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+                  className="mt-1 w-full rounded-md border border-line px-3 py-2 text-sm"
                   defaultValue={current?.selfNotes ?? ""}
                 />
               </div>
@@ -336,7 +336,7 @@ export function EmployeePerformancePanel({
                   id="managerNotes"
                   name="managerNotes"
                   rows={2}
-                  className="mt-1 w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+                  className="mt-1 w-full rounded-md border border-line px-3 py-2 text-sm"
                   defaultValue={current?.managerNotes ?? ""}
                 />
               </div>
@@ -345,7 +345,7 @@ export function EmployeePerformancePanel({
                 <select
                   id="peerEmployeeId"
                   name="peerEmployeeId"
-                  className="mt-1 h-9 w-full rounded-md border border-stone-300 bg-white px-2 text-sm"
+                  className="mt-1 h-9 w-full rounded-md border border-line bg-white px-2 text-sm"
                   defaultValue={current?.peerEmployeeId ?? ""}
                 >
                   <option value="">None</option>
@@ -374,7 +374,7 @@ export function EmployeePerformancePanel({
                   id="peerNotes"
                   name="peerNotes"
                   rows={2}
-                  className="mt-1 w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+                  className="mt-1 w-full rounded-md border border-line px-3 py-2 text-sm"
                   defaultValue={current?.peerNotes ?? ""}
                 />
               </div>
@@ -396,7 +396,7 @@ export function EmployeePerformancePanel({
                   id="finalNotes"
                   name="finalNotes"
                   rows={2}
-                  className="mt-1 w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+                  className="mt-1 w-full rounded-md border border-line px-3 py-2 text-sm"
                   defaultValue={current?.finalNotes ?? ""}
                 />
               </div>
@@ -407,7 +407,7 @@ export function EmployeePerformancePanel({
               </div>
             </form>
           ) : (
-            <p className="text-sm text-stone-500">
+            <p className="text-sm text-muted">
               {current?.finalNotes ||
                 current?.managerNotes ||
                 "No review notes yet."}
@@ -428,7 +428,7 @@ export function EmployeePerformancePanel({
                 <select
                   id="kind"
                   name="kind"
-                  className="mt-1 h-9 w-full rounded-md border border-stone-300 bg-white px-2 text-sm"
+                  className="mt-1 h-9 w-full rounded-md border border-line bg-white px-2 text-sm"
                 >
                   {RECOGNITION_KINDS.map((id) => (
                     <option key={id} value={id}>
@@ -449,18 +449,18 @@ export function EmployeePerformancePanel({
             </form>
           )}
           {recognitions.length === 0 ? (
-            <p className="text-sm text-stone-500">None recorded.</p>
+            <p className="text-sm text-muted">None recorded.</p>
           ) : (
-            <ul className="divide-y divide-stone-100 rounded-md border border-stone-200">
+            <ul className="divide-y divide-line rounded-md border border-line">
               {recognitions.map((row) => (
                 <li key={row.id} className="px-3 py-2.5 text-sm">
-                  <p className="font-medium text-stone-900">
+                  <p className="font-medium text-ink">
                     {recognitionKindLabel(row.kind)}
                   </p>
                   {row.note ? (
-                    <p className="text-sm text-stone-600">{row.note}</p>
+                    <p className="text-sm text-muted">{row.note}</p>
                   ) : null}
-                  <p className="text-xs text-stone-500">
+                  <p className="text-xs text-muted">
                     From {row.givenByName} ·{" "}
                     {new Date(row.createdAt).toLocaleDateString()}
                   </p>

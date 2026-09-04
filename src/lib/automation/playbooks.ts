@@ -14,9 +14,9 @@ export const WORKFLOW_PLAYBOOKS = [
     title: "Expense claim",
     href: "/expenses",
     steps: [
-      "Staff submits a claim with a receipt",
+      "Staff submits a claim to HR and Super Admin",
       "Line manager or HR up to ₦100,000; HR up to ₦500,000; Super Admin above that",
-      "Finance reimburses — payroll, transfer, or cash",
+      "Finance reimburses on the Finance portal — payroll, transfer, or cash",
     ],
   },
   {

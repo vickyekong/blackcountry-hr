@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { IconLabel } from "@/components/ui/icon-label";
+import { Percent, Scale } from "lucide-react";
 
 interface TaxBandForm {
   lowerBoundNaira: number;
@@ -107,7 +109,7 @@ export function SettingsForm() {
   }
 
   if (!data) {
-    return <p className="text-stone-500">Loading settings…</p>;
+    return <p className="text-muted">Loading settings…</p>;
   }
 
   const s = data.statutory ?? {
@@ -127,7 +129,9 @@ export function SettingsForm() {
     <form onSubmit={handleSubmit} className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Statutory rates</CardTitle>
+          <CardTitle>
+            <IconLabel icon={Percent}>Statutory rates</IconLabel>
+          </CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
           <div>
@@ -190,7 +194,7 @@ export function SettingsForm() {
               id="taxReliefMode"
               name="taxReliefMode"
               defaultValue={s.taxReliefMode}
-              className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+              className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
             >
               <option value="NTA2025">NTA 2025 (0% band + rent relief)</option>
               <option value="CRA">Legacy CRA</option>
@@ -207,7 +211,7 @@ export function SettingsForm() {
               defaultValue={s.taxFreeThresholdNaira}
               className="mt-1"
             />
-            <p className="mt-1 text-xs text-stone-500">
+            <p className="mt-1 text-xs text-muted">
               Used only in CRA relief mode. Under NTA 2025, the ₦800k personal
               allowance is the 0% tax band — not stacked as extra relief.
             </p>
@@ -245,7 +249,7 @@ export function SettingsForm() {
               defaultValue={s.workingDaysPerMonth ?? 22}
               className="mt-1"
             />
-            <p className="mt-1 text-xs text-stone-500">
+            <p className="mt-1 text-xs text-muted">
               Used for unpaid leave and attendance daily-rate deductions. Not a
               hard-coded 22 for every company.
             </p>
@@ -255,7 +259,9 @@ export function SettingsForm() {
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>PAYE tax bands (annual)</CardTitle>
+          <CardTitle>
+            <IconLabel icon={Scale}>PAYE tax bands (annual)</IconLabel>
+          </CardTitle>
           <Button type="button" variant="outline" size="sm" onClick={resetBandsToNta2025}>
             Reset to NTA 2025
           </Button>
@@ -284,7 +290,7 @@ export function SettingsForm() {
               />
             </div>
           ))}
-          <p className="text-xs text-stone-400">
+          <p className="text-xs text-muted">
             Bands apply to annual taxable income. Verify against current FIRS guidance
             before changing.
           </p>

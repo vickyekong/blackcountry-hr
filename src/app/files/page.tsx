@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/layout/app-shell";
+import { PageHeader } from "@/components/layout/page-header";
+import { Files } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -133,15 +135,11 @@ export default function FilesPage() {
 
   return (
     <AppShell>
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-ink">Files</h1>
-        <p className="mt-1 text-sm text-muted">
-          Company library for this employer. Super Admin, HR, and the business
-          head can edit. Full-time staff can view files marked for them.
-          Paste a SharePoint or Drive https link — each sub-company keeps its
-          own library.
-        </p>
-      </div>
+      <PageHeader
+        icon={Files}
+        title="Files"
+        description="Company library for this employer. Super Admin, HR, and the business head can edit. Full-time staff can view files marked for them. Paste a SharePoint or Drive https link — each sub-company keeps its own library."
+      />
 
       <Card className="mb-8">
         <CardHeader>
@@ -188,7 +186,7 @@ export default function FilesPage() {
                   setVisibility(e.target.value);
                   if (e.target.value !== "SPECIFIC") setSelectedIds([]);
                 }}
-                className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
               >
                 <option value="EDITORS">Editors only</option>
                 <option value="ALL_FULL_TIME">All full-time staff</option>

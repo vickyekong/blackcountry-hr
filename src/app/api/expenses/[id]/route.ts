@@ -168,7 +168,7 @@ export async function PATCH(
         title: "Expense ready to reimburse",
         body: `${staffName} — approved claim awaiting payment.`,
         linkUrl:
-          session.user.role === "FINANCE" ? "/finance/expenses" : "/expenses?tab=reimbursements",
+        linkUrl: "/finance/expenses",
         entityType: "ExpenseClaim",
         entityId: existing.id,
         excludeUserId: session.user.id,

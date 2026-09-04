@@ -6,6 +6,7 @@ import { can, isFinanceRole, isStaffRole } from "@/lib/permissions";
 import { AppShell } from "@/components/layout/app-shell";
 import { Badge, payrollStatusVariant } from "@/components/ui/badge";
 import { OverviewCharts } from "@/components/dashboard/overview-charts";
+import { Users } from "lucide-react";
 import {
   CommandCenterHero,
   OmniCoPilotStrip,
@@ -55,7 +56,8 @@ export default async function DashboardPage() {
       <section className="mb-8">
         <div className="mb-3 flex items-end justify-between gap-3">
           <div>
-            <h2 className="font-display text-xl font-semibold text-ink">
+            <h2 className="flex items-center gap-2 text-lg font-semibold tracking-tight text-ink">
+              <Users className="h-4 w-4" strokeWidth={1.75} />
               Staff mix
             </h2>
             <p className="text-sm text-muted">
@@ -77,7 +79,7 @@ export default async function DashboardPage() {
         />
       </section>
 
-      <section className="mb-8 overflow-hidden rounded-xl border border-line/80 bg-foam/95 shadow-soft">
+      <section className="mb-8 overflow-hidden rounded-lg border border-line bg-foam shadow-panel">
         <div className="flex items-center justify-between border-b border-line/60 px-5 py-4">
           <div>
             <h2 className="text-sm font-semibold text-ink">

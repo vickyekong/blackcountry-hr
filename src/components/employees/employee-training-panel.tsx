@@ -34,22 +34,22 @@ export function EmployeeTrainingPanel({ employeeId }: { employeeId: string }) {
     <Card>
       <CardHeader>
         <CardTitle>Training</CardTitle>
-        <p className="text-sm text-stone-500">
+        <p className="text-sm text-muted">
           Programmes assigned to this person. Enrol from the Training register.
         </p>
       </CardHeader>
       <CardContent className="space-y-3">
         {rows.length === 0 ? (
-          <p className="text-sm text-stone-500">No training assigned.</p>
+          <p className="text-sm text-muted">No training assigned.</p>
         ) : (
-          <ul className="divide-y divide-stone-100 rounded-md border border-stone-200">
+          <ul className="divide-y divide-line rounded-md border border-line">
             {rows.map((row) => (
               <li key={row.id} className="px-3 py-2.5 text-sm">
-                <p className="font-medium text-stone-900">
+                <p className="font-medium text-ink">
                   {row.program.name}
                   {row.program.required ? " · required" : ""}
                 </p>
-                <p className="text-xs text-stone-500">
+                <p className="text-xs text-muted">
                   {TRAINING_STATUS_LABELS[
                     row.status as keyof typeof TRAINING_STATUS_LABELS
                   ] ?? row.status}

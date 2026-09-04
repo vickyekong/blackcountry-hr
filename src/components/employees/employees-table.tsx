@@ -110,7 +110,7 @@ export function EmployeesTable({
   ).sort((a, b) => a.localeCompare(b));
 
   return (
-    <div className="rounded-lg border border-stone-200 bg-white">
+    <div className="rounded-lg border border-line bg-white">
       <Table>
         <TableHeader>
           <TableRow>
@@ -136,7 +136,7 @@ export function EmployeesTable({
                 <TableCell>
                   <Link
                     href={`/employees/${emp.id}`}
-                    className="font-medium text-stone-900 hover:underline"
+                    className="font-medium text-ink hover:underline"
                   >
                     {emp.employeeCode}
                   </Link>
@@ -147,7 +147,7 @@ export function EmployeesTable({
                 <TableCell>
                   <select
                     aria-label={`Sex for ${emp.employeeCode}`}
-                    className="h-8 min-w-[7.5rem] rounded-md border border-stone-300 bg-white px-2 text-sm text-stone-800 disabled:opacity-60"
+                    className="h-8 min-w-[7.5rem] rounded-md border border-line bg-white px-2 text-sm text-ink disabled:opacity-60"
                     value={emp.sex ?? ""}
                     disabled={savingId === emp.id}
                     onChange={(e) => {
@@ -168,7 +168,7 @@ export function EmployeesTable({
                 <TableCell>
                   <select
                     aria-label={`Job description for ${emp.employeeCode}`}
-                    className="h-8 min-w-[11rem] rounded-md border border-stone-300 bg-white px-2 text-sm text-stone-800 disabled:opacity-60"
+                    className="h-8 min-w-[11rem] rounded-md border border-line bg-white px-2 text-sm text-ink disabled:opacity-60"
                     value={emp.jobTitle}
                     disabled={
                       savingId === emp.id || jobDescriptionOptions.length === 0
@@ -194,7 +194,7 @@ export function EmployeesTable({
                 <TableCell>
                   <select
                     aria-label={`Department for ${emp.employeeCode}`}
-                    className="h-8 min-w-[10rem] rounded-md border border-stone-300 bg-white px-2 text-sm text-stone-800 disabled:opacity-60"
+                    className="h-8 min-w-[10rem] rounded-md border border-line bg-white px-2 text-sm text-ink disabled:opacity-60"
                     value={emp.department}
                     disabled={savingId === emp.id}
                     onChange={(e) => {
@@ -214,7 +214,7 @@ export function EmployeesTable({
                 <TableCell>
                   <select
                     aria-label={`Status for ${emp.employeeCode}`}
-                    className="h-8 min-w-[9rem] rounded-md border border-stone-300 bg-white px-2 text-sm text-stone-800 disabled:opacity-60"
+                    className="h-8 min-w-[9rem] rounded-md border border-line bg-white px-2 text-sm text-ink disabled:opacity-60"
                     value={emp.status}
                     disabled={savingId === emp.id}
                     onChange={(e) => {

@@ -551,11 +551,11 @@ export function EmployeesAttendanceTab() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-lg border border-stone-200 bg-white p-5">
-        <h2 className="text-lg font-semibold text-stone-900">
+      <div className="rounded-lg border border-line bg-white p-5">
+        <h2 className="text-lg font-semibold text-ink">
           Clock machine · import & report
         </h2>
-        <p className="mt-1 text-sm text-stone-500">
+        <p className="mt-1 text-sm text-muted">
           Upload a biometric punch export (CSV / PDF / Excel){" "}
           <strong>or</strong> an L&apos;ORI / Arami monthly attendance sheet
           (day codes W / A / O / UP / V…). {PRODUCT_NAME} detects the format, matches
@@ -567,7 +567,7 @@ export function EmployeesAttendanceTab() {
           <div>
             <Label>Report month</Label>
             <select
-              className="mt-1 flex h-9 rounded-md border border-stone-300 bg-white px-2 text-sm"
+              className="mt-1 flex h-9 rounded-md border border-line bg-white px-2 text-sm"
               value={month}
               onChange={(e) => {
                 setMonth(Number(e.target.value));
@@ -610,7 +610,7 @@ export function EmployeesAttendanceTab() {
                 setPeriodMode("week");
               }}
             />
-            <p className="mt-1 text-[11px] text-stone-500">
+            <p className="mt-1 text-[11px] text-muted">
               {formatWeekLabel(weekOf)}
             </p>
           </div>
@@ -695,9 +695,9 @@ export function EmployeesAttendanceTab() {
           </Button>
         </div>
 
-        <p className="mt-2 text-xs text-stone-500">
+        <p className="mt-2 text-xs text-muted">
           Viewing:{" "}
-          <span className="font-medium text-stone-700">
+          <span className="font-medium text-ink-soft">
             {periodMode === "week"
               ? `Week · ${formatWeekLabel(weekOf)}`
               : `Month · ${getMonthName(month)} ${year}`}
@@ -706,7 +706,7 @@ export function EmployeesAttendanceTab() {
           buttons above to re-run month or week scoring anytime.
         </p>
 
-        <p className="mt-3 text-xs text-stone-500">
+        <p className="mt-3 text-xs text-muted">
           Punch files match by clock ID / staff code; attendance sheets match by
           employee name (fuzzy).{" "}
           {employeesMissingDevice > 0 && (
@@ -720,9 +720,9 @@ export function EmployeesAttendanceTab() {
         {shiftsCount === 0 && (
           <form
             onSubmit={createShift}
-            className="mt-4 grid gap-2 rounded-md border border-dashed border-stone-300 bg-stone-50 p-3 sm:grid-cols-4"
+            className="mt-4 grid gap-2 rounded-md border border-dashed border-line bg-sand p-3 sm:grid-cols-4"
           >
-            <div className="sm:col-span-4 text-sm text-stone-600">
+            <div className="sm:col-span-4 text-sm text-muted">
               Optional: create a named shift. If none exists, import creates
               “Standard day” (08:00–17:00, Mon–Fri) automatically.
             </div>
@@ -759,7 +759,7 @@ export function EmployeesAttendanceTab() {
           </p>
         )}
         {loading && phase && (
-          <p className="mt-2 text-sm text-stone-500">{phase}</p>
+          <p className="mt-2 text-sm text-muted">{phase}</p>
         )}
       </div>
 
@@ -773,9 +773,9 @@ export function EmployeesAttendanceTab() {
         ].map(([label, value]) => (
           <div
             key={label as string}
-            className="rounded-lg border border-stone-200 bg-white px-4 py-3"
+            className="rounded-lg border border-line bg-white px-4 py-3"
           >
-            <p className="text-xs uppercase tracking-wide text-stone-500">
+            <p className="text-xs uppercase tracking-wide text-muted">
               {label}
             </p>
             <p className="mt-1 text-2xl font-semibold tabular-nums">{value}</p>
@@ -786,10 +786,10 @@ export function EmployeesAttendanceTab() {
       <div>
         <div className="mb-3 flex flex-wrap items-end justify-between gap-2">
           <div>
-            <h3 className="text-base font-semibold text-stone-900">
+            <h3 className="text-base font-semibold text-ink">
               Attendance analysis
             </h3>
-            <p className="text-sm text-stone-500">
+            <p className="text-sm text-muted">
               {periodLabel ||
                 (periodMode === "week"
                   ? formatWeekLabel(weekOf)
@@ -797,7 +797,7 @@ export function EmployeesAttendanceTab() {
               · penalty total{" "}
               {formatCurrency(BigInt(summary.penaltyKobo || "0"))}
             </p>
-            <p className="mt-1 text-xs text-stone-400">
+            <p className="mt-1 text-xs text-muted">
               Management departments are not shift-regulated (no late/absent
               scoring).
             </p>
@@ -811,10 +811,10 @@ export function EmployeesAttendanceTab() {
       </div>
 
       <div>
-        <h3 className="mb-3 text-base font-semibold text-stone-900">
+        <h3 className="mb-3 text-base font-semibold text-ink">
           Staff attendance summary
         </h3>
-        <div className="rounded-lg border border-stone-200 bg-white">
+        <div className="rounded-lg border border-line bg-white">
           <Table>
             <TableHeader>
               <TableRow>
@@ -833,7 +833,7 @@ export function EmployeesAttendanceTab() {
                 <TableRow key={row.id}>
                   <TableCell>
                     <div className="font-medium">{row.name}</div>
-                    <div className="text-xs text-stone-500">
+                    <div className="text-xs text-muted">
                       {row.employeeCode}
                       {row.clockDeviceId ? ` · device ${row.clockDeviceId}` : ""}
                     </div>
@@ -863,7 +863,7 @@ export function EmployeesAttendanceTab() {
               ))}
               {staffSummary.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center text-stone-500">
+                  <TableCell colSpan={8} className="text-center text-muted">
                     {loading
                       ? "Working…"
                       : "Import a clock-machine file to generate the staff attendance report."}
@@ -877,11 +877,11 @@ export function EmployeesAttendanceTab() {
 
       <div>
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <h3 className="text-base font-semibold text-stone-900">
+          <h3 className="text-base font-semibold text-ink">
             Daily attendance detail
           </h3>
           <select
-            className="h-9 rounded-md border border-stone-300 bg-white px-2 text-sm"
+            className="h-9 rounded-md border border-line bg-white px-2 text-sm"
             value={detailFilter}
             onChange={(e) => setDetailFilter(e.target.value)}
           >
@@ -893,7 +893,7 @@ export function EmployeesAttendanceTab() {
             <option value="ON_LEAVE">On leave</option>
           </select>
         </div>
-        <div className="rounded-lg border border-stone-200 bg-white">
+        <div className="rounded-lg border border-line bg-white">
           <Table>
             <TableHeader>
               <TableRow>
@@ -915,16 +915,16 @@ export function EmployeesAttendanceTab() {
                     <div className="font-medium">
                       {day.employee.firstName} {day.employee.lastName}
                     </div>
-                    <div className="text-xs text-stone-500">
+                    <div className="text-xs text-muted">
                       {day.employee.employeeCode} · {day.employee.department}
                     </div>
                   </TableCell>
-                  <TableCell className="text-sm text-stone-600">
+                  <TableCell className="text-sm text-muted">
                     {day.shift
                       ? `${day.shift.name} (${day.shift.startTime}–${day.shift.endTime})`
                       : "—"}
                   </TableCell>
-                  <TableCell className="text-sm tabular-nums text-stone-600">
+                  <TableCell className="text-sm tabular-nums text-muted">
                     {day.clockInAt
                       ? new Date(day.clockInAt).toLocaleTimeString([], {
                           hour: "2-digit",
@@ -952,7 +952,7 @@ export function EmployeesAttendanceTab() {
               ))}
               {days.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-stone-500">
+                  <TableCell colSpan={6} className="text-center text-muted">
                     No daily rows for this filter.
                   </TableCell>
                 </TableRow>

@@ -25,6 +25,8 @@ import { RemittancesPanel } from "@/components/payroll/remittances-panel";
 import { SimulatePanel } from "@/components/payroll/simulate-panel";
 import { getMonthName } from "@/lib/utils";
 import { cn } from "@/lib/cn";
+import { PageHeader } from "@/components/layout/page-header";
+import { Wallet, Layers, Gift, MinusCircle, HandCoins, Landmark, FileSpreadsheet, FlaskConical } from "lucide-react";
 
 interface PayrollRun {
   id: string;
@@ -36,14 +38,14 @@ interface PayrollRun {
 }
 
 const TABS = [
-  { id: "runs", label: "Runs" },
-  { id: "structures", label: "Structures" },
-  { id: "benefits", label: "Benefits" },
-  { id: "deductions", label: "Deductions" },
-  { id: "advances", label: "Advances" },
-  { id: "loans", label: "Loans" },
-  { id: "remittances", label: "Remittances" },
-  { id: "what-if", label: "What-if" },
+  { id: "runs", label: "Runs", icon: Wallet },
+  { id: "structures", label: "Structures", icon: Layers },
+  { id: "benefits", label: "Benefits", icon: Gift },
+  { id: "deductions", label: "Deductions", icon: MinusCircle },
+  { id: "advances", label: "Advances", icon: HandCoins },
+  { id: "loans", label: "Loans", icon: Landmark },
+  { id: "remittances", label: "Remittances", icon: FileSpreadsheet },
+  { id: "what-if", label: "What-if", icon: FlaskConical },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -89,21 +91,18 @@ function PayrollPageInner() {
 
   return (
     <AppShell>
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-stone-900">Payroll</h1>
-          <p className="mt-1 text-sm text-stone-500">
-            {PRODUCT_NAME} 4-step wizard uses weekly timesheets as hours. Salary
-            structures, advances, and loans attach as extra lines — Super Admin
-            still clears the run before Finance processes it.
-          </p>
-        </div>
-        {tab === "runs" ? (
-          <Button onClick={createRun} disabled={creating}>
-            {creating ? "Creating…" : "Start payroll wizard"}
-          </Button>
-        ) : null}
-      </div>
+      <PageHeader
+        icon={Wallet}
+        title="Payroll"
+        description={`${PRODUCT_NAME} 4-step wizard uses weekly timesheets as hours. Salary structures, advances, and loans attach as extra lines — Super Admin still clears the run before Finance processes it.`}
+        actions={
+          tab === "runs" ? (
+            <Button onClick={createRun} disabled={creating}>
+              {creating ? "Creating…" : "Start payroll wizard"}
+            </Button>
+          ) : null
+        }
+      />
 
       <div className="mb-6 flex flex-wrap gap-1 border-b border-line">
         {TABS.map((item) => (
@@ -116,12 +115,13 @@ function PayrollPageInner() {
               )
             }
             className={cn(
-              "-mb-px border-b-2 px-3 py-2 text-sm font-medium transition",
+              "-mb-px inline-flex items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium transition",
               tab === item.id
-                ? "border-stone-900 text-stone-900"
-                : "border-transparent text-stone-500 hover:text-stone-800"
+                ? "border-ink text-ink"
+                : "border-transparent text-muted hover:text-ink"
             )}
           >
+            <item.icon className="h-3.5 w-3.5" strokeWidth={1.75} />
             {item.label}
           </button>
         ))}
@@ -130,7 +130,7 @@ function PayrollPageInner() {
       {tab === "runs" ? (
         <>
           <PayrollExportPanel runs={runs} />
-          <div className="rounded-lg border border-stone-200 bg-white">
+          <div className="rounded-lg border border-line bg-white">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -162,7 +162,7 @@ function PayrollPageInner() {
                 ))}
                 {runs.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center text-stone-500">
+                    <TableCell colSpan={4} className="text-center text-muted">
                       No payroll runs yet
                     </TableCell>
                   </TableRow>

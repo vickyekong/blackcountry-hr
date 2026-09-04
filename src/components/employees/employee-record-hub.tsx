@@ -13,6 +13,17 @@ import { EmployeeLifecyclePanel } from "@/components/employees/lifecycle-panel";
 import { EmployeeTrainingPanel } from "@/components/employees/employee-training-panel";
 import { EmployeePerformancePanel } from "@/components/employees/employee-performance-panel";
 import { EmployeePayPanel } from "@/components/employees/employee-pay-panel";
+import {
+  LayoutDashboard,
+  FileText,
+  Sparkles,
+  BadgeCheck,
+  Package,
+  GraduationCap,
+  Target,
+  Wallet,
+  ListChecks,
+} from "lucide-react";
 
 type TabId =
   | "overview"
@@ -25,16 +36,16 @@ type TabId =
   | "pay"
   | "onboarding";
 
-const TABS: Array<{ id: TabId; label: string }> = [
-  { id: "overview", label: "Overview" },
-  { id: "documents", label: "Documents" },
-  { id: "skills", label: "Skills" },
-  { id: "certs", label: "Certifications" },
-  { id: "assets", label: "Assets" },
-  { id: "training", label: "Training" },
-  { id: "performance", label: "Performance" },
-  { id: "pay", label: "Pay extras" },
-  { id: "onboarding", label: "Onboarding" },
+const TABS: Array<{ id: TabId; label: string; icon: typeof LayoutDashboard }> = [
+  { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "documents", label: "Documents", icon: FileText },
+  { id: "skills", label: "Skills", icon: Sparkles },
+  { id: "certs", label: "Certifications", icon: BadgeCheck },
+  { id: "assets", label: "Assets", icon: Package },
+  { id: "training", label: "Training", icon: GraduationCap },
+  { id: "performance", label: "Performance", icon: Target },
+  { id: "pay", label: "Pay extras", icon: Wallet },
+  { id: "onboarding", label: "Onboarding", icon: ListChecks },
 ];
 
 export type EmployeeHubRecord = {
@@ -104,19 +115,20 @@ export function EmployeeRecordHub({
 
   return (
     <>
-      <div className="mb-6 flex flex-wrap gap-1 border-b border-stone-200">
+      <div className="mb-6 flex flex-wrap gap-1 border-b border-line">
         {TABS.map((item) => (
           <button
             key={item.id}
             type="button"
             onClick={() => setTab(item.id)}
             className={cn(
-              "border-b-2 px-4 py-2.5 text-sm font-medium transition-colors",
+              "inline-flex items-center gap-1.5 border-b-2 px-4 py-2.5 text-sm font-medium transition-colors",
               tab === item.id
-                ? "border-stone-900 text-stone-900"
-                : "border-transparent text-stone-500 hover:text-stone-800"
+                ? "border-ink text-ink"
+                : "border-transparent text-muted hover:text-ink"
             )}
           >
+            <item.icon className="h-3.5 w-3.5" strokeWidth={1.75} />
             {item.label}
           </button>
         ))}
@@ -178,7 +190,7 @@ export function EmployeeRecordHub({
                   employee.manager ? (
                     <Link
                       href={`/employees/${employee.manager.id}`}
-                      className="font-medium text-stone-900 hover:underline"
+                      className="font-medium text-ink hover:underline"
                     >
                       {employeeFullName(
                         employee.manager.firstName,
@@ -227,13 +239,13 @@ export function EmployeeRecordHub({
                 ["Other taxable", employee.otherTaxableAllowancesKobo],
               ].map(([label, amount]) => (
                 <div key={label as string} className="flex justify-between">
-                  <span className="text-stone-500">{label}</span>
+                  <span className="text-muted">{label}</span>
                   <span className="tabular-nums font-medium">
                     {money(amount as string | number)}
                   </span>
                 </div>
               ))}
-              <div className="flex justify-between border-t border-stone-100 pt-2 font-medium">
+              <div className="flex justify-between border-t border-line pt-2 font-medium">
                 <span>Monthly gross</span>
                 <span className="tabular-nums">{formatCurrency(gross)}</span>
               </div>
@@ -269,9 +281,9 @@ export function EmployeeRecordHub({
                   {employee.leaveBalances.map((b) => (
                     <div
                       key={b.id}
-                      className="rounded-md border border-stone-100 px-4 py-3 text-sm"
+                      className="rounded-md border border-line px-4 py-3 text-sm"
                     >
-                      <p className="text-stone-500">
+                      <p className="text-muted">
                         {b.leaveType.replace("_", " ")}
                       </p>
                       <p className="mt-1 font-medium tabular-nums">
@@ -315,10 +327,10 @@ export function EmployeeRecordHub({
       {tab === "pay" && <EmployeePayPanel employeeId={employee.id} />}
       {tab === "onboarding" && (
         <div>
-          <h2 className="mb-1 text-lg font-semibold text-stone-900">
+          <h2 className="mb-1 text-lg font-semibold text-ink">
             Onboarding &amp; offboarding
           </h2>
-          <p className="mb-3 text-sm text-stone-500">
+          <p className="mb-3 text-sm text-muted">
             HR checklists for this staff member — start, track, and complete
             tasks on their behalf
           </p>
@@ -338,8 +350,8 @@ function Row({
 }) {
   return (
     <div className="flex justify-between gap-4">
-      <span className="text-stone-500">{label}</span>
-      <span className="text-right text-stone-900">{value}</span>
+      <span className="text-muted">{label}</span>
+      <span className="text-right text-ink">{value}</span>
     </div>
   );
 }

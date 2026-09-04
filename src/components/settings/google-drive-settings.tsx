@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { IconLabel } from "@/components/ui/icon-label";
+import { Cloud } from "lucide-react";
 import { WORKSPACE_ROOT_FOLDER } from "@/lib/brand";
 
 interface DriveStatus {
@@ -134,8 +136,10 @@ export function GoogleDriveSettings() {
   return (
     <Card className="mt-8">
       <CardHeader>
-        <CardTitle>Google Workspace sync</CardTitle>
-        <p className="text-sm text-stone-500">
+        <CardTitle>
+          <IconLabel icon={Cloud}>Google Workspace sync</IconLabel>
+        </CardTitle>
+        <p className="text-sm text-muted">
           Connect your Workspace account to keep a shared HR folder, staff
           spreadsheet database, payroll Sheets, and the HR Desk company inbox
           (Gmail). Reconnect once after deploy so Gmail read + draft access is
@@ -144,7 +148,7 @@ export function GoogleDriveSettings() {
       </CardHeader>
       <CardContent className="space-y-4">
         {message && (
-          <p className="rounded-md border border-stone-200 bg-stone-50 px-3 py-2 text-sm text-stone-700">
+          <p className="rounded-md border border-line bg-sand px-3 py-2 text-sm text-ink-soft">
             {message}
           </p>
         )}
@@ -160,7 +164,7 @@ export function GoogleDriveSettings() {
 
         {status?.connected ? (
           <>
-            <p className="text-sm text-stone-700">
+            <p className="text-sm text-ink-soft">
               Connected as{" "}
               <span className="font-medium">
                 {status.email ?? "Google account"}
@@ -170,12 +174,12 @@ export function GoogleDriveSettings() {
                 : null}
             </p>
 
-            <div className="grid gap-2 text-sm text-stone-600 sm:grid-cols-2">
+            <div className="grid gap-2 text-sm text-muted sm:grid-cols-2">
               <div>
                 Staff database:{" "}
                 {status.staffSpreadsheetId ? (
                   <a
-                    className="text-stone-900 underline"
+                    className="text-ink underline"
                     href={`https://docs.google.com/spreadsheets/d/${status.staffSpreadsheetId}`}
                     target="_blank"
                     rel="noreferrer"
@@ -186,7 +190,7 @@ export function GoogleDriveSettings() {
                   "Not synced yet"
                 )}
                 {status.lastStaffSyncAt && (
-                  <span className="block text-xs text-stone-400">
+                  <span className="block text-xs text-muted">
                     Last sync {new Date(status.lastStaffSyncAt).toLocaleString()}
                   </span>
                 )}
@@ -195,7 +199,7 @@ export function GoogleDriveSettings() {
                 Payroll database:{" "}
                 {status.payrollSpreadsheetId ? (
                   <a
-                    className="text-stone-900 underline"
+                    className="text-ink underline"
                     href={`https://docs.google.com/spreadsheets/d/${status.payrollSpreadsheetId}`}
                     target="_blank"
                     rel="noreferrer"
@@ -206,7 +210,7 @@ export function GoogleDriveSettings() {
                   "Not synced yet"
                 )}
                 {status.lastPayrollSyncAt && (
-                  <span className="block text-xs text-stone-400">
+                  <span className="block text-xs text-muted">
                     Last sync{" "}
                     {new Date(status.lastPayrollSyncAt).toLocaleString()}
                   </span>
@@ -223,7 +227,7 @@ export function GoogleDriveSettings() {
                 onChange={(e) => setFolderId(e.target.value)}
                 placeholder={`Leave blank to auto-create “${WORKSPACE_ROOT_FOLDER}”`}
               />
-              <p className="mt-1 text-xs text-stone-500">
+              <p className="mt-1 text-xs text-muted">
                 Sync creates Staff, Payroll, and Exports folders under this root.
                 Use a Shared Drive folder ID for company-wide access.
               </p>

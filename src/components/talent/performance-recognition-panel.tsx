@@ -80,7 +80,7 @@ export function PerformanceRecognitionPanel({ year }: { year: number }) {
               <select
                 id="employeeId"
                 name="employeeId"
-                className="mt-1 h-9 w-full rounded-md border border-stone-300 bg-white px-2 text-sm"
+                className="mt-1 h-9 w-full rounded-md border border-line bg-white px-2 text-sm"
                 required
               >
                 <option value="">Select</option>
@@ -96,7 +96,7 @@ export function PerformanceRecognitionPanel({ year }: { year: number }) {
               <select
                 id="kind"
                 name="kind"
-                className="mt-1 h-9 w-full rounded-md border border-stone-300 bg-white px-2 text-sm"
+                className="mt-1 h-9 w-full rounded-md border border-line bg-white px-2 text-sm"
                 required
               >
                 {RECOGNITION_KINDS.map((id) => (
@@ -126,18 +126,18 @@ export function PerformanceRecognitionPanel({ year }: { year: number }) {
         </CardHeader>
         <CardContent>
           {rows.length === 0 ? (
-            <p className="text-sm text-stone-500">No recognition recorded yet.</p>
+            <p className="text-sm text-muted">No recognition recorded yet.</p>
           ) : (
-            <ul className="divide-y divide-stone-100 rounded-md border border-stone-200">
+            <ul className="divide-y divide-line rounded-md border border-line">
               {rows.map((row) => (
                 <li key={row.id} className="px-3 py-2.5 text-sm">
-                  <p className="font-medium text-stone-900">
+                  <p className="font-medium text-ink">
                     {row.employeeName} · {recognitionKindLabel(row.kind)}
                   </p>
                   {row.note ? (
-                    <p className="text-sm text-stone-600">{row.note}</p>
+                    <p className="text-sm text-muted">{row.note}</p>
                   ) : null}
-                  <p className="text-xs text-stone-500">
+                  <p className="text-xs text-muted">
                     From {row.givenByName} ·{" "}
                     {new Date(row.createdAt).toLocaleDateString()}
                   </p>

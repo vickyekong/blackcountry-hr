@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/layout/app-shell";
+import { PageHeader } from "@/components/layout/page-header";
+import { CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -165,16 +167,14 @@ export default function LeavePage() {
 
   return (
     <AppShell>
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-stone-900">Leave</h1>
-          <p className="mt-1 text-sm text-stone-500">
-            Record and approve leave for staff (HR portal). Public holidays are
-            skipped in working-day counts.
-          </p>
-        </div>
-        <Button onClick={() => setShowForm(!showForm)}>Record leave</Button>
-      </div>
+      <PageHeader
+        icon={CalendarDays}
+        title="Leave"
+        description="Record and approve leave for staff (HR portal). Public holidays are skipped in working-day counts."
+        actions={
+          <Button onClick={() => setShowForm(!showForm)}>Record leave</Button>
+        }
+      />
 
       {holidays.length > 0 && (
         <Card className="mb-6">
@@ -249,7 +249,7 @@ export default function LeavePage() {
                   id="employeeId"
                   name="employeeId"
                   required
-                  className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                  className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
                 >
                   <option value="">Select staff</option>
                   {staff.map((s) => (
@@ -264,7 +264,7 @@ export default function LeavePage() {
                 <select
                   id="type"
                   name="type"
-                  className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                  className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
                   required
                 >
                   <option value="ANNUAL">Annual</option>
@@ -311,7 +311,7 @@ export default function LeavePage() {
                 </div>
               </div>
               {computedDays !== null && (
-                <p className="text-sm text-stone-600">
+                <p className="text-sm text-muted">
                   Working days:{" "}
                   <span className="font-medium">{computedDays}</span>
                 </p>
@@ -332,7 +332,7 @@ export default function LeavePage() {
         </Card>
       )}
 
-      <div className="rounded-lg border border-stone-200 bg-white">
+      <div className="rounded-lg border border-line bg-white">
         <Table>
           <TableHeader>
             <TableRow>

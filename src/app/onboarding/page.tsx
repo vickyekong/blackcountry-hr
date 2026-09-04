@@ -147,12 +147,10 @@ export default function OnboardingPage() {
   const isSuperAdmin = session.user.role === "SUPER_ADMIN";
 
   return (
-    <div className="min-h-screen bg-mist px-4 py-10 sm:px-6">
+    <div className="min-h-screen bg-atmosphere px-4 py-10 sm:px-6">
       <div className="mx-auto max-w-lg">
-        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted">
-          {PRODUCT_NAME} setup
-        </p>
-        <h1 className="font-display mt-2 text-3xl font-semibold tracking-tight text-ink">
+        <p className="page-kicker">{PRODUCT_NAME} setup</p>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-ink">
           {step === 1 ? "Brand your workspace" : "Invite your HR admin"}
         </h1>
         <p className="mt-2 text-sm text-muted">
@@ -163,17 +161,17 @@ export default function OnboardingPage() {
 
         <div className="mt-4 flex gap-2">
           <span
-            className={`h-1.5 flex-1 rounded-full ${step >= 1 ? "bg-ok" : "bg-sand"}`}
+              className={`h-1.5 flex-1 rounded-full ${step >= 1 ? "bg-lagoon" : "bg-sand"}`}
           />
           <span
-            className={`h-1.5 flex-1 rounded-full ${step >= 2 ? "bg-ok" : "bg-sand"}`}
+            className={`h-1.5 flex-1 rounded-full ${step >= 2 ? "bg-lagoon" : "bg-sand"}`}
           />
         </div>
 
         {step === 1 && (
           <form
             onSubmit={saveBranding}
-            className="mt-8 space-y-4 rounded-xl border border-line bg-foam p-5 shadow-soft"
+            className="mt-8 space-y-4 rounded-lg border border-line bg-foam p-5 shadow-panel"
           >
             <div>
               <Label htmlFor="name">Company display name</Label>
@@ -289,7 +287,7 @@ export default function OnboardingPage() {
         {step === 2 && (
           <form
             onSubmit={inviteHr}
-            className="mt-8 space-y-4 rounded-xl border border-line bg-foam p-5 shadow-soft"
+            className="mt-8 space-y-4 rounded-lg border border-line bg-foam p-5 shadow-panel"
           >
             {!isSuperAdmin ? (
               <p className="text-sm text-muted">

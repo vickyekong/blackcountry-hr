@@ -7,11 +7,13 @@ import { cn } from "@/lib/cn";
 import { PerformanceGoalsPanel } from "@/components/talent/performance-goals-panel";
 import { PerformanceReviewsPanel } from "@/components/talent/performance-reviews-panel";
 import { PerformanceRecognitionPanel } from "@/components/talent/performance-recognition-panel";
+import { PageHeader } from "@/components/layout/page-header";
+import { Target, ClipboardCheck, Award } from "lucide-react";
 
 const TABS = [
-  { id: "goals", href: "/performance", label: "Goals" },
-  { id: "reviews", href: "/performance?tab=reviews", label: "Reviews" },
-  { id: "recognition", href: "/performance?tab=recognition", label: "Recognition" },
+  { id: "goals", href: "/performance", label: "Goals", icon: Target },
+  { id: "reviews", href: "/performance?tab=reviews", label: "Reviews", icon: ClipboardCheck },
+  { id: "recognition", href: "/performance?tab=recognition", label: "Recognition", icon: Award },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -26,24 +28,22 @@ function PerformanceBody({ canManage }: { canManage: boolean }) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold text-stone-900">Performance</h1>
-          <p className="mt-1 text-sm text-stone-500">
-            Company, department, and individual goals with KPI achievement.
-            Appraisals and recognition sit here — they do not change payroll.
-          </p>
-        </div>
-        <label className="text-sm text-stone-600">
-          Year{" "}
-          <input
-            type="number"
-            className="ml-2 h-9 w-24 rounded-md border border-stone-300 px-2"
-            value={year}
-            onChange={(e) => setYear(Number(e.target.value) || year)}
-          />
-        </label>
-      </div>
+      <PageHeader
+        icon={Target}
+        title="Performance"
+        description="Company, department, and individual goals with KPI achievement. Appraisals and recognition sit here — they do not change payroll."
+        actions={
+          <label className="text-sm text-muted">
+            Year{" "}
+            <input
+              type="number"
+              className="ml-2 h-9 w-24 rounded-md border border-line px-2"
+              value={year}
+              onChange={(e) => setYear(Number(e.target.value) || year)}
+            />
+          </label>
+        }
+      />
 
       <div className="flex gap-2 border-b border-line">
         {TABS.map((item) => (
@@ -51,12 +51,13 @@ function PerformanceBody({ canManage }: { canManage: boolean }) {
             key={item.id}
             href={item.href}
             className={cn(
-              "-mb-px border-b-2 px-3 py-2 text-sm font-medium",
+              "-mb-px inline-flex items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium",
               tab === item.id
                 ? "border-ink text-ink"
                 : "border-transparent text-muted hover:text-ink"
             )}
           >
+            <item.icon className="h-3.5 w-3.5" strokeWidth={1.75} />
             {item.label}
           </Link>
         ))}

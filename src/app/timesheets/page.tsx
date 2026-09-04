@@ -22,6 +22,8 @@ import { HolidaysPanel } from "@/components/time/holidays-panel";
 import { OvertimePanel } from "@/components/time/overtime-panel";
 import { can } from "@/lib/permissions";
 import { cn } from "@/lib/cn";
+import { PageHeader } from "@/components/layout/page-header";
+import { Clock, CalendarDays, Timer } from "lucide-react";
 import type { UserRole } from "@prisma/client";
 
 type ProjectTask = { id: string; name: string; status: string };
@@ -164,21 +166,18 @@ function TimesheetsPageInner() {
 
   return (
     <AppShell>
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-ink">Timesheets</h1>
-        <p className="mt-1 text-sm text-muted">
-          Weekly hours against a project and task are the source of time for
-          payroll. Validate a week to lock it. Holidays affect leave day
-          counts; extra overtime requests attach to the next draft run.
-        </p>
-      </div>
+      <PageHeader
+        icon={Clock}
+        title="Timesheets"
+        description="Weekly hours against a project and task are the source of time for payroll. Validate a week to lock it. Holidays affect leave day counts; extra overtime requests attach to the next draft run."
+      />
       {validator ? (
         <div className="mb-6 flex flex-wrap gap-1 border-b border-line">
           {(
             [
-              { id: "hours", label: "Hours" },
-              { id: "holidays", label: "Holidays" },
-              { id: "overtime", label: "Overtime" },
+              { id: "hours", label: "Hours", icon: Clock },
+              { id: "holidays", label: "Holidays", icon: CalendarDays },
+              { id: "overtime", label: "Overtime", icon: Timer },
             ] as const
           ).map((item) => (
             <button
@@ -189,13 +188,14 @@ function TimesheetsPageInner() {
                   item.id === "hours" ? "/timesheets" : `/timesheets?tab=${item.id}`
                 )
               }
-              className={cn(
-                "-mb-px border-b-2 px-3 py-2 text-sm font-medium transition",
+                className={cn(
+                "-mb-px inline-flex items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium transition",
                 tab === item.id
-                  ? "border-stone-900 text-stone-900"
-                  : "border-transparent text-stone-500 hover:text-stone-800"
+                  ? "border-ink text-ink"
+                  : "border-transparent text-muted hover:text-ink"
               )}
             >
+              <item.icon className="h-3.5 w-3.5" strokeWidth={1.75} />
               {item.label}
             </button>
           ))}
@@ -238,7 +238,7 @@ function TimesheetsPageInner() {
                     id="employeeId"
                     name="employeeId"
                     required
-                    className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                    className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
                   >
                     <option value="">Select</option>
                     {employees.map((emp) => (
@@ -257,7 +257,7 @@ function TimesheetsPageInner() {
                     required
                     value={logProjectId}
                     onChange={(e) => setLogProjectId(e.target.value)}
-                    className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                    className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
                   >
                     <option value="">Select</option>
                     {projects
@@ -275,7 +275,7 @@ function TimesheetsPageInner() {
                     id="taskId"
                     name="taskId"
                     required
-                    className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                    className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
                   >
                     <option value="">Select</option>
                     {(

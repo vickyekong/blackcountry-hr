@@ -23,13 +23,13 @@ function PersonLine({ person }: { person: OrgPerson }) {
     <li className="text-sm">
       <a
         href={`/employees/${person.id}`}
-        className="font-medium text-stone-900 hover:underline"
+        className="font-medium text-ink hover:underline"
       >
         {person.firstName} {person.lastName}
       </a>
-      <p className="text-xs text-stone-500">
+      <p className="text-xs text-muted">
         {person.jobTitle || "—"}
-        <span className="text-stone-400"> · {person.employeeCode}</span>
+        <span className="text-muted"> · {person.employeeCode}</span>
       </p>
     </li>
   );
@@ -40,7 +40,7 @@ function ReportBranch({ node }: { node: ReportingNode<OrgPerson> }) {
     <li>
       <PersonLine person={node.person} />
       {node.reports.length > 0 && (
-        <ul className="ml-4 mt-2 space-y-2 border-l border-stone-200 pl-3">
+        <ul className="ml-4 mt-2 space-y-2 border-l border-line pl-3">
           {node.reports.map((child) => (
             <ReportBranch key={child.person.id} node={child} />
           ))}
@@ -103,14 +103,14 @@ export function OrgChartPanel({ employees }: { employees: EmployeeTableRow[] }) 
     <div className="space-y-8">
       {showReports && (
         <div>
-          <h2 className="text-lg font-semibold text-stone-900">
+          <h2 className="text-lg font-semibold text-ink">
             Reporting lines
           </h2>
-          <p className="mt-1 text-sm text-stone-500">
+          <p className="mt-1 text-sm text-muted">
             Set a line manager on each employee record. Unassigned people appear
             at the top.
           </p>
-          <ul className="mt-4 space-y-3 rounded-xl border border-stone-200 bg-white p-4">
+          <ul className="mt-4 space-y-3 rounded-xl border border-line bg-white p-4">
             {reporting.map((node) => (
               <ReportBranch key={node.person.id} node={node} />
             ))}
@@ -119,29 +119,29 @@ export function OrgChartPanel({ employees }: { employees: EmployeeTableRow[] }) 
       )}
 
       <div>
-        <h2 className="text-lg font-semibold text-stone-900">
+        <h2 className="text-lg font-semibold text-ink">
           Organisation chart
         </h2>
-        <p className="mt-1 text-sm text-stone-500">
+        <p className="mt-1 text-sm text-muted">
           Active staff grouped by department and job description ({total} people
           · {departments.length} departments)
         </p>
       </div>
 
       {departments.length === 0 ? (
-        <p className="text-sm text-stone-500">No active staff to show.</p>
+        <p className="text-sm text-muted">No active staff to show.</p>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {departments.map((dept) => (
             <section
               key={dept.name}
-              className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm"
+              className="rounded-xl border border-line bg-white p-4 shadow-sm"
             >
-              <header className="mb-3 border-b border-stone-100 pb-2">
-                <h3 className="text-sm font-semibold text-stone-900">
+              <header className="mb-3 border-b border-line pb-2">
+                <h3 className="text-sm font-semibold text-ink">
                   {dept.name}
                 </h3>
-                <p className="text-xs text-stone-500">
+                <p className="text-xs text-muted">
                   {dept.people.length}{" "}
                   {dept.people.length === 1 ? "person" : "people"}
                 </p>

@@ -80,7 +80,7 @@ export function EmployeeLifecyclePanel({ employeeId }: { employeeId: string }) {
 
   if (loading) {
     return (
-      <p className="text-sm text-stone-500">Loading lifecycle checklists…</p>
+      <p className="text-sm text-muted">Loading lifecycle checklists…</p>
     );
   }
 
@@ -114,7 +114,7 @@ export function EmployeeLifecyclePanel({ employeeId }: { employeeId: string }) {
       </div>
 
       {items.length === 0 ? (
-        <p className="text-sm text-stone-500">
+        <p className="text-sm text-muted">
           No checklists yet. Use the buttons above to start onboarding or
           offboarding for this staff member. New hires also get onboarding
           automatically when created.
@@ -126,32 +126,32 @@ export function EmployeeLifecyclePanel({ employeeId }: { employeeId: string }) {
           return (
             <div
               key={lc.id}
-              className="rounded-lg border border-stone-200 bg-white"
+              className="rounded-lg border border-line bg-white"
             >
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-100 px-4 py-3">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-3">
                 <div>
-                  <p className="text-sm font-semibold text-stone-900">
+                  <p className="text-sm font-semibold text-ink">
                     {lc.kind === "ONBOARDING" ? "Onboarding" : "Offboarding"}
                   </p>
-                  <p className="text-xs text-stone-500">
+                  <p className="text-xs text-muted">
                     {lc.status} · {done}/{total} tasks complete
                   </p>
                 </div>
               </div>
-              <ul className="divide-y divide-stone-100">
+              <ul className="divide-y divide-line">
                 {lc.tasks.map((task) => (
                   <li
                     key={task.id}
                     className="flex flex-wrap items-start justify-between gap-3 px-4 py-3"
                   >
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-stone-900">
+                      <p className="text-sm font-medium text-ink">
                         <span
                           className={
                             task.status === "DONE"
                               ? "text-emerald-700"
                               : task.status === "SKIPPED"
-                                ? "text-stone-400"
+                                ? "text-muted"
                                 : "text-amber-700"
                           }
                         >
@@ -160,14 +160,14 @@ export function EmployeeLifecyclePanel({ employeeId }: { employeeId: string }) {
                         {task.title}
                       </p>
                       {task.description && (
-                        <p className="mt-0.5 text-xs text-stone-500">
+                        <p className="mt-0.5 text-xs text-muted">
                           {task.description}
                         </p>
                       )}
                       {task.href && (
                         <Link
                           href={task.href}
-                          className="mt-1 inline-block text-xs text-stone-700 hover:underline"
+                          className="mt-1 inline-block text-xs text-ink-soft hover:underline"
                         >
                           Open →
                         </Link>

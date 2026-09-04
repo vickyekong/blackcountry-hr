@@ -44,13 +44,13 @@ export function TimeAnalyticsPanel({ year }: { year: number }) {
   }, [year]);
 
   if (!time) {
-    return <p className="text-sm text-stone-500">Loading time analytics…</p>;
+    return <p className="text-sm text-muted">Loading time analytics…</p>;
   }
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-stone-500">
+        <p className="text-sm text-muted">
           Timesheets are the source of hours for payroll. Clock figures appear
           only when attendance days were compiled. {time.expectedHoursNote}.
         </p>
@@ -91,7 +91,7 @@ export function TimeAnalyticsPanel({ year }: { year: number }) {
           </CardHeader>
           <CardContent>
             {time.hoursByDepartment.length === 0 ? (
-              <p className="text-sm text-stone-500">No approved hours this year.</p>
+              <p className="text-sm text-muted">No approved hours this year.</p>
             ) : (
               <ResponsiveContainer width="100%" height={260}>
                 <BarChart data={time.hoursByDepartment}>
@@ -112,16 +112,16 @@ export function TimeAnalyticsPanel({ year }: { year: number }) {
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
             {time.leaveByType.length === 0 ? (
-              <p className="text-stone-500">No approved leave overlapping {year}.</p>
+              <p className="text-muted">No approved leave overlapping {year}.</p>
             ) : (
               time.leaveByType.map((row) => (
                 <div key={row.type} className="flex justify-between">
-                  <span className="text-stone-500">{row.type.replace(/_/g, " ")}</span>
+                  <span className="text-muted">{row.type.replace(/_/g, " ")}</span>
                   <span className="tabular-nums font-medium">{row.days} days</span>
                 </div>
               ))
             )}
-            <div className="border-t border-stone-100 pt-3 text-xs text-stone-400">
+            <div className="border-t border-line pt-3 text-xs text-muted">
               Timesheet weeks:{" "}
               {time.weeks.length
                 ? time.weeks
@@ -136,14 +136,14 @@ export function TimeAnalyticsPanel({ year }: { year: number }) {
       <Card>
         <CardHeader>
           <CardTitle>Clock comparison</CardTitle>
-          <p className="text-sm text-stone-500">
+          <p className="text-sm text-muted">
             Late / absent / early (partial) from compiled attendance days — not
             used for pay.
           </p>
         </CardHeader>
         <CardContent>
           {!time.clock.hasData ? (
-            <p className="text-sm text-stone-500">
+            <p className="text-sm text-muted">
               No clock days in {year}. Use Employees → Attendance if a site still
               compiles punches.
             </p>

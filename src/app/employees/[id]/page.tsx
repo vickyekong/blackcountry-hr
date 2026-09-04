@@ -50,11 +50,11 @@ export default async function EmployeeDetailPage({
     <AppShell>
       <div className="mb-8 flex items-start justify-between">
         <div>
-          <p className="text-sm text-stone-500">{employee.employeeCode}</p>
-          <h1 className="text-2xl font-semibold text-stone-900">
+          <p className="text-sm text-muted">{employee.employeeCode}</p>
+          <h1 className="text-2xl font-semibold text-ink">
             {employeeFullName(employee.firstName, employee.lastName)}
           </h1>
-          <p className="mt-1 text-sm text-stone-500">
+          <p className="mt-1 text-sm text-muted">
             {employee.jobTitle} · {employee.department}
             {employee.sex ? ` · ${employeeSexLabel(employee.sex)}` : ""}
           </p>

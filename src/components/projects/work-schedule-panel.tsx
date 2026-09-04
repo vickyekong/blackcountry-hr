@@ -305,7 +305,7 @@ export function WorkSchedulePanel() {
                               <select
                                 name="projectId"
                                 required
-                                className="h-7 min-w-0 flex-1 rounded border border-stone-300 px-1 text-xs"
+                                className="h-7 min-w-0 flex-1 rounded border border-line px-1 text-xs"
                                 defaultValue=""
                               >
                                 <option value="">Project</option>

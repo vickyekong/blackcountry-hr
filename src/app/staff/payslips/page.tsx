@@ -12,6 +12,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatCurrency, getMonthName } from "@/lib/utils";
+import { PageHeader } from "@/components/layout/page-header";
+import { Banknote } from "lucide-react";
 
 interface PayslipRow {
   id: string;
@@ -40,13 +42,11 @@ export default function StaffPayslipsPage() {
 
   return (
     <AppShell>
-      <div className="mb-8">
-        <h1 className="font-display text-2xl font-semibold text-ink">Payslips</h1>
-        <p className="mt-1 text-sm text-muted">
-          Your approved payslips only. Download the PDF after Super Admin has signed
-          off the run.
-        </p>
-      </div>
+      <PageHeader
+        icon={Banknote}
+        title="Payslips"
+        description="Your approved payslips only. Download the PDF after Super Admin has signed off the run."
+      />
 
       {error && <p className="mb-4 text-sm text-signal">{error}</p>}
 

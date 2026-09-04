@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Wallet } from "lucide-react";
 import { can } from "@/lib/permissions";
 
 export function RunPayrollCta({ label }: { label: string }) {
@@ -47,7 +48,14 @@ export function RunPayrollCta({ label }: { label: string }) {
       variant="brand"
       className="w-full sm:w-auto"
     >
-      {loading ? "Starting…" : label}
+      {loading ? (
+        "Starting…"
+      ) : (
+        <span className="inline-flex items-center gap-1.5">
+          <Wallet className="h-4 w-4" strokeWidth={1.75} />
+          {label}
+        </span>
+      )}
     </Button>
   );
 }

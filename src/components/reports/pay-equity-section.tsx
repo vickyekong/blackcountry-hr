@@ -60,7 +60,7 @@ function GroupTable({
       </CardHeader>
       <CardContent>
         {rows.length === 0 ? (
-          <p className="text-sm text-stone-500">No data</p>
+          <p className="text-sm text-muted">No data</p>
         ) : (
           <Table>
             <TableHeader>
@@ -107,14 +107,14 @@ export function PayEquitySection() {
 
   if (loading) {
     return (
-      <p className="mt-8 text-sm text-stone-500">Loading pay equity…</p>
+      <p className="mt-8 text-sm text-muted">Loading pay equity…</p>
     );
   }
 
   if (!data?.hasData || !data.period) {
     return (
       <Card className="mt-8">
-        <CardContent className="py-8 text-center text-sm text-stone-500">
+        <CardContent className="py-8 text-center text-sm text-muted">
           Approve a payroll run to unlock pay equity analysis.
         </CardContent>
       </Card>
@@ -124,10 +124,10 @@ export function PayEquitySection() {
   return (
     <section className="mt-10 space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-stone-900">
+        <h2 className="text-lg font-semibold text-ink">
           Compensation &amp; pay equity
         </h2>
-        <p className="text-sm text-stone-500">
+        <p className="text-sm text-muted">
           Based on latest approved payroll (
           {getMonthName(data.period.month)} {data.period.year} · {data.headcount}{" "}
           payslips). Gaps ≥10% are flagged for review — not automatic proof of
@@ -138,20 +138,20 @@ export function PayEquitySection() {
       {data.gaps.length > 0 && (
         <div className="rounded-lg border border-amber-200 bg-amber-50">
           <div className="border-b border-amber-100 px-4 py-3">
-            <h3 className="text-sm font-semibold text-stone-900">
+            <h3 className="text-sm font-semibold text-ink">
               Equity flags
             </h3>
           </div>
           <ul className="divide-y divide-amber-100">
             {data.gaps.map((g) => (
               <li key={g.id} className="px-4 py-3">
-                <p className="text-sm font-medium text-stone-900">
+                <p className="text-sm font-medium text-ink">
                   {g.title}
-                  <span className="ml-2 text-xs text-stone-500">
+                  <span className="ml-2 text-xs text-muted">
                     {g.severity}
                   </span>
                 </p>
-                <p className="mt-0.5 text-sm text-stone-600">{g.detail}</p>
+                <p className="mt-0.5 text-sm text-muted">{g.detail}</p>
               </li>
             ))}
           </ul>

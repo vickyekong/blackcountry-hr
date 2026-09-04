@@ -1,12 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Manrope } from "next/font/google";
+import { Fraunces, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { PRODUCT_NAME, PRODUCT_POSITIONING } from "@/lib/brand";
 
-const manrope = Manrope({
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-manrope",
+  variable: "--font-jakarta",
   display: "swap",
 });
 
@@ -25,7 +25,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#292929",
+  themeColor: "#121212",
 };
 
 export default function RootLayout({
@@ -36,7 +36,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${manrope.variable} ${fraunces.variable} font-sans antialiased`}
+        className={`${jakarta.variable} ${fraunces.variable} font-sans antialiased`}
       >
         <Providers>{children}</Providers>
       </body>

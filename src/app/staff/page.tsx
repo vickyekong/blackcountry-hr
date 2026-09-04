@@ -6,6 +6,19 @@ import { AppShell } from "@/components/layout/app-shell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { PageHeader } from "@/components/layout/page-header";
+import { IconLabel } from "@/components/ui/icon-label";
+import {
+  Home,
+  CalendarDays,
+  Clock,
+  Receipt,
+  Banknote,
+  Send,
+  UserRound,
+  Inbox,
+  ListChecks,
+} from "lucide-react";
 
 interface StaffHome {
   firstName: string;
@@ -77,26 +90,44 @@ export default function StaffHomePage() {
 
   return (
     <AppShell>
-      <div className="mb-8">
-        <p className="text-sm text-muted">Staff portal</p>
-        <h1 className="font-display text-2xl font-semibold text-ink">
-          {profile
-            ? `Hello, ${profile.firstName}`
-            : "Your workspace"}
-        </h1>
-        {profile && (
-          <p className="mt-1 text-sm text-muted">
-            {profile.jobTitle} · {profile.department} · {profile.employeeCode}
-          </p>
-        )}
-      </div>
+      <PageHeader
+        icon={Home}
+        kicker="Staff portal"
+        title={profile ? `Hello, ${profile.firstName}` : "Your workspace"}
+        description={
+          profile
+            ? `${profile.jobTitle} · ${profile.department} · ${profile.employeeCode}`
+            : undefined
+        }
+      />
 
       {error && <p className="mb-4 text-sm text-signal">{error}</p>}
+
+      <div className="mb-6 flex flex-wrap gap-2">
+        {[
+          { href: "/staff/leave", label: "Apply for leave", icon: CalendarDays },
+          { href: "/staff/timesheets", label: "Log timesheet", icon: Clock },
+          { href: "/staff/expenses", label: "Submit expense", icon: Receipt },
+          { href: "/staff/payslips", label: "Payslips", icon: Banknote },
+          { href: "/staff/requests", label: "Requests", icon: Send },
+        ].map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="inline-flex h-9 items-center gap-1.5 rounded-md border border-line bg-foam px-3 text-sm font-medium text-ink hover:bg-sand"
+          >
+            <item.icon className="h-3.5 w-3.5" strokeWidth={1.75} />
+            {item.label}
+          </Link>
+        ))}
+      </div>
 
       <div className="mb-6 grid gap-4 sm:grid-cols-3">
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Profile</CardTitle>
+            <CardTitle className="text-base">
+              <IconLabel icon={UserRound}>Profile</IconLabel>
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-semibold tabular-nums text-ink">
@@ -114,7 +145,9 @@ export default function StaffHomePage() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Annual leave</CardTitle>
+            <CardTitle className="text-base">
+              <IconLabel icon={CalendarDays}>Annual leave</IconLabel>
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-semibold tabular-nums text-ink">
@@ -132,7 +165,9 @@ export default function StaffHomePage() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Open items</CardTitle>
+            <CardTitle className="text-base">
+              <IconLabel icon={Inbox}>Open items</IconLabel>
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-semibold tabular-nums text-ink">
@@ -151,7 +186,9 @@ export default function StaffHomePage() {
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>What you can do here</CardTitle>
+            <CardTitle>
+              <IconLabel icon={ListChecks}>What you can do here</IconLabel>
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm text-muted">
             <p>Update your personal details (next of kin, phone, address).</p>
@@ -167,7 +204,9 @@ export default function StaffHomePage() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Latest payslip</CardTitle>
+            <CardTitle>
+              <IconLabel icon={Banknote}>Latest payslip</IconLabel>
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {latestPayslip ? (

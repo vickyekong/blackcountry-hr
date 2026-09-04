@@ -38,12 +38,12 @@ function Row({
   const n = Number(variance);
   return (
     <div className="grid grid-cols-4 gap-2 py-2 text-sm">
-      <span className="text-stone-500">{label}</span>
+      <span className="text-muted">{label}</span>
       <span className="tabular-nums">{formatCurrency(baseline)}</span>
       <span className="tabular-nums">{formatCurrency(scenario)}</span>
       <span
         className={`tabular-nums ${
-          n > 0 ? "text-stone-900" : n < 0 ? "text-emerald-800" : "text-muted"
+          n > 0 ? "text-ink" : n < 0 ? "text-emerald-800" : "text-muted"
         }`}
       >
         {n > 0 ? "+" : ""}
@@ -172,7 +172,7 @@ export function SimulatePanel() {
                   }`
                 : ""}
             </p>
-            <div className="grid grid-cols-4 gap-2 border-b border-line py-2 text-xs font-medium uppercase tracking-wide text-stone-500">
+            <div className="grid grid-cols-4 gap-2 border-b border-line py-2 text-xs font-medium uppercase tracking-wide text-muted">
               <span>Line</span>
               <span>Now</span>
               <span>Scenario</span>

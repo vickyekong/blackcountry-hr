@@ -12,12 +12,12 @@ export function ReportStat({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-xs font-medium uppercase tracking-wide text-stone-500">
+        <CardTitle className="text-xs font-medium uppercase tracking-wide text-muted">
           {label}
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-xl font-semibold tabular-nums text-stone-900">
+        <p className="text-xl font-semibold tabular-nums text-ink">
           {value}
         </p>
       </CardContent>

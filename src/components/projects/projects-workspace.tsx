@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { employeeFullName, formatCurrency, formatDate } from "@/lib/utils";
+import { PageHeader } from "@/components/layout/page-header";
+import { FolderKanban } from "lucide-react";
 import {
   PROJECT_STATUSES,
   TASK_PRIORITIES,
@@ -86,7 +88,7 @@ export type Project = {
 };
 
 const selectClass =
-  "mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm";
+  "mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm";
 
 export function ProjectsWorkspace({
   canManage,
@@ -278,14 +280,15 @@ export function ProjectsWorkspace({
 
   return (
     <>
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-ink">Projects</h1>
-        <p className="mt-1 text-sm text-muted">
-          {canManage
+      <PageHeader
+        icon={FolderKanban}
+        title="Projects"
+        description={
+          canManage
             ? "Plan work on the existing project catalog. Timesheets still log hours against active projects and tasks."
-            : "Company projects and your assigned tasks. Log hours on Timesheets."}
-        </p>
-      </div>
+            : "Company projects and your assigned tasks. Log hours on Timesheets."
+        }
+      />
 
       {canManage && (
         <Card className="mb-8">
@@ -375,7 +378,7 @@ export function ProjectsWorkspace({
                 <select
                   id="proj-team"
                   multiple
-                  className="mt-1 min-h-[88px] w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+                  className="mt-1 min-h-[88px] w-full rounded-md border border-line px-3 py-2 text-sm"
                   value={memberIds}
                   onChange={(e) =>
                     setMemberIds(
@@ -397,7 +400,7 @@ export function ProjectsWorkspace({
                   id="proj-tasks"
                   value={taskLines}
                   onChange={(e) => setTaskLines(e.target.value)}
-                  className="mt-1 min-h-[88px] w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+                  className="mt-1 min-h-[88px] w-full rounded-md border border-line px-3 py-2 text-sm"
                   placeholder="General&#10;Site visit&#10;Design review"
                 />
                 <p className="mt-1 text-xs text-muted">
@@ -465,7 +468,7 @@ export function ProjectsWorkspace({
                                   defaultValue={Math.round(
                                     m.plannedMinutesPerWeek / 60
                                   )}
-                                  className="ml-1 h-6 w-14 rounded border border-stone-300 px-1"
+                                  className="ml-1 h-6 w-14 rounded border border-line px-1"
                                   onBlur={(e) => {
                                     const hours = Number(e.target.value || 0);
                                     void patchProject(project.id, {
@@ -492,7 +495,7 @@ export function ProjectsWorkspace({
                 </div>
                 {canManage && (
                   <select
-                    className="h-9 rounded-md border border-stone-300 px-2 text-sm"
+                    className="h-9 rounded-md border border-line px-2 text-sm"
                     value={project.status}
                     disabled={busy}
                     onChange={(e) =>
@@ -535,7 +538,7 @@ export function ProjectsWorkspace({
                         ) : null}
                         {canProgress ? (
                           <select
-                            className="h-8 rounded-md border border-stone-300 px-2 text-xs"
+                            className="h-8 rounded-md border border-line px-2 text-xs"
                             value={task.progress ?? "TODO"}
                             disabled={busy}
                             onChange={(e) =>
@@ -583,7 +586,7 @@ export function ProjectsWorkspace({
                           {canManage ? (
                             <div className="flex flex-wrap gap-2">
                               <select
-                                className="h-8 rounded-md border border-stone-300 px-2 text-xs"
+                                className="h-8 rounded-md border border-line px-2 text-xs"
                                 value={task.assignee?.id ?? ""}
                                 onChange={(e) =>
                                   void patchTask(project.id, task.id, {
@@ -602,7 +605,7 @@ export function ProjectsWorkspace({
                                 ))}
                               </select>
                               <select
-                                className="h-8 rounded-md border border-stone-300 px-2 text-xs"
+                                className="h-8 rounded-md border border-line px-2 text-xs"
                                 value={task.priority ?? "MEDIUM"}
                                 onChange={(e) =>
                                   void patchTask(project.id, task.id, {

@@ -174,7 +174,7 @@ export function StructuresPanel() {
                   <select
                     name="employeeId"
                     required
-                    className="flex h-9 rounded-md border border-stone-300 px-3 text-sm"
+                    className="flex h-9 rounded-md border border-line px-3 text-sm"
                   >
                     <option value="">Assign to staff</option>
                     {staff.map((s) => (

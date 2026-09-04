@@ -122,7 +122,7 @@ export function PerformanceGoalsPanel({
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-stone-500">
+      <p className="text-sm text-muted">
         Numeric targets compute achievement automatically (620 / 500 = 124%).
         Scores do not change payroll.
         {companyPct != null ? ` Company-weighted achievement this year: ${companyPct}%.` : ""}
@@ -139,7 +139,7 @@ export function PerformanceGoalsPanel({
                 <Label htmlFor="scope">Scope</Label>
                 <select
                   id="scope"
-                  className="mt-1 h-9 w-full rounded-md border border-stone-300 bg-white px-2 text-sm"
+                  className="mt-1 h-9 w-full rounded-md border border-line bg-white px-2 text-sm"
                   value={scope}
                   onChange={(e) => setScope(e.target.value as GoalScope)}
                 >
@@ -156,7 +156,7 @@ export function PerformanceGoalsPanel({
                   <select
                     id="employeeId"
                     name="employeeId"
-                    className="mt-1 h-9 w-full rounded-md border border-stone-300 bg-white px-2 text-sm"
+                    className="mt-1 h-9 w-full rounded-md border border-line bg-white px-2 text-sm"
                     required
                   >
                     <option value="">Select</option>
@@ -174,7 +174,7 @@ export function PerformanceGoalsPanel({
                   <select
                     id="department"
                     name="department"
-                    className="mt-1 h-9 w-full rounded-md border border-stone-300 bg-white px-2 text-sm"
+                    className="mt-1 h-9 w-full rounded-md border border-line bg-white px-2 text-sm"
                     required
                   >
                     <option value="">Select</option>
@@ -242,17 +242,17 @@ export function PerformanceGoalsPanel({
           </CardHeader>
           <CardContent>
             {group.rows.length === 0 ? (
-              <p className="text-sm text-stone-500">None this year.</p>
+              <p className="text-sm text-muted">None this year.</p>
             ) : (
-              <ul className="divide-y divide-stone-100 rounded-md border border-stone-200">
+              <ul className="divide-y divide-line rounded-md border border-line">
                 {group.rows.map((goal) => (
                   <li
                     key={goal.id}
                     className="flex flex-wrap items-center justify-between gap-2 px-3 py-2.5 text-sm"
                   >
                     <div>
-                      <p className="font-medium text-stone-900">{goal.title}</p>
-                      <p className="text-xs text-stone-500">
+                      <p className="font-medium text-ink">{goal.title}</p>
+                      <p className="text-xs text-muted">
                         {reviewPeriodLabel(goal.periodLabel)}
                         {goal.employeeName ? ` · ${goal.employeeName}` : ""}
                         {goal.department ? ` · ${goal.department}` : ""}
@@ -264,7 +264,7 @@ export function PerformanceGoalsPanel({
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="tabular-nums text-xs font-medium text-stone-700">
+                      <span className="tabular-nums text-xs font-medium text-ink-soft">
                         {pct(goal.achievementPercent)}
                       </span>
                       {canManage && (

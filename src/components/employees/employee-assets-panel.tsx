@@ -36,22 +36,22 @@ export function EmployeeAssetsPanel({ employeeId }: { employeeId: string }) {
     <Card>
       <CardHeader>
         <CardTitle>Assets &amp; equipment</CardTitle>
-        <p className="text-sm text-stone-500">
+        <p className="text-sm text-muted">
           Company items currently assigned to this staff member. Assign or
           return them from the Assets register.
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
         {rows.length === 0 ? (
-          <p className="text-sm text-stone-500">No assets assigned.</p>
+          <p className="text-sm text-muted">No assets assigned.</p>
         ) : (
-          <ul className="divide-y divide-stone-100 rounded-md border border-stone-200">
+          <ul className="divide-y divide-line rounded-md border border-line">
             {rows.map((row) => (
               <li key={row.id} className="px-3 py-2.5 text-sm">
-                <p className="font-medium text-stone-900">
+                <p className="font-medium text-ink">
                   {row.assetCode} · {row.name}
                 </p>
-                <p className="text-xs text-stone-500">
+                <p className="text-xs text-muted">
                   {assetTypeLabel(row.assetType)}
                   {row.assignedAt ? ` · since ${formatDate(row.assignedAt)}` : ""}
                   {row.condition ? ` · ${row.condition}` : ""}

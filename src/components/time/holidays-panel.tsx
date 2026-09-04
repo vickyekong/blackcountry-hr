@@ -101,7 +101,7 @@ export function HolidaysPanel() {
               <select
                 id="kind"
                 name="kind"
-                className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
                 defaultValue="PUBLIC"
               >
                 {HOLIDAY_KINDS.map((kind) => (

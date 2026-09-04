@@ -98,7 +98,7 @@ export function PayrollReportsPanel() {
     <>
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <Label htmlFor="month" className="text-xs text-stone-500">
+          <Label htmlFor="month" className="text-xs text-muted">
             Payroll period
           </Label>
           <div className="mt-1 flex gap-2">
@@ -106,7 +106,7 @@ export function PayrollReportsPanel() {
               id="month"
               value={month}
               onChange={(e) => setMonth(Number(e.target.value))}
-              className="h-9 rounded-md border border-stone-300 px-2 text-sm"
+              className="h-9 rounded-md border border-line px-2 text-sm"
             >
               {monthOptions.map((m) => (
                 <option key={m} value={m}>
@@ -117,7 +117,7 @@ export function PayrollReportsPanel() {
             <select
               value={year}
               onChange={(e) => setYear(Number(e.target.value))}
-              className="h-9 rounded-md border border-stone-300 px-2 text-sm"
+              className="h-9 rounded-md border border-line px-2 text-sm"
             >
               {yearOptions.map((y) => (
                 <option key={y} value={y}>
@@ -150,10 +150,10 @@ export function PayrollReportsPanel() {
       </div>
 
       {loading && !data ? (
-        <p className="text-stone-500">Loading…</p>
+        <p className="text-muted">Loading…</p>
       ) : !data?.hasData ? (
         <Card>
-          <CardContent className="py-12 text-center text-stone-500">
+          <CardContent className="py-12 text-center text-muted">
             No approved payroll data for {getMonthName(month)} {year}.
           </CardContent>
         </Card>
@@ -168,7 +168,7 @@ export function PayrollReportsPanel() {
             ].map(([label, value]) => (
               <Card key={label as string}>
                 <CardHeader>
-                  <CardTitle className="text-xs font-medium uppercase tracking-wide text-stone-500">
+                  <CardTitle className="text-xs font-medium uppercase tracking-wide text-muted">
                     {label}
                   </CardTitle>
                 </CardHeader>
@@ -221,13 +221,13 @@ export function PayrollReportsPanel() {
                   ["NSITF", data.remittances!.nsitf],
                 ].map(([label, amount]) => (
                   <div key={label as string} className="flex justify-between">
-                    <span className="text-stone-500">{label}</span>
+                    <span className="text-muted">{label}</span>
                     <span className="font-medium tabular-nums">
                       {formatCurrency(BigInt(amount as string))}
                     </span>
                   </div>
                 ))}
-                <div className="border-t border-stone-100 pt-3 text-xs text-stone-400">
+                <div className="border-t border-line pt-3 text-xs text-muted">
                   {Object.entries(data.remittances!.deadlines).map(([k, v]) => (
                     <p key={k}>
                       {k.toUpperCase()}: {v}
@@ -244,7 +244,7 @@ export function PayrollReportsPanel() {
         <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
           <div>
             <CardTitle>YTD employee earnings</CardTitle>
-            <p className="mt-1 text-sm text-stone-500">
+            <p className="mt-1 text-sm text-muted">
               For annual tax filing / Form A support
             </p>
           </div>
@@ -252,7 +252,7 @@ export function PayrollReportsPanel() {
             <select
               value={ytdYear}
               onChange={(e) => setYtdYear(Number(e.target.value))}
-              className="h-9 rounded-md border border-stone-300 px-2 text-sm"
+              className="h-9 rounded-md border border-line px-2 text-sm"
             >
               {[ytdYear - 1, ytdYear, ytdYear + 1].map((y) => (
                 <option key={y} value={y}>
@@ -288,12 +288,12 @@ export function PayrollReportsPanel() {
                 <TableRow key={emp.employeeCode}>
                   <TableCell>
                     <span className="font-medium">{emp.name}</span>
-                    <span className="ml-2 text-xs text-stone-400">
+                    <span className="ml-2 text-xs text-muted">
                       {emp.employeeCode}
                     </span>
                   </TableCell>
                   <TableCell>{emp.department}</TableCell>
-                  <TableCell className="text-stone-500">
+                  <TableCell className="text-muted">
                     {emp.tin ?? "—"}
                   </TableCell>
                   <TableCell className="text-right tabular-nums">
@@ -312,7 +312,7 @@ export function PayrollReportsPanel() {
               ))}
               {ytdData.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center text-stone-500">
+                  <TableCell colSpan={7} className="text-center text-muted">
                     No approved payroll data for {ytdYear} yet
                   </TableCell>
                 </TableRow>

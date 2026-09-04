@@ -193,7 +193,7 @@ export default function EditEmployeePage() {
   if (!employee) {
     return (
       <AppShell>
-        <p className="text-stone-500">Loading…</p>
+        <p className="text-muted">Loading…</p>
       </AppShell>
     );
   }
@@ -201,8 +201,8 @@ export default function EditEmployeePage() {
   return (
     <AppShell>
       <div className="mb-8">
-        <p className="text-sm text-stone-500">{employee.employeeCode}</p>
-        <h1 className="text-2xl font-semibold text-stone-900">Edit Employee</h1>
+        <p className="text-sm text-muted">{employee.employeeCode}</p>
+        <h1 className="text-2xl font-semibold text-ink">Edit Employee</h1>
       </div>
 
       <Card className="max-w-2xl">
@@ -239,7 +239,7 @@ export default function EditEmployeePage() {
                   name="jobTitle"
                   defaultValue={employee.jobTitle}
                   required
-                  className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                  className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
                 >
                   {[
                     ...new Set([
@@ -262,7 +262,7 @@ export default function EditEmployeePage() {
                   name="department"
                   value={department}
                   onChange={(e) => setDepartment(e.target.value)}
-                  className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                  className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
                 >
                   <option value="">Select…</option>
                   {[
@@ -285,7 +285,7 @@ export default function EditEmployeePage() {
                   id="status"
                   name="status"
                   defaultValue={employee.status}
-                  className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                  className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
                 >
                   {EMPLOYEE_STATUS_OPTIONS.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -307,7 +307,7 @@ export default function EditEmployeePage() {
               <div>
                 <Label htmlFor="shiftId">Shift</Label>
                 {shiftExempt ? (
-                  <p className="mt-2 text-sm text-stone-500">
+                  <p className="mt-2 text-sm text-muted">
                     Management is not shift-regulated — no clock-in schedule or
                     attendance penalties apply.
                   </p>
@@ -316,7 +316,7 @@ export default function EditEmployeePage() {
                     id="shiftId"
                     name="shiftId"
                     defaultValue={employee.shiftAssignment?.shiftId ?? ""}
-                    className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                    className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
                   >
                     <option value="">No shift</option>
                     {shifts.map((s) => (
@@ -333,7 +333,7 @@ export default function EditEmployeePage() {
                   id="sex"
                   name="sex"
                   defaultValue={employee.sex ?? ""}
-                  className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                  className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
                 >
                   <option value="">Select…</option>
                   <option value="MALE">Male</option>
@@ -346,7 +346,7 @@ export default function EditEmployeePage() {
                   id="employmentType"
                   name="employmentType"
                   defaultValue={employee.employmentType}
-                  className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                  className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
                 >
                   <option value="FULL_TIME">Full-time</option>
                   <option value="CONTRACT">Contract</option>
@@ -358,7 +358,7 @@ export default function EditEmployeePage() {
                   id="managerId"
                   name="managerId"
                   defaultValue={employee.managerId ?? ""}
-                  className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                  className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
                 >
                   <option value="">None</option>
                   {colleagues.map((person) => (
@@ -428,8 +428,8 @@ export default function EditEmployeePage() {
             </div>
 
             {canEditPay ? (
-            <div className="border-t border-stone-100 pt-4">
-              <p className="mb-3 text-sm font-medium text-stone-700">
+            <div className="border-t border-line pt-4">
+              <p className="mb-3 text-sm font-medium text-ink-soft">
                 Compensation (₦)
               </p>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -509,16 +509,16 @@ export default function EditEmployeePage() {
               </div>
             </div>
             ) : (
-            <div className="border-t border-stone-100 pt-4">
-              <p className="text-sm text-stone-500">
+            <div className="border-t border-line pt-4">
+              <p className="text-sm text-muted">
                 Compensation is view-only for your role. Ask a Super Admin or HR
                 user with pay access to change salary fields.
               </p>
             </div>
             )}
 
-            <div className="border-t border-stone-100 pt-4">
-              <p className="mb-3 text-sm font-medium text-stone-700">Bank & statutory</p>
+            <div className="border-t border-line pt-4">
+              <p className="mb-3 text-sm font-medium text-ink-soft">Bank & statutory</p>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <Label htmlFor="bankName">Bank name</Label>
@@ -563,8 +563,8 @@ export default function EditEmployeePage() {
               </div>
             </div>
 
-            <div className="border-t border-stone-100 pt-4">
-              <p className="mb-3 text-sm font-medium text-stone-700">Next of kin</p>
+            <div className="border-t border-line pt-4">
+              <p className="mb-3 text-sm font-medium text-ink-soft">Next of kin</p>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <Label htmlFor="nextOfKinName">Name</Label>

@@ -37,34 +37,34 @@ export function LoginForm({ signupEnabled }: { signupEnabled: boolean }) {
   }
 
   return (
-    <div className="relative flex min-h-screen min-h-dvh overflow-x-hidden bg-login-atmosphere">
-      <div
-        aria-hidden
-        className="landing-plus-field-login pointer-events-none absolute inset-0"
-      />
-      <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col justify-center gap-8 px-4 py-10 sm:gap-10 sm:px-6 sm:py-12 lg:flex-row lg:items-center lg:gap-16 lg:px-10">
-        <div className="animate-soft-rise max-w-md text-foam lg:flex-1">
-          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-lagoon-mist/70">
+    <div className="grid min-h-screen min-h-dvh lg:grid-cols-2">
+      <div className="relative hidden bg-login-atmosphere px-10 py-12 text-foam lg:flex lg:flex-col lg:justify-between">
+        <p className="text-sm font-semibold tracking-tight">{PRODUCT_NAME}</p>
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-lagoon">
             Blackcountry Group · issued accounts only
           </p>
-          <h1 className="font-display mt-3 text-4xl font-semibold leading-[1.05] tracking-tight text-foam sm:mt-4 sm:text-5xl md:text-6xl">
-            {PRODUCT_NAME}
+          <h1 className="font-marketing mt-4 max-w-md text-4xl font-semibold leading-[1.05] tracking-tight">
+            Five portals. One payroll truth.
           </h1>
-          <p className="mt-3 max-w-sm text-sm leading-relaxed text-lagoon-mist/75 sm:mt-4 sm:text-base">
+          <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/60">
             {PRODUCT_TAGLINE}. Super Admin, HR, Finance, business heads, and
             Staff each have their own door — this is not a public product.
           </p>
         </div>
+        <p className="text-xs text-white/35">Private workspace · not for the open market</p>
+      </div>
 
-        <div
-          className="animate-fade-up w-full max-w-sm self-center lg:flex-shrink-0 lg:self-auto"
-          style={{ animationDelay: "80ms" }}
-        >
+      <div className="flex items-center justify-center bg-mist px-4 py-10 sm:px-8">
+        <div className="animate-fade-up w-full max-w-sm">
+          <p className="mb-8 text-sm font-semibold tracking-tight text-ink lg:hidden">
+            {PRODUCT_NAME}
+          </p>
           <form
             onSubmit={handleSubmit}
-            className="rounded-xl border border-white/15 bg-foam/95 p-5 shadow-soft backdrop-blur-sm sm:p-6"
+            className="rounded-lg border border-line bg-foam p-5 shadow-panel sm:p-6"
           >
-            <p className="text-sm font-medium text-ink">Sign in</p>
+            <p className="text-base font-semibold text-ink">Sign in</p>
             <p className="mt-1 text-xs text-muted">
               Sign in with the account HR issued for your company
             </p>
@@ -93,20 +93,15 @@ export function LoginForm({ signupEnabled }: { signupEnabled: boolean }) {
                 />
               </div>
               {error && <p className="text-sm text-signal">{error}</p>}
-              <Button
-                type="submit"
-                variant="brand"
-                className="w-full"
-                disabled={loading}
-              >
+              <Button type="submit" variant="brand" className="w-full" disabled={loading}>
                 {loading ? "Signing in…" : "Enter workspace"}
               </Button>
             </div>
           </form>
           {signupEnabled ? (
-            <p className="mt-4 text-center text-xs text-lagoon-mist/60">
+            <p className="mt-4 text-center text-xs text-muted">
               Internal setup only.{" "}
-              <Link href="/signup" className="underline underline-offset-2">
+              <Link href="/signup" className="font-medium text-ink underline underline-offset-2">
                 Continue
               </Link>
             </p>

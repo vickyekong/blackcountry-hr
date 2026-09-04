@@ -12,6 +12,8 @@ import {
   assetTypeLabel,
 } from "@/lib/people/labels";
 import { employeeFullName, formatCurrency } from "@/lib/utils";
+import { PageHeader } from "@/components/layout/page-header";
+import { Package } from "lucide-react";
 
 type AssetRow = {
   id: string;
@@ -107,16 +109,11 @@ export function AssetsWorkspace({ canManage }: { canManage: boolean }) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-stone-900">
-          Assets &amp; equipment
-        </h1>
-        <p className="mt-1 text-sm text-stone-500">
-          Track laptops, phones, vehicles, and other company items assigned to
-          staff. Offboarding still uses the existing checklist — return items
-          here so the register stays accurate.
-        </p>
-      </div>
+      <PageHeader
+        icon={Package}
+        title="Assets & equipment"
+        description="Track laptops, phones, vehicles, and other company items assigned to staff. Offboarding still uses the existing checklist — return items here so the register stays accurate."
+      />
 
       {canManage && (
         <Card>
@@ -141,7 +138,7 @@ export function AssetsWorkspace({ canManage }: { canManage: boolean }) {
                 <select
                   id="assetType"
                   name="assetType"
-                  className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                  className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
                   defaultValue="LAPTOP"
                 >
                   {ASSET_TYPES.map((type) => (
@@ -192,19 +189,19 @@ export function AssetsWorkspace({ canManage }: { canManage: boolean }) {
         </CardHeader>
         <CardContent>
           {assets.length === 0 ? (
-            <p className="text-sm text-stone-500">No assets registered yet.</p>
+            <p className="text-sm text-muted">No assets registered yet.</p>
           ) : (
-            <ul className="divide-y divide-stone-100 rounded-md border border-stone-200">
+            <ul className="divide-y divide-line rounded-md border border-line">
               {assets.map((asset) => (
                 <li
                   key={asset.id}
                   className="flex flex-wrap items-start justify-between gap-3 px-3 py-3 text-sm"
                 >
                   <div>
-                    <p className="font-medium text-stone-900">
+                    <p className="font-medium text-ink">
                       {asset.assetCode} · {asset.name}
                     </p>
-                    <p className="text-xs text-stone-500">
+                    <p className="text-xs text-muted">
                       {assetTypeLabel(asset.assetType)} ·{" "}
                       {assetStatusLabel(asset.status)}
                       {asset.serialNumber ? ` · ${asset.serialNumber}` : ""}
@@ -213,7 +210,7 @@ export function AssetsWorkspace({ canManage }: { canManage: boolean }) {
                         : ""}
                     </p>
                     {asset.assignedEmployee && (
-                      <p className="mt-1 text-xs text-stone-600">
+                      <p className="mt-1 text-xs text-muted">
                         Assigned to{" "}
                         <Link
                           href={`/employees/${asset.assignedEmployee.id}`}
@@ -230,7 +227,7 @@ export function AssetsWorkspace({ canManage }: { canManage: boolean }) {
                   {canManage && (
                     <div className="flex flex-wrap items-center gap-2">
                       <select
-                        className="h-8 rounded-md border border-stone-300 px-2 text-sm"
+                        className="h-8 rounded-md border border-line px-2 text-sm"
                         value={asset.assignedEmployeeId ?? ""}
                         disabled={busy || asset.status === "RETIRED"}
                         onChange={(e) =>

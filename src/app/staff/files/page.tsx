@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/layout/app-shell";
+import { PageHeader } from "@/components/layout/page-header";
+import { Files } from "lucide-react";
 
 type FileRow = {
   id: string;
@@ -26,13 +28,11 @@ export default function StaffFilesPage() {
 
   return (
     <AppShell>
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-ink">Files</h1>
-        <p className="mt-1 text-sm text-muted">
-          Documents your company has shared with full-time staff. View or
-          download — you cannot edit them here.
-        </p>
-      </div>
+      <PageHeader
+        icon={Files}
+        title="Files"
+        description="Documents your company has shared with full-time staff. View or download — you cannot edit them here."
+      />
       {error && <p className="mb-4 text-sm text-signal">{error}</p>}
       <ul className="space-y-2">
         {files.map((f) => (

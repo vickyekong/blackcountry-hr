@@ -52,15 +52,15 @@ export default async function PublicJobPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <header className="border-b border-line bg-foam px-5 py-4">
-        <p className="text-xs uppercase tracking-wide text-muted">{PRODUCT_NAME}</p>
-        <p className="font-display text-lg font-semibold">{listing.company.name}</p>
+        <p className="page-kicker">{PRODUCT_NAME}</p>
+        <p className="mt-1 text-lg font-semibold tracking-tight">{listing.company.name}</p>
       </header>
       <main className="mx-auto max-w-3xl px-5 py-10">
         <p className="text-sm text-muted">
           {listing.department} · {listing.location} ·{" "}
           {listing.employmentType === "CONTRACT" ? "Contract" : "Full-time"}
         </p>
-        <h1 className="font-display mt-2 text-3xl font-semibold">{listing.title}</h1>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight">{listing.title}</h1>
         <div className="mt-6 whitespace-pre-wrap text-sm leading-relaxed">
           {listing.description}
         </div>
@@ -72,7 +72,7 @@ export default async function PublicJobPage({
             </p>
           </div>
         )}
-        <div className="mt-10 rounded-xl border border-line bg-foam p-5">
+        <div className="mt-10 rounded-lg border border-line bg-foam p-5 shadow-panel">
           <h2 className="text-base font-semibold">Apply</h2>
           <p className="mt-1 mb-4 text-sm text-muted">
             Your application goes to HR for this company.

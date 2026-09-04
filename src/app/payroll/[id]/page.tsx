@@ -247,7 +247,7 @@ function PayrollRunDetailInner() {
   if (!run) {
     return (
       <AppShell>
-        <p className="text-stone-500">Loading payroll wizard…</p>
+        <p className="text-muted">Loading payroll wizard…</p>
       </AppShell>
     );
   }
@@ -302,7 +302,7 @@ export default function PayrollRunDetailPage() {
     <Suspense
       fallback={
         <AppShell>
-          <p className="text-stone-500">Loading payroll wizard…</p>
+          <p className="text-muted">Loading payroll wizard…</p>
         </AppShell>
       }
     >

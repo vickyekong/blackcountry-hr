@@ -85,7 +85,7 @@ export function EmployeeSkillsPanel({
     <Card>
       <CardHeader>
         <CardTitle>Skills</CardTitle>
-        <p className="text-sm text-stone-500">
+        <p className="text-sm text-muted">
           Skills this person holds. Use the company catalog or add a new name.
         </p>
       </CardHeader>
@@ -99,7 +99,7 @@ export function EmployeeSkillsPanel({
               <Label htmlFor="skillPick">Catalog</Label>
               <select
                 id="skillPick"
-                className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
                 value={skillId}
                 onChange={(e) => setSkillId(e.target.value)}
               >
@@ -125,7 +125,7 @@ export function EmployeeSkillsPanel({
               <Label htmlFor="skillLevel">Level</Label>
               <select
                 id="skillLevel"
-                className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
                 value={level}
                 onChange={(e) =>
                   setLevel(e.target.value as (typeof SKILL_LEVELS)[number])
@@ -145,17 +145,17 @@ export function EmployeeSkillsPanel({
         )}
         {message && <p className="text-sm text-red-600">{message}</p>}
         {rows.length === 0 ? (
-          <p className="text-sm text-stone-500">No skills recorded yet.</p>
+          <p className="text-sm text-muted">No skills recorded yet.</p>
         ) : (
-          <ul className="divide-y divide-stone-100 rounded-md border border-stone-200">
+          <ul className="divide-y divide-line rounded-md border border-line">
             {rows.map((row) => (
               <li
                 key={row.id}
                 className="flex flex-wrap items-center justify-between gap-3 px-3 py-2.5 text-sm"
               >
                 <div>
-                  <p className="font-medium text-stone-900">{row.name}</p>
-                  <p className="text-xs text-stone-500">{skillLevelLabel(row.level)}</p>
+                  <p className="font-medium text-ink">{row.name}</p>
+                  <p className="text-xs text-muted">{skillLevelLabel(row.level)}</p>
                 </div>
                 {canManage && (
                   <Button
@@ -171,7 +171,7 @@ export function EmployeeSkillsPanel({
             ))}
           </ul>
         )}
-        <p className="text-xs text-stone-500">
+        <p className="text-xs text-muted">
           Company skill catalog lives under{" "}
           <Link href="/employees?tab=skills" className="underline">
             Employees → Skills

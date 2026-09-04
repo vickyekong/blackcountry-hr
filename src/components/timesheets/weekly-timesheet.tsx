@@ -245,7 +245,7 @@ export function WeeklyTimesheet({
                     required
                     value={projectId}
                     onChange={(e) => setProjectId(e.target.value)}
-                    className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                    className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
                   >
                     <option value="">Select</option>
                     {projects
@@ -265,7 +265,7 @@ export function WeeklyTimesheet({
                     required
                     value={taskId}
                     onChange={(e) => setTaskId(e.target.value)}
-                    className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                    className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
                   >
                     <option value="">Select</option>
                     {activeTasks.map((t) => (

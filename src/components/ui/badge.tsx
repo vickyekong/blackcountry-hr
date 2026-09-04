@@ -1,11 +1,11 @@
 import { cn } from "@/lib/cn";
 
 const variants = {
-  default: "bg-sand text-ink-soft",
-  success: "bg-ok/10 text-ok",
-  warning: "bg-warn/10 text-warn",
-  danger: "bg-signal/10 text-signal",
-  info: "bg-sky/15 text-sky",
+  default: "bg-sand text-ink-soft ring-1 ring-line",
+  success: "bg-ok/10 text-ok ring-1 ring-ok/15",
+  warning: "bg-warn/10 text-warn ring-1 ring-warn/15",
+  danger: "bg-signal/10 text-signal ring-1 ring-signal/15",
+  info: "bg-sky/12 text-sky ring-1 ring-sky/20",
 };
 
 export function Badge({
@@ -20,7 +20,7 @@ export function Badge({
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium tabular-nums",
+        "inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold tabular-nums",
         variants[variant],
         className
       )}

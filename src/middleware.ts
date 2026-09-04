@@ -29,6 +29,9 @@ export default withAuth(
     }
 
     if (role === "FINANCE") {
+      if (path === "/expenses" || path.startsWith("/expenses/")) {
+        return NextResponse.redirect(new URL("/finance/expenses", req.url));
+      }
       if (!financeApp) {
         return NextResponse.redirect(new URL("/finance", req.url));
       }

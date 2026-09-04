@@ -33,7 +33,8 @@ describe("five-portal roles", () => {
     expect(can("FINANCE", "reimburseExpenses")).toBe(true);
     expect(can("FINANCE", "reviewExpenses")).toBe(false);
     expect(can("HR_ADMIN", "reviewExpenses")).toBe(true);
-    expect(can("HR_ADMIN", "reimburseExpenses")).toBe(true);
+    expect(can("HR_ADMIN", "reimburseExpenses")).toBe(false);
+    expect(can("SUPER_ADMIN", "reimburseExpenses")).toBe(false);
     expect(can("BUSINESS_HEAD", "reviewExpenses")).toBe(false);
   });
 

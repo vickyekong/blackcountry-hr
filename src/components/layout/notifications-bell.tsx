@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { Bell } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 interface NotificationItem {
@@ -20,6 +21,7 @@ export function NotificationsBell() {
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<NotificationItem[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const rootRef = useRef<HTMLDivElement>(null);
 
   const role = session?.user?.role;
   const showBell = Boolean(role);
@@ -43,6 +45,22 @@ export function NotificationsBell() {
     return () => window.clearInterval(id);
   }, [showBell, load]);
 
+  useEffect(() => {
+    if (!open) return;
+    function onPointer(e: MouseEvent) {
+      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    window.addEventListener("mousedown", onPointer);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("mousedown", onPointer);
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
   if (!showBell) return null;
 
   async function markRead(id: string) {
@@ -64,67 +82,80 @@ export function NotificationsBell() {
   }
 
   return (
-    <div className="relative mb-2">
+    <div className="relative" ref={rootRef}>
       <button
         type="button"
+        aria-label={
+          unreadCount > 0
+            ? `${unreadCount} unread notifications`
+            : role === "EMPLOYEE"
+              ? "Inbox"
+              : "Approvals and inbox"
+        }
+        aria-expanded={open}
         onClick={() => {
           setOpen((v) => !v);
           if (!open) load();
         }}
-        className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-lagoon-mist/80 transition hover:bg-white/5 hover:text-foam"
+        className="relative inline-flex h-9 w-9 items-center justify-center rounded-md border border-line bg-foam text-ink transition hover:bg-sand"
       >
-        <span>{role === "EMPLOYEE" ? "Inbox" : "Approvals & inbox"}</span>
+        <Bell className="h-4 w-4" strokeWidth={1.75} />
         {unreadCount > 0 && (
-          <span className="inline-flex min-w-[1.25rem] items-center justify-center rounded-md bg-lagoon px-1.5 py-0.5 text-[10px] font-semibold text-ink">
+          <span className="absolute -right-1 -top-1 inline-flex min-w-[1.1rem] items-center justify-center rounded-full bg-lagoon px-1 py-0.5 text-[10px] font-bold text-ink">
             {unreadCount}
           </span>
         )}
       </button>
 
       {open && (
-        <div className="absolute left-0 right-0 z-30 mt-1 max-h-80 overflow-auto rounded-xl border border-line bg-foam shadow-soft">
-          <div className="flex items-center justify-between border-b border-line/70 px-3 py-2">
-            <p className="text-xs font-medium uppercase tracking-wide text-muted">
-              Notifications
+        <div className="absolute right-0 z-50 mt-2 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-lg border border-line bg-foam shadow-soft">
+          <div className="flex items-center justify-between border-b border-line px-3 py-2">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted">
+              Inbox
             </p>
             {unreadCount > 0 && (
               <button
                 type="button"
                 onClick={() => void markAllRead()}
-                className="text-xs text-muted hover:text-ink"
+                className="text-xs font-medium text-muted hover:text-ink"
               >
                 Mark all read
               </button>
             )}
           </div>
-          {items.length === 0 ? (
-            <p className="px-3 py-4 text-sm text-muted">No notifications</p>
-          ) : (
-            <ul>
-              {items.map((item) => (
-                <li key={item.id} className="border-b border-sand last:border-0">
-                  <Link
-                    href={item.linkUrl.replace(/^https?:\/\/[^/]+/, "") || item.linkUrl}
-                    onClick={() => {
-                      void markRead(item.id);
-                      setOpen(false);
-                    }}
-                    className={cn(
-                      "block px-3 py-3 hover:bg-mist",
-                      !item.readAt && "bg-ok/10"
-                    )}
-                  >
-                    <p className="text-sm font-medium text-ink">
-                      {item.title}
-                    </p>
-                    <p className="mt-0.5 line-clamp-2 text-xs text-muted">
-                      {item.body}
-                    </p>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
+          <div className="max-h-80 overflow-auto">
+            {items.length === 0 ? (
+              <p className="px-3 py-8 text-center text-sm text-muted">
+                No notifications
+              </p>
+            ) : (
+              <ul>
+                {items.map((item) => (
+                  <li key={item.id} className="border-b border-line/70 last:border-0">
+                    <Link
+                      href={
+                        item.linkUrl.replace(/^https?:\/\/[^/]+/, "") ||
+                        item.linkUrl
+                      }
+                      onClick={() => {
+                        void markRead(item.id);
+                        setOpen(false);
+                      }}
+                      className={cn(
+                        "block px-3 py-3 hover:bg-sand",
+                        !item.readAt && "bg-lagoon/15"
+                      )}
+                    >
+                      <p className="text-sm font-medium text-ink">{item.title}</p>
+                      <p className="mt-0.5 line-clamp-2 text-xs text-muted">
+                        {item.body}
+                      </p>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
       )}
     </div>

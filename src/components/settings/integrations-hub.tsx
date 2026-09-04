@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { IconLabel } from "@/components/ui/icon-label";
+import { Webhook } from "lucide-react";
 import { WEBHOOK_EVENTS, type WebhookEvent } from "@/lib/integrations/events";
 
 type CatalogItem = {
@@ -127,7 +129,9 @@ export function IntegrationsHub() {
   return (
     <Card className="mt-6">
       <CardHeader>
-        <CardTitle>Integrations</CardTitle>
+        <CardTitle>
+          <IconLabel icon={Webhook}>Integrations</IconLabel>
+        </CardTitle>
         <p className="text-sm text-muted">
           Existing Google, Microsoft, clock CSV, cron, and audit stay as they
           are. Slack, Teams, accounting, and payments attach through signed

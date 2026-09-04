@@ -16,8 +16,8 @@ export default async function PublicJobsPage() {
   return (
     <div className="min-h-screen bg-mist text-ink">
       <header className="border-b border-line bg-foam px-5 py-4">
-        <p className="text-xs uppercase tracking-wide text-muted">{PRODUCT_NAME}</p>
-        <h1 className="font-display text-lg font-semibold">Open roles</h1>
+        <p className="page-kicker">{PRODUCT_NAME}</p>
+        <h1 className="mt-1 text-lg font-semibold tracking-tight">Open roles</h1>
       </header>
       <main className="mx-auto max-w-3xl px-5 py-10">
         {listings.length === 0 ? (
@@ -28,7 +28,7 @@ export default async function PublicJobsPage() {
               <li key={listing.id}>
                 <Link
                   href={`/jobs/${listing.id}`}
-                  className="block rounded-xl border border-line bg-foam px-5 py-4 hover:border-ok/40"
+                  className="block rounded-lg border border-line bg-foam px-5 py-4 shadow-panel hover:bg-sand"
                 >
                   <p className="text-xs text-muted">{listing.company.name}</p>
                   <p className="mt-1 font-semibold">{listing.title}</p>

@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AppShell } from "@/components/layout/app-shell";
+import { PageHeader } from "@/components/layout/page-header";
+import { Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge, payrollStatusVariant } from "@/components/ui/badge";
 import {
@@ -45,13 +47,12 @@ export default function FinanceHomePage() {
 
   return (
     <AppShell>
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-ink">Finance</h1>
-        <p className="mt-1 text-sm text-muted">
-          Process payroll after Super Admin approval and HR forward. You do not
-          hire people or create logins.
-        </p>
-      </div>
+      <PageHeader
+        icon={Wallet}
+        kicker="Finance portal"
+        title="Finance"
+        description="Process payroll after Super Admin approval and HR forward. You do not hire people or create logins."
+      />
       {error && <p className="mb-4 text-sm text-signal">{error}</p>}
       <div className="rounded-lg border border-line bg-foam">
         <Table>

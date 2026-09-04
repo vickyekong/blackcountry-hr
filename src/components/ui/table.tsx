@@ -24,7 +24,7 @@ export function Table({
 }
 
 export function TableHeader({ children }: { children: React.ReactNode }) {
-  return <thead className="border-b border-line">{children}</thead>;
+  return <thead className="border-b border-line bg-sand/70">{children}</thead>;
 }
 
 export function TableBody({ children }: { children: React.ReactNode }) {
@@ -41,7 +41,7 @@ export function TableRow({
   return (
     <tr
       className={cn(
-        "border-b border-sand transition-colors hover:bg-mist/70",
+        "border-b border-line/60 transition-colors hover:bg-sand",
         className
       )}
     >
@@ -60,7 +60,7 @@ export function TableHead({
   return (
     <th
       className={cn(
-        "h-10 whitespace-nowrap px-3 text-left align-middle text-xs font-medium uppercase tracking-wide text-muted sm:px-4",
+        "h-9 whitespace-nowrap px-3 text-left align-middle text-[11px] font-semibold uppercase tracking-[0.08em] text-muted sm:px-4",
         className
       )}
     >
@@ -77,7 +77,7 @@ export function TableCell({
   return (
     <td
       className={cn(
-        "whitespace-nowrap px-3 py-3 align-middle text-ink-soft sm:px-4",
+        "whitespace-nowrap px-3 py-2.5 align-middle text-ink-soft sm:px-4",
         className
       )}
       {...props}

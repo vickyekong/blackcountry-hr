@@ -79,10 +79,10 @@ export function PayrollForecastSection() {
   return (
     <section className="mt-10 space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-stone-900">
+        <h2 className="text-lg font-semibold text-ink">
           Headcount &amp; payroll forecast
         </h2>
-        <p className="text-sm text-stone-500">
+        <p className="text-sm text-muted">
           Model the monthly run-rate impact of new hires using your current
           statutory rates (PAYE, pension, NHF, NSITF).
         </p>
@@ -176,19 +176,19 @@ export function PayrollForecastSection() {
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-stone-500">Gross</span>
+                <span className="text-muted">Gross</span>
                 <span className="tabular-nums font-medium">
                   {formatCurrency(BigInt(result.scenario.perHire.grossKobo))}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-stone-500">Net</span>
+                <span className="text-muted">Net</span>
                 <span className="tabular-nums font-medium">
                   {formatCurrency(BigInt(result.scenario.perHire.netKobo))}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-stone-500">Employer cost</span>
+                <span className="text-muted">Employer cost</span>
                 <span className="tabular-nums font-medium">
                   {formatCurrency(
                     BigInt(result.scenario.perHire.employerCostKobo)
@@ -206,15 +206,15 @@ export function PayrollForecastSection() {
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-stone-500">Monthly employer Δ</span>
-                <span className="tabular-nums font-semibold text-stone-900">
+                <span className="text-muted">Monthly employer Δ</span>
+                <span className="tabular-nums font-semibold text-ink">
                   {formatCurrency(
                     BigInt(result.projected.deltaEmployerCostKobo)
                   )}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-stone-500">Annual employer Δ</span>
+                <span className="text-muted">Annual employer Δ</span>
                 <span className="tabular-nums font-medium">
                   {formatCurrency(
                     BigInt(result.scenario.annualEmployerCostKobo)
@@ -222,7 +222,7 @@ export function PayrollForecastSection() {
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-stone-500">PAYE / mo</span>
+                <span className="text-muted">PAYE / mo</span>
                 <span className="tabular-nums">
                   {formatCurrency(BigInt(result.scenario.monthly.payeKobo))}
                 </span>
@@ -236,20 +236,20 @@ export function PayrollForecastSection() {
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               {result.baseline && (
-                <p className="text-xs text-stone-500">
+                <p className="text-xs text-muted">
                   Baseline: {result.baseline.headcount} staff ·{" "}
                   {getMonthName(result.baseline.period.month)}{" "}
                   {result.baseline.period.year}
                 </p>
               )}
               <div className="flex justify-between">
-                <span className="text-stone-500">Headcount</span>
+                <span className="text-muted">Headcount</span>
                 <span className="tabular-nums font-medium">
                   {result.projected.projectedHeadcount}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-stone-500">Monthly gross</span>
+                <span className="text-muted">Monthly gross</span>
                 <span className="tabular-nums font-medium">
                   {formatCurrency(
                     BigInt(result.projected.projectedGrossKobo)
@@ -257,7 +257,7 @@ export function PayrollForecastSection() {
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-stone-500">Monthly employer cost</span>
+                <span className="text-muted">Monthly employer cost</span>
                 <span className="tabular-nums font-semibold">
                   {formatCurrency(
                     BigInt(result.projected.projectedEmployerCostKobo)

@@ -113,10 +113,10 @@ export function OrgCatalogManager({
       {(title || description) && (
         <div>
           {title ? (
-            <h3 className="text-base font-semibold text-stone-900">{title}</h3>
+            <h3 className="text-base font-semibold text-ink">{title}</h3>
           ) : null}
           {description ? (
-            <p className={`text-sm text-stone-500 ${title ? "mt-1" : ""}`}>
+            <p className={`text-sm text-muted ${title ? "mt-1" : ""}`}>
               {description}
             </p>
           ) : null}
@@ -143,11 +143,11 @@ export function OrgCatalogManager({
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       {rows.length === 0 ? (
-        <p className="text-sm text-stone-500">
+        <p className="text-sm text-muted">
           No {itemLabel}s yet. Add one to enable the employee dropdown.
         </p>
       ) : (
-        <ul className="divide-y divide-stone-100 rounded-md border border-stone-200">
+        <ul className="divide-y divide-line rounded-md border border-line">
           {rows.map((row) => (
             <li
               key={row.id}
@@ -185,7 +185,7 @@ export function OrgCatalogManager({
                 </div>
               ) : (
                 <>
-                  <span className="font-medium text-stone-800">{row.name}</span>
+                  <span className="font-medium text-ink">{row.name}</span>
                   <div className="flex items-center gap-2">
                     <Button
                       type="button"

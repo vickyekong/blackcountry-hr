@@ -11,6 +11,8 @@ import {
   TRAINING_STATUS_LABELS,
 } from "@/lib/talent/labels";
 import { employeeFullName } from "@/lib/utils";
+import { PageHeader } from "@/components/layout/page-header";
+import { GraduationCap } from "lucide-react";
 
 type Enrollment = {
   id: string;
@@ -110,13 +112,11 @@ export function TrainingWorkspace({ canManage }: { canManage: boolean }) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-stone-900">Training</h1>
-        <p className="mt-1 text-sm text-stone-500">
-          Programmes and enrolment. Required orientation can be ticked off on
-          the employee onboarding checklist once someone is assigned.
-        </p>
-      </div>
+      <PageHeader
+        icon={GraduationCap}
+        title="Training"
+        description="Programmes and enrolment. Required orientation can be ticked off on the employee onboarding checklist once someone is assigned."
+      />
 
       {canManage && (
         <Card>
@@ -149,7 +149,7 @@ export function TrainingWorkspace({ canManage }: { canManage: boolean }) {
       )}
 
       {programs.length === 0 ? (
-        <p className="text-sm text-stone-500">No programmes yet.</p>
+        <p className="text-sm text-muted">No programmes yet.</p>
       ) : (
         programs.map((program) => (
           <Card key={program.id}>
@@ -159,7 +159,7 @@ export function TrainingWorkspace({ canManage }: { canManage: boolean }) {
                 {program.required ? " · required" : ""}
               </CardTitle>
               {program.description && (
-                <p className="text-sm text-stone-500">{program.description}</p>
+                <p className="text-sm text-muted">{program.description}</p>
               )}
             </CardHeader>
             <CardContent className="space-y-3">
@@ -173,7 +173,7 @@ export function TrainingWorkspace({ canManage }: { canManage: boolean }) {
                 >
                   <select
                     name="employeeId"
-                    className="h-9 rounded-md border border-stone-300 px-2 text-sm"
+                    className="h-9 rounded-md border border-line px-2 text-sm"
                     required
                   >
                     <option value="">Assign staff…</option>
@@ -185,7 +185,7 @@ export function TrainingWorkspace({ canManage }: { canManage: boolean }) {
                   </select>
                   <select
                     name="status"
-                    className="h-9 rounded-md border border-stone-300 px-2 text-sm"
+                    className="h-9 rounded-md border border-line px-2 text-sm"
                     defaultValue="ASSIGNED"
                   >
                     {TRAINING_STATUSES.map((status) => (
@@ -200,9 +200,9 @@ export function TrainingWorkspace({ canManage }: { canManage: boolean }) {
                 </form>
               )}
               {program.enrollments.length === 0 ? (
-                <p className="text-sm text-stone-500">Nobody enrolled yet.</p>
+                <p className="text-sm text-muted">Nobody enrolled yet.</p>
               ) : (
-                <ul className="divide-y divide-stone-100 rounded-md border border-stone-200">
+                <ul className="divide-y divide-line rounded-md border border-line">
                   {program.enrollments.map((row) => (
                     <li
                       key={row.id}
@@ -210,14 +210,14 @@ export function TrainingWorkspace({ canManage }: { canManage: boolean }) {
                     >
                       <Link
                         href={`/employees/${row.employee.id}`}
-                        className="font-medium text-stone-900 hover:underline"
+                        className="font-medium text-ink hover:underline"
                       >
                         {employeeFullName(
                           row.employee.firstName,
                           row.employee.lastName
                         )}
                       </Link>
-                      <span className="text-xs text-stone-500">
+                      <span className="text-xs text-muted">
                         {TRAINING_STATUS_LABELS[
                           row.status as keyof typeof TRAINING_STATUS_LABELS
                         ] ?? row.status}

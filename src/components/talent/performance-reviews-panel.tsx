@@ -44,16 +44,16 @@ export function PerformanceReviewsPanel({ year }: { year: number }) {
     <Card>
       <CardHeader>
         <CardTitle>Appraisals this year</CardTitle>
-        <p className="text-sm text-stone-500">
+        <p className="text-sm text-muted">
           Self, manager, peer, and final scores live on the employee record.
           Completing a review does not change pay.
         </p>
       </CardHeader>
       <CardContent>
         {staff.length === 0 ? (
-          <p className="text-sm text-stone-500">No staff in this company.</p>
+          <p className="text-sm text-muted">No staff in this company.</p>
         ) : (
-          <ul className="divide-y divide-stone-100 rounded-md border border-stone-200">
+          <ul className="divide-y divide-line rounded-md border border-line">
             {staff.map((row) => (
               <li
                 key={row.id}
@@ -62,15 +62,15 @@ export function PerformanceReviewsPanel({ year }: { year: number }) {
                 <div>
                   <Link
                     href={`/employees/${row.id}`}
-                    className="font-medium text-stone-900 hover:underline"
+                    className="font-medium text-ink hover:underline"
                   >
                     {row.name}
                   </Link>
-                  <p className="text-xs text-stone-500">
+                  <p className="text-xs text-muted">
                     {row.employeeCode} · {row.department}
                   </p>
                 </div>
-                <p className="text-xs text-stone-500">
+                <p className="text-xs text-muted">
                   {row.goalCount} KPI{row.goalCount === 1 ? "" : "s"} ·{" "}
                   {pct(row.achievementPercent)}
                   {row.review

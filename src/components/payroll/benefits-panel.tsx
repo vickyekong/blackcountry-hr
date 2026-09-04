@@ -115,7 +115,7 @@ export function BenefitsPanel() {
             <select
               id="kind"
               name="kind"
-              className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+              className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
             >
               {BENEFIT_KINDS.map((kind) => (
                 <option key={kind} value={kind}>
@@ -184,7 +184,7 @@ export function BenefitsPanel() {
                   <select
                     name="employeeId"
                     required
-                    className="flex h-9 rounded-md border border-stone-300 px-3 text-sm"
+                    className="flex h-9 rounded-md border border-line px-3 text-sm"
                   >
                     <option value="">Enroll staff</option>
                     {staff.map((s) => (

@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { AppShell } from "@/components/layout/app-shell";
+import { PageHeader } from "@/components/layout/page-header";
+import { MessageCircle, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -110,12 +112,11 @@ export default function HrAskClient() {
 
   return (
     <AppShell>
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-stone-900">HR Ask</h1>
-        <p className="mt-1 text-sm text-stone-500">
-          Policy &amp; query desk — plus staff and HR change requests awaiting review
-        </p>
-      </div>
+      <PageHeader
+        icon={MessageCircle}
+        title="HR Ask"
+        description="Policy & query desk — plus staff and HR change requests awaiting review"
+      />
 
       <div className="mb-6 flex gap-2">
         <Button
@@ -123,6 +124,7 @@ export default function HrAskClient() {
           size="sm"
           onClick={() => setTab("ask")}
         >
+          <MessageCircle className="mr-1.5 h-3.5 w-3.5" strokeWidth={1.75} />
           Ask HR
         </Button>
         <Button
@@ -130,6 +132,7 @@ export default function HrAskClient() {
           size="sm"
           onClick={() => setTab("changes")}
         >
+          <Send className="mr-1.5 h-3.5 w-3.5" strokeWidth={1.75} />
           Change requests
         </Button>
       </div>
@@ -146,10 +149,10 @@ export default function HrAskClient() {
                   key={q.id}
                   type="button"
                   onClick={() => runQuery(q.id)}
-                  className="block w-full rounded-md border border-stone-200 px-3 py-2 text-left text-sm hover:bg-stone-50"
+                  className="block w-full rounded-md border border-line px-3 py-2 text-left text-sm hover:bg-sand"
                 >
-                  <span className="font-medium text-stone-900">{q.label}</span>
-                  <span className="mt-0.5 block text-xs text-stone-500">
+                  <span className="font-medium text-ink">{q.label}</span>
+                  <span className="mt-0.5 block text-xs text-muted">
                     {q.hint}
                   </span>
                 </button>
@@ -161,19 +164,19 @@ export default function HrAskClient() {
             <CardHeader>
               <CardTitle>{result?.title ?? "Results"}</CardTitle>
               {result && (
-                <p className="text-sm text-stone-500">{result.summary}</p>
+                <p className="text-sm text-muted">{result.summary}</p>
               )}
             </CardHeader>
             <CardContent>
               {loading ? (
-                <p className="text-sm text-stone-500">Running…</p>
+                <p className="text-sm text-muted">Running…</p>
               ) : !result ? (
-                <p className="text-sm text-stone-500">
+                <p className="text-sm text-muted">
                   Pick a question to generate a live report from staff, leave,
                   onboarding, and payroll data.
                 </p>
               ) : result.rows.length === 0 ? (
-                <p className="text-sm text-stone-500">No matching rows.</p>
+                <p className="text-sm text-muted">No matching rows.</p>
               ) : (
                 <Table>
                   <TableHeader>
@@ -205,7 +208,7 @@ export default function HrAskClient() {
         <Card>
           <CardHeader>
             <CardTitle>Pending employee updates</CardTitle>
-            <p className="text-sm text-stone-500">
+            <p className="text-sm text-muted">
               Staff can submit these from their portal. Bank and tax-relief still
               need Super Admin. Next of kin, address, and general requests can be
               cleared by HR.
@@ -213,30 +216,30 @@ export default function HrAskClient() {
           </CardHeader>
           <CardContent>
             {pending.length === 0 ? (
-              <p className="text-sm text-stone-500">Inbox clear.</p>
+              <p className="text-sm text-muted">Inbox clear.</p>
             ) : (
-              <ul className="divide-y divide-stone-100">
+              <ul className="divide-y divide-line">
                 {pending.map((r) => (
                   <li
                     key={r.id}
                     className="flex flex-wrap items-start justify-between gap-3 py-4"
                   >
                     <div>
-                      <p className="text-sm font-medium text-stone-900">
+                      <p className="text-sm font-medium text-ink">
                         {r.employee.firstName} {r.employee.lastName} (
                         {r.employee.employeeCode}) ·{" "}
                         {r.type.replace(/_/g, " ")}
                       </p>
-                      <p className="mt-1 text-xs text-stone-500">
+                      <p className="mt-1 text-xs text-muted">
                         {r.company?.name ? `${r.company.name} · ` : ""}
                         {r.employee.department} ·{" "}
                         {new Date(r.createdAt).toLocaleString()}
                       </p>
-                      <pre className="mt-2 overflow-x-auto rounded bg-stone-50 px-2 py-1 text-xs text-stone-700">
+                      <pre className="mt-2 overflow-x-auto rounded bg-sand px-2 py-1 text-xs text-ink-soft">
                         {JSON.stringify(r.payload, null, 2)}
                       </pre>
                       {r.note && (
-                        <p className="mt-1 text-xs text-stone-600">
+                        <p className="mt-1 text-xs text-muted">
                           Note: {r.note}
                         </p>
                       )}

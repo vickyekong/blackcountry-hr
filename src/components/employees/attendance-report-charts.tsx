@@ -38,11 +38,11 @@ function MiniPie({
   const total = data.reduce((sum, d) => sum + d.value, 0);
 
   return (
-    <div className="rounded-lg border border-stone-200 bg-white p-4">
-      <h3 className="text-sm font-semibold text-stone-900">{title}</h3>
-      {subtitle && <p className="mt-0.5 text-xs text-stone-500">{subtitle}</p>}
+    <div className="rounded-lg border border-line bg-white p-4">
+      <h3 className="text-sm font-semibold text-ink">{title}</h3>
+      {subtitle && <p className="mt-0.5 text-xs text-muted">{subtitle}</p>}
       {total === 0 ? (
-        <p className="py-10 text-center text-sm text-stone-500">No data yet</p>
+        <p className="py-10 text-center text-sm text-muted">No data yet</p>
       ) : (
         <div className="mt-2 h-52">
           <ResponsiveContainer width="100%" height="100%">

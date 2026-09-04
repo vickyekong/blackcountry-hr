@@ -84,7 +84,7 @@ function NewEmployeeForm() {
   return (
     <>
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-stone-900">Add Employee</h1>
+        <h1 className="text-2xl font-semibold text-ink">Add Employee</h1>
         {applicationId ? (
           <p className="mt-1 text-sm text-muted">
             Hiring from an application
@@ -140,7 +140,7 @@ function NewEmployeeForm() {
                   id="sex"
                   name="sex"
                   required
-                  className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                  className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
                   defaultValue=""
                 >
                   <option value="" disabled>
@@ -156,7 +156,7 @@ function NewEmployeeForm() {
                   id="department"
                   name="department"
                   required
-                  className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                  className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
                   defaultValue={hireDepartment}
                 >
                   <option value="" disabled>
@@ -184,7 +184,7 @@ function NewEmployeeForm() {
                 <select
                   id="employmentType"
                   name="employmentType"
-                  className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                  className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
                   defaultValue={searchParams.get("employmentType") ?? "FULL_TIME"}
                 >
                   <option value="FULL_TIME">Full-time</option>
@@ -193,8 +193,8 @@ function NewEmployeeForm() {
               </div>
             </div>
 
-            <div className="border-t border-stone-100 pt-4">
-              <p className="mb-3 text-sm font-medium text-stone-700">Compensation (₦)</p>
+            <div className="border-t border-line pt-4">
+              <p className="mb-3 text-sm font-medium text-ink-soft">Compensation (₦)</p>
               <div className="grid gap-4 sm:grid-cols-3">
                 <div>
                   <Label htmlFor="basicSalary">Basic</Label>
@@ -211,8 +211,8 @@ function NewEmployeeForm() {
               </div>
             </div>
 
-            <div className="border-t border-stone-100 pt-4">
-              <p className="mb-3 text-sm font-medium text-stone-700">Bank & tax</p>
+            <div className="border-t border-line pt-4">
+              <p className="mb-3 text-sm font-medium text-ink-soft">Bank & tax</p>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <Label htmlFor="bankName">Bank name</Label>

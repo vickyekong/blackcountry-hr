@@ -108,7 +108,7 @@ export function RecruitmentBoard() {
                 id="department"
                 name="department"
                 required
-                className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
               >
                 <option value="">Select</option>
                 {departments.map((d) => (
@@ -127,7 +127,7 @@ export function RecruitmentBoard() {
               <select
                 id="employmentType"
                 name="employmentType"
-                className="mt-1 flex h-9 w-full rounded-md border border-stone-300 px-3 text-sm"
+                className="mt-1 flex h-9 w-full rounded-md border border-line px-3 text-sm"
                 defaultValue="FULL_TIME"
               >
                 <option value="FULL_TIME">Full-time</option>
@@ -157,7 +157,7 @@ export function RecruitmentBoard() {
                 required
                 minLength={10}
                 rows={5}
-                className="mt-1 w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+                className="mt-1 w-full rounded-md border border-line px-3 py-2 text-sm"
               />
             </div>
             <div className="sm:col-span-2">
@@ -166,7 +166,7 @@ export function RecruitmentBoard() {
                 id="requirements"
                 name="requirements"
                 rows={3}
-                className="mt-1 w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+                className="mt-1 w-full rounded-md border border-line px-3 py-2 text-sm"
               />
             </div>
             <label className="flex items-center gap-2 text-sm sm:col-span-2">

@@ -60,13 +60,12 @@ export function SignupForm() {
   }
 
   return (
-    <div className="relative flex min-h-screen min-h-dvh overflow-x-hidden bg-atmosphere text-ink">
+    <div className="relative flex min-h-screen min-h-dvh overflow-x-hidden bg-mist text-ink">
+      <div className="h-1 w-full bg-lagoon lg:hidden" />
       <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col justify-center gap-8 px-4 py-10 sm:gap-10 sm:px-6 sm:py-12 lg:flex-row lg:items-center lg:gap-16 lg:px-10">
         <div className="animate-soft-rise max-w-md lg:flex-1">
-          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-ok">
-            New company
-          </p>
-          <h1 className="font-display mt-3 text-4xl font-semibold leading-[1.05] tracking-tight text-ink sm:mt-4 sm:text-5xl">
+          <p className="page-kicker">New company</p>
+          <h1 className="font-marketing mt-3 text-4xl font-semibold leading-[1.05] tracking-tight text-ink sm:mt-4 sm:text-5xl">
             Create your {PRODUCT_NAME} workspace
           </h1>
           <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted sm:mt-4 sm:text-base">
@@ -87,7 +86,7 @@ export function SignupForm() {
         >
           <form
             onSubmit={handleSubmit}
-            className="rounded-xl border border-line bg-foam p-5 shadow-soft sm:p-6"
+            className="rounded-lg border border-line bg-foam p-5 shadow-panel sm:p-6"
           >
             <p className="text-sm font-medium text-ink">Company signup</p>
             <p className="mt-1 text-xs text-muted">

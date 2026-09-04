@@ -35,16 +35,30 @@ const config: Config = {
         },
         warn: withAlpha("--warn"),
         sky: withAlpha("--sky"),
+        rail: withAlpha("--rail"),
       },
       fontFamily: {
-        sans: ["var(--font-manrope)", "Manrope", "ui-sans-serif", "system-ui"],
-        display: ["var(--font-fraunces)", "Fraunces", "ui-serif", "Georgia"],
+        sans: [
+          "var(--font-jakarta)",
+          "Plus Jakarta Sans",
+          "ui-sans-serif",
+          "system-ui",
+        ],
+        display: [
+          "var(--font-jakarta)",
+          "Plus Jakarta Sans",
+          "ui-sans-serif",
+          "system-ui",
+        ],
+        marketing: ["var(--font-fraunces)", "Fraunces", "ui-serif", "Georgia"],
       },
       borderRadius: {
-        xl: "var(--radius)",
+        lg: "var(--radius)",
+        xl: "0.75rem",
       },
       boxShadow: {
-        soft: "0 1px 0 rgba(41, 41, 41, 0.04), 0 8px 24px -12px rgba(41, 41, 41, 0.14)",
+        soft: "0 1px 0 rgba(28, 28, 28, 0.04), 0 12px 28px -16px rgba(28, 28, 28, 0.18)",
+        panel: "0 1px 0 rgba(28, 28, 28, 0.04)",
       },
       transitionTimingFunction: {
         brand: "cubic-bezier(0.22, 1, 0.36, 1)",
