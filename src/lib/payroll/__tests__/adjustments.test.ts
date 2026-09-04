@@ -11,12 +11,14 @@ describe("aggregateAdjustments", () => {
       { type: "ADVANCE", amountKobo: nairaToKobo(-10_000) },
       { type: "UNPAID_LEAVE", amountKobo: nairaToKobo(-5_000) },
       { type: "OVERTIME", amountKobo: nairaToKobo(12_000) },
+      { type: "BENEFIT_DEDUCTION", amountKobo: nairaToKobo(-4_000) },
     ]);
 
     expect(result.bonusKobo).toBe(nairaToKobo(87_000));
     expect(result.loanDeductionKobo).toBe(nairaToKobo(20_000));
     expect(result.advanceDeductionKobo).toBe(nairaToKobo(10_000));
     expect(result.unpaidLeaveDeductionKobo).toBe(nairaToKobo(5_000));
+    expect(result.otherDeductionsKobo).toBe(nairaToKobo(4_000));
   });
 
   it("returns zeros for empty input", () => {

@@ -61,6 +61,20 @@ export async function GET(
     }
 
     const periodLabel = `${getMonthName(payslip.payrollRun.periodMonth)} ${payslip.payrollRun.periodYear}`;
+    const breakdown = (payslip.breakdown ?? {}) as {
+      deductions?: {
+        loanDeductionKobo?: string | number;
+        advanceDeductionKobo?: string | number;
+        unpaidLeaveDeductionKobo?: string | number;
+        otherDeductionsKobo?: string | number;
+      };
+    };
+    const loan = BigInt(breakdown.deductions?.loanDeductionKobo ?? 0);
+    const advance = BigInt(breakdown.deductions?.advanceDeductionKobo ?? 0);
+    const otherShown = breakdown.deductions
+      ? BigInt(breakdown.deductions.unpaidLeaveDeductionKobo ?? 0) +
+        BigInt(breakdown.deductions.otherDeductionsKobo ?? 0)
+      : payslip.otherDeductionsKobo;
 
     const buffer = await renderToBuffer(
       <PayslipDocument
@@ -84,7 +98,9 @@ export async function GET(
           paye: payslip.payeKobo.toString(),
           pension: payslip.pensionEmployeeKobo.toString(),
           nhf: payslip.nhfKobo.toString(),
-          other: payslip.otherDeductionsKobo.toString(),
+          loan: loan > 0n ? loan.toString() : undefined,
+          advance: advance > 0n ? advance.toString() : undefined,
+          other: (otherShown > 0n ? otherShown : 0n).toString(),
           total: (
             payslip.payeKobo +
             payslip.pensionEmployeeKobo +

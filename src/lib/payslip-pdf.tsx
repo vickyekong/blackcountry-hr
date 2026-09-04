@@ -97,6 +97,8 @@ export interface PayslipPdfProps {
     paye: string;
     pension: string;
     nhf: string;
+    loan?: string;
+    advance?: string;
     other: string;
     total: string;
   };
@@ -166,6 +168,12 @@ export function PayslipDocument(props: PayslipPdfProps) {
             ["PAYE Tax", props.deductions.paye],
             ["Pension (Employee)", props.deductions.pension],
             ["NHF", props.deductions.nhf],
+            ...(props.deductions.loan && Number(props.deductions.loan) > 0
+              ? [["Loan repayment", props.deductions.loan] as const]
+              : []),
+            ...(props.deductions.advance && Number(props.deductions.advance) > 0
+              ? [["Salary advance", props.deductions.advance] as const]
+              : []),
             ["Other Deductions", props.deductions.other],
           ].map(([label, val]) => (
             <View key={label} style={styles.row}>

@@ -16,6 +16,7 @@ import {
 import { getPayrollPreflight } from "@/lib/payroll/preflight";
 import { approvedTimesheetHoursForPeriod } from "@/lib/timesheets/period";
 import { findAccessiblePayrollRun } from "@/lib/tenancy/workspace";
+import { markPayrollExpensesReimbursed } from "@/lib/expenses/payroll-attach";
 import { z } from "zod";
 
 const actionSchema = z.object({
@@ -328,6 +329,14 @@ export async function PATCH(
       where: { id: run.id },
       data: update,
     });
+
+    if (body.action === "complete_processing") {
+      await markPayrollExpensesReimbursed({
+        payrollRunId: run.id,
+        reimbursedById: session.user.id,
+        reimbursedAt: updated.paidAt ?? new Date(),
+      });
+    }
 
     if (body.action === "approve" || body.action === "reject") {
       await prisma.notification.updateMany({

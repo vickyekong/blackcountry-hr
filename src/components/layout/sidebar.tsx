@@ -26,10 +26,13 @@ const staffNavItems: Array<{ href: string; label: string }> = [
   { href: "/staff/files", label: "Files" },
   { href: "/staff/requests", label: "Requests" },
   { href: "/staff/payslips", label: "Payslips" },
+  { href: "/staff/advances", label: "Advances" },
+  { href: "/staff/expenses", label: "Expenses" },
 ];
 
 const financeNavItems: Array<{ href: string; label: string }> = [
   { href: "/finance", label: "Payroll to process" },
+  { href: "/finance/expenses", label: "Expenses" },
 ];
 
 const navItems: Array<{
@@ -81,6 +84,11 @@ const navItems: Array<{
     href: "/payroll",
     label: "Payroll",
     roles: ["SUPER_ADMIN", "HR_ADMIN"],
+  },
+  {
+    href: "/expenses",
+    label: "Expenses",
+    roles: ["SUPER_ADMIN", "HR_ADMIN", "BUSINESS_HEAD"],
   },
   {
     href: "/timesheets",
@@ -189,7 +197,7 @@ function NavPanel({
                   : portal === "BUSINESS_HEAD"
                     ? "This company’s people, projects, and files"
                     : portal === "EMPLOYEE"
-                      ? "Your details, leave, timesheets, projects, and requests"
+                      ? "Your details, leave, timesheets, projects, advances, expenses, and requests"
                       : null}
           </p>
         )}

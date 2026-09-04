@@ -33,6 +33,9 @@ export function aggregateAdjustments(
         unpaidLeaveDeductionKobo += abs;
         break;
       case "ATTENDANCE_PENALTY":
+      case "BENEFIT_DEDUCTION":
+      case "COOPERATIVE":
+      case "CUSTOM_DEDUCTION":
         otherDeductionsKobo += abs;
         break;
     }

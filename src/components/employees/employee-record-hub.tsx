@@ -12,6 +12,7 @@ import { EmployeeAssetsPanel } from "@/components/employees/employee-assets-pane
 import { EmployeeLifecyclePanel } from "@/components/employees/lifecycle-panel";
 import { EmployeeTrainingPanel } from "@/components/employees/employee-training-panel";
 import { EmployeePerformancePanel } from "@/components/employees/employee-performance-panel";
+import { EmployeePayPanel } from "@/components/employees/employee-pay-panel";
 
 type TabId =
   | "overview"
@@ -21,6 +22,7 @@ type TabId =
   | "assets"
   | "training"
   | "performance"
+  | "pay"
   | "onboarding";
 
 const TABS: Array<{ id: TabId; label: string }> = [
@@ -31,6 +33,7 @@ const TABS: Array<{ id: TabId; label: string }> = [
   { id: "assets", label: "Assets" },
   { id: "training", label: "Training" },
   { id: "performance", label: "Performance" },
+  { id: "pay", label: "Pay extras" },
   { id: "onboarding", label: "Onboarding" },
 ];
 
@@ -306,6 +309,7 @@ export function EmployeeRecordHub({
           canManage={canManage}
         />
       )}
+      {tab === "pay" && <EmployeePayPanel employeeId={employee.id} />}
       {tab === "onboarding" && (
         <div>
           <h2 className="mb-1 text-lg font-semibold text-stone-900">

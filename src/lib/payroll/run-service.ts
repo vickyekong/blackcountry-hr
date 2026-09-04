@@ -28,6 +28,16 @@ import {
   attachApprovedOvertimeToDraftRun,
   detachOvertimeFromRun,
 } from "@/lib/time/overtime";
+import {
+  attachPayrollMoneyToDraftRun,
+  detachPayrollMoneyFromRun,
+} from "@/lib/payroll/money-attach";
+import {
+  addExpenseReimbursements,
+  attachPayrollExpensesToDraftRun,
+  detachPayrollExpensesFromRun,
+  expenseReimbursementKoboByEmployee,
+} from "@/lib/expenses/payroll-attach";
 
 export class PayrollRunError extends Error {
   constructor(
@@ -274,6 +284,8 @@ export async function recalculatePayrollRun(
     run,
     workingDaysPerMonth: config.workingDaysPerMonth,
   });
+  await attachPayrollMoneyToDraftRun({ run });
+  await attachPayrollExpensesToDraftRun({ run });
   const refreshed = await loadRunContext(runId, companyId, {
     preferSnapshot: options?.preferSnapshot,
   });
@@ -314,6 +326,9 @@ export async function recalculatePayrollRun(
   const timesheetMinutes = new Map(
     timesheetRows.map((row) => [row.employeeId, row.minutes])
   );
+  const expenseKoboByEmployee = await expenseReimbursementKoboByEmployee(
+    runWithOt.id
+  );
 
   const payslipRows = employees.map((employee) => {
     const leaveAdj = buildLeaveAdjustments(
@@ -337,9 +352,13 @@ export async function recalculatePayrollRun(
         annualRentKobo: employee.annualRentKobo,
       },
     });
+    const compensationWithExpenses = addExpenseReimbursements(
+      compensation,
+      expenseKoboByEmployee.get(employee.id) ?? 0n
+    );
 
     const breakdown = calculatePayroll(
-      compensation,
+      compensationWithExpenses,
       configWithOt,
       { month: runWithOt.periodMonth, year: runWithOt.periodYear },
       adjustments
@@ -450,6 +469,8 @@ export async function reverseAndRegeneratePayrollRun(
 
   await prisma.payslip.deleteMany({ where: { payrollRunId: run.id } });
   await detachOvertimeFromRun(run.id);
+  await detachPayrollMoneyFromRun(run.id);
+  await detachPayrollExpensesFromRun(run.id);
 
   await prisma.payrollRun.update({
     where: { id: run.id },

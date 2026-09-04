@@ -89,6 +89,10 @@ export const PERMISSIONS = {
   approveChangeRequests: ["SUPER_ADMIN"] as UserRole[],
   /** Next of kin, address, and general staff requests — HR or Super Admin */
   reviewStaffRequests: ["SUPER_ADMIN", "HR_ADMIN"] as UserRole[],
+  /** Expense claims — HR and Super Admin; line managers handled in the API */
+  reviewExpenses: ["SUPER_ADMIN", "HR_ADMIN"] as UserRole[],
+  /** Mark approved claims paid — Finance, plus HR/Super Admin for the same company */
+  reimburseExpenses: ["SUPER_ADMIN", "HR_ADMIN", "FINANCE"] as UserRole[],
   viewReports: ["SUPER_ADMIN", "HR_ADMIN", "FINANCE", "BUSINESS_HEAD"] as UserRole[],
   viewAuditLog: ["SUPER_ADMIN", "HR_ADMIN", "FINANCE"] as UserRole[],
   /** Month-range CSV export of the audit log */

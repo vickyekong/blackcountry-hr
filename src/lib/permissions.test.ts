@@ -30,6 +30,11 @@ describe("five-portal roles", () => {
     expect(can("BUSINESS_HEAD", "manageRecruitment")).toBe(false);
     expect(can("FINANCE", "approvePayroll")).toBe(false);
     expect(can("FINANCE", "processPayrollFinance")).toBe(true);
+    expect(can("FINANCE", "reimburseExpenses")).toBe(true);
+    expect(can("FINANCE", "reviewExpenses")).toBe(false);
+    expect(can("HR_ADMIN", "reviewExpenses")).toBe(true);
+    expect(can("HR_ADMIN", "reimburseExpenses")).toBe(true);
+    expect(can("BUSINESS_HEAD", "reviewExpenses")).toBe(false);
   });
 
   it("lets Super Admin, HR, and business heads create projects; Staff can view; Finance cannot", () => {

@@ -65,6 +65,8 @@ export const config = {
     "/performance",
     "/payroll/:path*",
     "/leave/:path*",
+    "/expenses/:path*",
+    "/expenses",
     "/reports/:path*",
     "/audit-log/:path*",
     "/hr-desk/:path*",

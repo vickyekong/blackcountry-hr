@@ -138,6 +138,13 @@ model Company {
   trainingPrograms      TrainingProgram[]
   performanceGoals      PerformanceGoal[]
   performanceReviews    PerformanceReview[]
+  salaryStructures      SalaryStructure[]
+  benefitPlans          BenefitPlan[]
+  recurringDeductions   RecurringDeduction[]
+  salaryAdvances        SalaryAdvance[]
+  salaryLoans           SalaryLoan[]
+  remittancePayments    RemittancePayment[]
+  expenseClaims         ExpenseClaim[]
 
   @@index([parentId])
 }
@@ -231,6 +238,10 @@ model User {
   payrollRunsApproved PayrollRun[] @relation("ApprovedBy")
   leaveApprovals      LeaveRequest[] @relation("LeaveApprover")
   overtimeApprovals   OvertimeRequest[] @relation("OvertimeApprover")
+  advanceApprovals    SalaryAdvance[] @relation("AdvanceApprover")
+  loanApprovals       SalaryLoan[] @relation("LoanApprover")
+  expenseApprovals    ExpenseClaim[] @relation("ExpenseApprover")
+  expenseReimbursements ExpenseClaim[] @relation("ExpenseReimburser")
   auditLogs           AuditLog[]
   notifications       Notification[]
   hrDeskAssigned      HrDeskMessage[] @relation("HrDeskAssignee")
@@ -260,12 +271,14 @@ model Employee {
   rsaPin              String?
   nhfNumber           String?
 
-  // Compensation (all in kobo)
+  // Compensation (all in kobo) — engine reads these fields, not the structure row
   basicSalaryKobo     BigInt
   housingAllowanceKobo BigInt @default(0)
   transportAllowanceKobo BigInt @default(0)
   otherTaxableAllowancesKobo BigInt @default(0)
   nonTaxableReimbursementsKobo BigInt @default(0)
+  salaryStructureId   String?
+  salaryStructure     SalaryStructure? @relation(fields: [salaryStructureId], references: [id], onDelete: SetNull)
 
   // Optional rent for NTA2025 relief
   annualRentKobo      BigInt @default(0)
@@ -313,6 +326,11 @@ model Employee {
   trainingEnrollments TrainingEnrollment[]
   performanceGoals    PerformanceGoal[]
   performanceReviews  PerformanceReview[]
+  employeeBenefits    EmployeeBenefit[]
+  recurringDeductions RecurringDeduction[]
+  salaryAdvances      SalaryAdvance[]
+  salaryLoans         SalaryLoan[]
+  expenseClaims       ExpenseClaim[]
 
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
@@ -321,6 +339,7 @@ model Employee {
   @@unique([companyId, clockDeviceId])
   @@index([companyId, status])
   @@index([managerId])
+  @@index([salaryStructureId])
 }
 
 model EmployeeDocument {
@@ -422,6 +441,10 @@ model PayrollRun {
   payslips    Payslip[]
   adjustments PayrollAdjustment[]
   overtimeRequests OvertimeRequest[]
+  advanceCharges SalaryAdvanceCharge[]
+  loanCharges    SalaryLoanCharge[]
+  remittancePayments RemittancePayment[]
+  expenseClaims      ExpenseClaim[]
 
   @@unique([companyId, periodMonth, periodYear])
   @@index([companyId, status])
@@ -433,7 +456,7 @@ model PayrollAdjustment {
   payrollRun    PayrollRun @relation(fields: [payrollRunId], references: [id], onDelete: Cascade)
   employeeId    String
   employee      Employee   @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  type          String     // BONUS, LOAN_DEDUCTION, ADVANCE, UNPAID_LEAVE, OVERTIME, ATTENDANCE_PENALTY
+  type          String     // BONUS, LOAN_DEDUCTION, ADVANCE, UNPAID_LEAVE, OVERTIME, ATTENDANCE_PENALTY, BENEFIT_DEDUCTION, COOPERATIVE, CUSTOM_DEDUCTION
   amountKobo    BigInt     // positive = earning, negative = deduction
   description   String?
   createdAt     DateTime   @default(now())
@@ -474,6 +497,195 @@ model Payslip {
 
   @@unique([payrollRunId, employeeId])
   @@index([employeeId])
+}
+
+/// Template copied onto Employee compensation fields when assigned. Engine still reads the employee row.
+model SalaryStructure {
+  id                             String     @id @default(cuid())
+  companyId                      String
+  company                        Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name                           String
+  basicSalaryKobo                BigInt
+  housingAllowanceKobo           BigInt     @default(0)
+  transportAllowanceKobo         BigInt     @default(0)
+  feedingAllowanceKobo           BigInt     @default(0)
+  medicalAllowanceKobo           BigInt     @default(0)
+  communicationAllowanceKobo     BigInt     @default(0)
+  otherTaxableAllowancesKobo     BigInt     @default(0)
+  nonTaxableReimbursementsKobo   BigInt     @default(0)
+  employees                      Employee[]
+  createdAt                      DateTime   @default(now())
+  updatedAt                      DateTime   @updatedAt
+
+  @@unique([companyId, name])
+  @@index([companyId])
+}
+
+model BenefitPlan {
+  id                    String            @id @default(cuid())
+  companyId             String
+  company               Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name                  String
+  kind                  String            @default("OTHER")
+  employerCostKobo      BigInt            @default(0)
+  employeeDeductionKobo BigInt            @default(0)
+  notes                 String?
+  enrollments           EmployeeBenefit[]
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+
+  @@unique([companyId, name])
+  @@index([companyId])
+}
+
+model EmployeeBenefit {
+  id         String      @id @default(cuid())
+  employeeId String
+  employee   Employee    @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  planId     String
+  plan       BenefitPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  status     String      @default("ACTIVE")
+  startedAt  DateTime    @default(now())
+  endedAt    DateTime?
+
+  @@unique([employeeId, planId])
+  @@index([planId])
+}
+
+model RecurringDeduction {
+  id          String   @id @default(cuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  employeeId  String
+  employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  kind        String   @default("OTHER")
+  amountKobo  BigInt
+  description String?
+  status      String   @default("ACTIVE")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([companyId, status])
+  @@index([employeeId])
+}
+
+model SalaryAdvance {
+  id               String                @id @default(cuid())
+  companyId        String
+  company          Company               @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  employeeId       String
+  employee         Employee              @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  requestedKobo    BigInt
+  approvedKobo     BigInt                @default(0)
+  installments     Int                   @default(1)
+  reason           String?
+  status           String                @default("PENDING")
+  approvedById     String?
+  approvedBy       User?                 @relation("AdvanceApprover", fields: [approvedById], references: [id])
+  approvedAt       DateTime?
+  charges          SalaryAdvanceCharge[]
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+
+  @@index([companyId, status])
+  @@index([employeeId])
+}
+
+model SalaryAdvanceCharge {
+  id           String        @id @default(cuid())
+  advanceId    String
+  advance      SalaryAdvance @relation(fields: [advanceId], references: [id], onDelete: Cascade)
+  payrollRunId String
+  payrollRun   PayrollRun    @relation(fields: [payrollRunId], references: [id], onDelete: Cascade)
+  amountKobo   BigInt
+
+  @@unique([advanceId, payrollRunId])
+  @@index([payrollRunId])
+}
+
+model SalaryLoan {
+  id            String             @id @default(cuid())
+  companyId     String
+  company       Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  employeeId    String
+  employee      Employee           @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  principalKobo BigInt
+  interestKobo  BigInt             @default(0)
+  installments  Int                @default(1)
+  reason        String?
+  status        String             @default("PENDING")
+  approvedById  String?
+  approvedBy    User?              @relation("LoanApprover", fields: [approvedById], references: [id])
+  approvedAt    DateTime?
+  charges       SalaryLoanCharge[]
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  @@index([companyId, status])
+  @@index([employeeId])
+}
+
+model SalaryLoanCharge {
+  id           String     @id @default(cuid())
+  loanId       String
+  loan         SalaryLoan @relation(fields: [loanId], references: [id], onDelete: Cascade)
+  payrollRunId String
+  payrollRun   PayrollRun @relation(fields: [payrollRunId], references: [id], onDelete: Cascade)
+  amountKobo   BigInt
+
+  @@unique([loanId, payrollRunId])
+  @@index([payrollRunId])
+}
+
+model RemittancePayment {
+  id           String     @id @default(cuid())
+  companyId    String
+  company      Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  payrollRunId String
+  payrollRun   PayrollRun @relation(fields: [payrollRunId], references: [id], onDelete: Cascade)
+  kind         String
+  amountKobo   BigInt     @default(0)
+  status       String     @default("PENDING")
+  paidAt       DateTime?
+  reference    String?
+  notes        String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@unique([payrollRunId, kind])
+  @@index([companyId, status])
+}
+
+model ExpenseClaim {
+  id                   String    @id @default(cuid())
+  companyId            String
+  company              Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  employeeId           String
+  employee             Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  category             String    @default("OTHER")
+  amountKobo           BigInt
+  approvedAmountKobo   BigInt    @default(0)
+  description          String
+  incurredOn           DateTime
+  receiptUrl           String?
+  status               String    @default("PENDING")
+  approvedById         String?
+  approvedBy           User?     @relation("ExpenseApprover", fields: [approvedById], references: [id])
+  approvedAt           DateTime?
+  reviewNote           String?
+  reimbursementMethod  String?
+  reimbursementRef     String?
+  reimbursedAt         DateTime?
+  reimbursedById       String?
+  reimbursedBy         User?     @relation("ExpenseReimburser", fields: [reimbursedById], references: [id])
+  payrollRunId         String?
+  payrollRun           PayrollRun? @relation(fields: [payrollRunId], references: [id], onDelete: SetNull)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@index([companyId, status])
+  @@index([employeeId])
+  @@index([payrollRunId])
 }
 
 model LeaveRequest {
