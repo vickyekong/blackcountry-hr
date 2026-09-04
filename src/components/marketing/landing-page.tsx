@@ -4,6 +4,7 @@ import {
   PRODUCT_TAGLINE,
 } from "@/lib/brand";
 import { LandingLottie } from "@/components/marketing/landing-lottie";
+import { BrandStripe } from "@/components/brand/brand-stripe";
 
 /** Hard <a> navigations so Sign in never soft-routes into the login shell by mistake. */
 function CtaLink({
@@ -82,6 +83,7 @@ const FLOW = [
 const CAPABILITIES = [
   {
     title: "People ops",
+    tone: "ok" as const,
     items: [
       "Employee profiles & compensation structure",
       "Onboarding and offboarding checklists",
@@ -91,6 +93,7 @@ const CAPABILITIES = [
   },
   {
     title: "Payroll",
+    tone: "lagoon" as const,
     items: [
       "NTA 2025 PAYE with taxable vs non-taxable lines",
       "Pension, NHF, NSITF on every run",
@@ -100,6 +103,7 @@ const CAPABILITIES = [
   },
   {
     title: "Command center",
+    tone: "sky" as const,
     items: [
       "Super Admin, HR, Finance, Business head, and Staff portals",
       "Compliance gaps (TIN, RSA PIN) at a glance",
@@ -110,16 +114,29 @@ const CAPABILITIES = [
 ] as const;
 
 const STATUTORY = [
-  { name: "PAYE", detail: "NTA 2025 bands + ₦800k relief path" },
-  { name: "Pension", detail: "Employee & employer contributions" },
-  { name: "NHF", detail: "Housing fund on qualifying pay" },
-  { name: "NSITF", detail: "Employer remittance aligned to run" },
+  { name: "PAYE", detail: "NTA 2025 bands + ₦800k relief path", accent: "border-lagoon" },
+  { name: "Pension", detail: "Employee & employer contributions", accent: "border-ok" },
+  { name: "NHF", detail: "Housing fund on qualifying pay", accent: "border-sky" },
+  { name: "NSITF", detail: "Employer remittance aligned to run", accent: "border-signal" },
 ] as const;
+
+const FLOW_STEP_CLASS = [
+  "bg-lagoon text-ink",
+  "bg-ok text-foam",
+  "bg-sky text-ink",
+  "bg-signal text-foam",
+] as const;
+
+const CAPABILITY_DOT: Record<(typeof CAPABILITIES)[number]["tone"], string> = {
+  ok: "bg-ok",
+  lagoon: "bg-lagoon",
+  sky: "bg-sky",
+};
 
 export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean }) {
   return (
     <div className="min-h-screen min-h-dvh bg-mist text-ink">
-      <div className="h-1 w-full bg-lagoon" />
+      <BrandStripe />
       <header className="sticky top-0 z-30 flex items-center justify-between border-b border-line bg-foam/90 px-5 py-3 backdrop-blur-md sm:px-8 lg:px-12">
         <p className="text-sm font-semibold tracking-tight text-ink sm:text-base">
           {PRODUCT_NAME}
@@ -142,7 +159,7 @@ export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean 
         </nav>
       </header>
 
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden bg-atmosphere">
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-14 sm:px-8 sm:py-20 lg:grid-cols-12 lg:gap-12 lg:px-12 lg:py-24">
           <div className="animate-soft-rise lg:col-span-7">
             <p className="page-kicker">Private · Blackcountry Group</p>
@@ -296,7 +313,9 @@ export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean 
                     speed={0.85}
                   />
                 </div>
-                <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-lagoon text-xs font-bold text-ink">
+                <span
+                  className={`inline-flex h-6 w-6 items-center justify-center rounded-md text-xs font-bold ${FLOW_STEP_CLASS[Number(item.step) - 1]}`}
+                >
                   {item.step}
                 </span>
                 <h3 className="mt-2 text-base font-semibold text-ink">{item.title}</h3>
@@ -321,14 +340,20 @@ export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean 
 
           <div className="mt-12 grid gap-8 md:grid-cols-3">
             {CAPABILITIES.map((group) => (
-              <div key={group.title} className="rounded-lg border border-line bg-foam p-5 shadow-panel">
+              <div
+                key={group.title}
+                className="rounded-lg border border-line bg-foam p-5 shadow-panel"
+              >
                 <h3 className="text-lg font-semibold tracking-tight text-ink">
                   {group.title}
                 </h3>
                 <ul className="mt-4 space-y-2.5">
                   {group.items.map((item) => (
                     <li key={item} className="flex gap-2.5 text-sm leading-relaxed text-muted">
-                      <span aria-hidden className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-sm bg-lagoon" />
+                      <span
+                        aria-hidden
+                        className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-sm ${CAPABILITY_DOT[group.tone]}`}
+                      />
                       <span>{item}</span>
                     </li>
                   ))}
@@ -363,7 +388,10 @@ export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean 
 
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {STATUTORY.map((item) => (
-              <div key={item.name} className="rounded-lg border border-white/10 bg-white/5 p-4">
+              <div
+                key={item.name}
+                className={`rounded-lg border border-white/10 border-l-2 bg-white/5 p-4 ${item.accent}`}
+              >
                 <p className="text-xl font-semibold text-foam">{item.name}</p>
                 <p className="mt-1.5 text-sm leading-relaxed text-white/55">{item.detail}</p>
               </div>
@@ -431,8 +459,9 @@ export function LandingPage({ signupEnabled = true }: { signupEnabled?: boolean 
         </div>
       </section>
 
-      <footer className="border-t border-white/10 bg-rail px-5 py-6 sm:px-8 lg:px-12">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 text-xs text-white/40 sm:flex-row">
+      <footer className="border-t border-white/10 bg-rail">
+        <BrandStripe />
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-5 py-6 text-xs text-white/40 sm:flex-row sm:px-8 lg:px-12">
           <p className="text-sm font-medium text-white/70">{PRODUCT_NAME}</p>
           <p>
             © {new Date().getFullYear()} {PRODUCT_NAME} · Private workspace for

@@ -1,16 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requirePermission, handleApiError } from "@/lib/api-auth";
+import { serializeBigInts } from "@/lib/payroll/config-mapper";
+import { nairaToKobo } from "@/lib/money";
 import { z } from "zod";
 
 const updateSchema = z
   .object({
     name: z.string().trim().min(1).max(80).optional(),
     managerEmployeeId: z.string().nullable().optional(),
+    budgetNaira: z.number().min(0).nullable().optional(),
   })
   .refine(
-    (body) => body.name !== undefined || body.managerEmployeeId !== undefined,
-    { message: "Provide a name or a department head" }
+    (body) =>
+      body.name !== undefined ||
+      body.managerEmployeeId !== undefined ||
+      body.budgetNaira !== undefined,
+    { message: "Provide a name, department head, or budget" }
   );
 
 export async function PATCH(
@@ -66,11 +72,18 @@ export async function PATCH(
       }
     }
 
+    let budgetKobo: bigint | null | undefined;
+    if (body.budgetNaira !== undefined) {
+      budgetKobo =
+        body.budgetNaira === null ? null : nairaToKobo(body.budgetNaira);
+    }
+
     const department = await prisma.department.update({
       where: { id: params.id },
       data: {
         ...(body.name && { name: body.name }),
         ...(managerEmployeeId !== undefined && { managerEmployeeId }),
+        ...(budgetKobo !== undefined && { budgetKobo }),
       },
     });
 
@@ -95,11 +108,15 @@ export async function PATCH(
           from: existing.name,
           to: department.name,
           managerEmployeeId: department.managerEmployeeId,
+          budgetKobo:
+            department.budgetKobo === null
+              ? null
+              : department.budgetKobo.toString(),
         },
       },
     });
 
-    return NextResponse.json(department);
+    return NextResponse.json(serializeBigInts(department));
   } catch (error) {
     return handleApiError(error);
   }

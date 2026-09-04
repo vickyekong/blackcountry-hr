@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { PRODUCT_NAME } from "@/lib/brand";
+import { BrandStripe } from "@/components/brand/brand-stripe";
 import { ensureRecruitmentSchema } from "@/lib/ensure-recruitment-schema";
 import { PublicApplyForm } from "@/components/recruitment/public-apply-form";
 import { getAppBaseUrl } from "@/lib/app-url";
@@ -46,11 +47,12 @@ export default async function PublicJobPage({
   };
 
   return (
-    <div className="min-h-screen bg-mist text-ink">
+    <div className="min-h-screen bg-atmosphere text-ink">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      <BrandStripe />
       <header className="border-b border-line bg-foam px-5 py-4">
         <p className="page-kicker">{PRODUCT_NAME}</p>
         <p className="mt-1 text-lg font-semibold tracking-tight">{listing.company.name}</p>

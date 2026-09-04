@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PRODUCT_NAME, PRODUCT_TAGLINE } from "@/lib/brand";
+import { BrandStripe } from "@/components/brand/brand-stripe";
 
 export function LoginForm({ signupEnabled }: { signupEnabled: boolean }) {
   const router = useRouter();
@@ -39,7 +40,8 @@ export function LoginForm({ signupEnabled }: { signupEnabled: boolean }) {
   return (
     <div className="grid min-h-screen min-h-dvh lg:grid-cols-2">
       <div className="relative hidden bg-login-atmosphere px-10 py-12 text-foam lg:flex lg:flex-col lg:justify-between">
-        <p className="text-sm font-semibold tracking-tight">{PRODUCT_NAME}</p>
+        <BrandStripe className="absolute inset-x-0 top-0" />
+        <p className="mt-2 text-sm font-semibold tracking-tight">{PRODUCT_NAME}</p>
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-lagoon">
             Blackcountry Group · issued accounts only

@@ -4,7 +4,7 @@ import { signOut, useSession } from "next-auth/react";
 import { NotificationsBell } from "@/components/layout/notifications-bell";
 import { WorkspaceSwitcher } from "@/components/layout/workspace-switcher";
 import { DashboardToggle } from "@/components/layout/dashboard-toggle";
-import { portalEyebrow } from "@/components/layout/nav-config";
+import { portalChipClass, portalEyebrow } from "@/components/layout/nav-config";
 import { effectivePortalRole, portalLabel } from "@/lib/permissions";
 
 export function TopBar() {
@@ -14,7 +14,9 @@ export function TopBar() {
 
   return (
     <header className="sticky top-0 z-30 hidden h-14 items-center gap-3 border-b border-line bg-foam/90 px-5 backdrop-blur-md lg:flex">
-      <span className="inline-flex h-6 items-center rounded-md bg-lagoon px-2 text-[11px] font-bold uppercase tracking-[0.08em] text-ink">
+      <span
+        className={`inline-flex h-6 items-center rounded-md px-2 text-[11px] font-bold uppercase tracking-[0.08em] ${portalChipClass(portal)}`}
+      >
         {portalEyebrow(portal)}
       </span>
       <WorkspaceSwitcher className="max-w-[16rem]" />

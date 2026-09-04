@@ -161,6 +161,7 @@ model Department {
   name               String
   managerEmployeeId  String?
   manager            Employee? @relation("DepartmentHead", fields: [managerEmployeeId], references: [id], onDelete: SetNull)
+  budgetKobo         BigInt?
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
@@ -518,6 +519,7 @@ model SalaryStructure {
   companyId                      String
   company                        Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
   name                           String
+  grade                          String?
   basicSalaryKobo                BigInt
   housingAllowanceKobo           BigInt     @default(0)
   transportAllowanceKobo         BigInt     @default(0)

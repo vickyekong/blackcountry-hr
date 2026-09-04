@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { getMonthName } from "@/lib/utils";
 import { getAppBaseUrl } from "@/lib/app-url";
+import { sendNotificationEmail } from "@/lib/email";
 import { payrollApproverCompanyIds } from "@/lib/tenancy/workspace";
 import type { UserRole } from "@prisma/client";
 
@@ -64,6 +65,17 @@ export async function notifyPayrollSubmitted(options: {
     })
   );
 
+  void Promise.all(
+    notifications.map((row) =>
+      sendNotificationEmail({
+        to: row.email,
+        subject: title,
+        text: body,
+        linkUrl,
+      })
+    )
+  );
+
   return { linkUrl, periodLabel, recipients: notifications };
 }
 
@@ -89,7 +101,7 @@ export async function notifyUsersInRoles(options: {
       role: { in: options.roles },
       ...(options.excludeUserId ? { id: { not: options.excludeUserId } } : {}),
     },
-    select: { id: true },
+    select: { id: true, email: true },
   });
   if (recipients.length === 0) return 0;
 
@@ -105,6 +117,17 @@ export async function notifyUsersInRoles(options: {
       entityId: options.entityId,
     })),
   });
+
+  void Promise.all(
+    recipients.map((user) =>
+      sendNotificationEmail({
+        to: user.email,
+        subject: options.title,
+        text: options.body,
+        linkUrl: options.linkUrl,
+      })
+    )
+  );
   return recipients.length;
 }
 
@@ -149,7 +172,7 @@ export async function notifyEmployeeUser(options: {
       companyId: options.companyId,
       employeeId: options.employeeId,
     },
-    select: { id: true },
+    select: { id: true, email: true },
   });
   if (!user) return;
   await prisma.notification.create({
@@ -163,6 +186,12 @@ export async function notifyEmployeeUser(options: {
       entityType: options.entityType,
       entityId: options.entityId,
     },
+  });
+  void sendNotificationEmail({
+    to: user.email,
+    subject: options.title,
+    text: options.body,
+    linkUrl: options.linkUrl,
   });
 }
 

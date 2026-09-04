@@ -23,6 +23,9 @@
   --warn: 214 85 39;
   --sky: 107 154 237;
   --rail: 18 18 18;
+  --land: 49 100 66;
+  --sea: 107 154 237;
+  --earth: 214 85 39;
 
   --background: rgb(var(--mist));
   --foreground: rgb(var(--ink));
@@ -61,15 +64,19 @@ body {
   .bg-atmosphere {
     background-color: rgb(var(--mist));
     background-image:
-      radial-gradient(ellipse 90% 50% at 0% -8%, rgb(var(--lagoon) / 0.16), transparent 52%),
-      linear-gradient(180deg, rgb(var(--sand)) 0%, rgb(var(--mist)) 28%);
+      radial-gradient(ellipse 80% 48% at 0% -10%, rgb(var(--lagoon) / 0.28), transparent 52%),
+      radial-gradient(ellipse 55% 40% at 100% 0%, rgb(var(--sky) / 0.14), transparent 48%),
+      radial-gradient(ellipse 45% 36% at 85% 110%, rgb(var(--ok) / 0.12), transparent 50%),
+      linear-gradient(180deg, rgb(var(--sand)) 0%, rgb(var(--mist)) 32%);
   }
 
   .bg-login-atmosphere {
     background-color: rgb(var(--rail));
     background-image:
-      radial-gradient(ellipse 70% 50% at 100% 0%, rgb(var(--lagoon) / 0.22), transparent 55%),
-      radial-gradient(ellipse 50% 40% at 0% 100%, rgb(var(--ok) / 0.16), transparent 50%);
+      radial-gradient(ellipse 70% 50% at 100% 0%, rgb(var(--lagoon) / 0.28), transparent 55%),
+      radial-gradient(ellipse 45% 40% at 0% 0%, rgb(var(--sky) / 0.18), transparent 48%),
+      radial-gradient(ellipse 50% 42% at 0% 100%, rgb(var(--ok) / 0.2), transparent 50%),
+      radial-gradient(ellipse 35% 30% at 100% 100%, rgb(var(--signal) / 0.14), transparent 45%);
   }
 
   .surface-panel {

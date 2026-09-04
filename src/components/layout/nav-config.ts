@@ -68,6 +68,30 @@ export const NAV_GROUP_ICONS: Record<NavGroupId, LucideIcon> = {
   system: Settings,
 };
 
+/** Land / sea / sky / signal mapped onto rail groups. */
+export const NAV_GROUP_TONE: Record<
+  NavGroupId,
+  "lagoon" | "ok" | "sky" | "signal" | "foam"
+> = {
+  operate: "lagoon",
+  people: "ok",
+  work: "signal",
+  pay: "sky",
+  insight: "sky",
+  me: "lagoon",
+  system: "foam",
+};
+
+export const NAV_GROUP_DOT: Record<NavGroupId, string> = {
+  operate: "bg-lagoon",
+  people: "bg-ok",
+  work: "bg-signal",
+  pay: "bg-sky",
+  insight: "bg-sky",
+  me: "bg-lagoon",
+  system: "bg-white/40",
+};
+
 export const NAV_GROUP_ORDER: NavGroupId[] = [
   "operate",
   "people",
@@ -323,6 +347,23 @@ export function portalEyebrow(portal: string | null) {
   }
 }
 
+export function portalChipClass(portal: string | null) {
+  switch (portal) {
+    case "SUPER_ADMIN":
+      return "bg-lagoon text-ink";
+    case "HR_ADMIN":
+      return "bg-ok text-foam";
+    case "FINANCE":
+      return "bg-sky text-ink";
+    case "BUSINESS_HEAD":
+      return "bg-signal text-foam";
+    case "EMPLOYEE":
+      return "bg-sand text-ink ring-1 ring-line";
+    default:
+      return "bg-lagoon text-ink";
+  }
+}
+
 export function portalPurpose(portal: string | null) {
   switch (portal) {
     case "SUPER_ADMIN":
@@ -353,7 +394,7 @@ export const NAV_BLURBS: Record<string, string> = {
   "/hr-ask": "Policy queries and change requests",
   "/payroll": "Draft, clear, and forward the pay run",
   "/expenses": "Expense reports for HR and Super Admin",
-  "/timesheets": "Weekly hours that feed payroll",
+  "/timesheets": "Weekly hours, clock compile, and shift exceptions",
   "/projects": "Work catalog and assigned tasks",
   "/files": "Company library for this employer",
   "/leave": "Record and approve staff leave",

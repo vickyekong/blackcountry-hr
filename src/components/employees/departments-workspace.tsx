@@ -4,12 +4,14 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { employeeFullName } from "@/lib/utils";
+import { employeeFullName, formatCurrency } from "@/lib/utils";
+import { koboToNaira } from "@/lib/money";
 
 export type DepartmentRow = {
   id: string;
   name: string;
   managerEmployeeId?: string | null;
+  budgetKobo?: string | number | null;
   manager?: {
     id: string;
     firstName: string;
@@ -171,6 +173,41 @@ export function DepartmentsWorkspace({
     }
   }
 
+  async function setBudget(id: string, raw: string) {
+    setLoading(true);
+    setError("");
+    const trimmed = raw.trim();
+    const budgetNaira = trimmed === "" ? null : Number(trimmed);
+    if (budgetNaira !== null && !Number.isFinite(budgetNaira)) {
+      setError("Budget must be a number in naira");
+      setLoading(false);
+      return;
+    }
+    try {
+      const res = await fetch(`/api/departments/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ budgetNaira }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Failed to set budget");
+      publish(
+        rows.map((r) =>
+          r.id === id
+            ? {
+                ...r,
+                budgetKobo: data.budgetKobo ?? null,
+              }
+            : r
+        )
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to set budget");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function removeItem(id: string) {
     if (!confirm("Delete this department?")) return;
     setLoading(true);
@@ -194,8 +231,8 @@ export function DepartmentsWorkspace({
       <div>
         <h3 className="text-base font-semibold text-ink">Departments</h3>
         <p className="mt-1 text-sm text-muted">
-          Company departments. Assign a head here; staff still pick the
-          department name on their record.
+          Company departments. Assign a head and an optional annual budget
+          here; staff still pick the department name on their record.
         </p>
       </div>
 
@@ -302,6 +339,46 @@ export function DepartmentsWorkspace({
                           row.manager.lastName
                         )
                       : "Unassigned"}
+                  </span>
+                )}
+              </div>
+              <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
+                <span>Budget:</span>
+                {canManage ? (
+                  <form
+                    key={`${row.id}-${row.budgetKobo ?? "none"}`}
+                    className="flex flex-wrap items-center gap-2"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      const value = String(
+                        new FormData(e.currentTarget).get("budgetNaira") || ""
+                      );
+                      void setBudget(row.id, value);
+                    }}
+                  >
+                    <Input
+                      name="budgetNaira"
+                      type="number"
+                      min={0}
+                      step={1000}
+                      className="h-8 w-36 text-sm"
+                      defaultValue={
+                        row.budgetKobo != null && row.budgetKobo !== ""
+                          ? String(koboToNaira(BigInt(row.budgetKobo)))
+                          : ""
+                      }
+                      placeholder="₦ / year"
+                      disabled={loading}
+                    />
+                    <Button type="submit" size="sm" variant="outline" disabled={loading}>
+                      Save
+                    </Button>
+                  </form>
+                ) : (
+                  <span className="text-ink">
+                    {row.budgetKobo != null && row.budgetKobo !== ""
+                      ? formatCurrency(row.budgetKobo)
+                      : "None"}
                   </span>
                 )}
               </div>

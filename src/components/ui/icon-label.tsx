@@ -8,7 +8,7 @@ export function SectionIcon({
   className,
 }: {
   icon: LucideIcon;
-  tone?: "lagoon" | "ink" | "foam";
+  tone?: "lagoon" | "ink" | "foam" | "ok" | "sky" | "signal";
   size?: "sm" | "md";
   className?: string;
 }) {
@@ -20,6 +20,9 @@ export function SectionIcon({
         tone === "lagoon" && "bg-lagoon text-ink",
         tone === "ink" && "bg-ink text-lagoon",
         tone === "foam" && "bg-sand text-ink",
+        tone === "ok" && "bg-ok text-foam",
+        tone === "sky" && "bg-sky text-ink",
+        tone === "signal" && "bg-signal text-foam",
         className
       )}
     >

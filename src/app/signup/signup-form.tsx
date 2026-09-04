@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PRODUCT_NAME, PRODUCT_TAGLINE } from "@/lib/brand";
+import { BrandStripe } from "@/components/brand/brand-stripe";
 
 export function SignupForm() {
   const router = useRouter();
@@ -60,8 +61,8 @@ export function SignupForm() {
   }
 
   return (
-    <div className="relative flex min-h-screen min-h-dvh overflow-x-hidden bg-mist text-ink">
-      <div className="h-1 w-full bg-lagoon lg:hidden" />
+    <div className="relative flex min-h-screen min-h-dvh overflow-x-hidden bg-atmosphere text-ink">
+      <BrandStripe className="absolute inset-x-0 top-0 z-20" />
       <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col justify-center gap-8 px-4 py-10 sm:gap-10 sm:px-6 sm:py-12 lg:flex-row lg:items-center lg:gap-16 lg:px-10">
         <div className="animate-soft-rise max-w-md lg:flex-1">
           <p className="page-kicker">New company</p>

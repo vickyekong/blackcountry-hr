@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { runEnsureOnce } from "@/lib/ensure-once";
 
 let ensured = false;
 
@@ -22,6 +23,10 @@ async function addFk(
 
 /** Idempotent: salary structures, benefits, deductions, advances, loans, remittances. */
 export async function ensurePayrollExtrasSchema() {
+  return runEnsureOnce("payroll-extras-schema", ensurePayrollExtrasSchemaUnlocked);
+}
+
+async function ensurePayrollExtrasSchemaUnlocked() {
   if (ensured) return;
 
   await prisma.$executeRawUnsafe(`
@@ -29,6 +34,7 @@ export async function ensurePayrollExtrasSchema() {
       "id" TEXT NOT NULL,
       "companyId" TEXT NOT NULL,
       "name" TEXT NOT NULL,
+      "grade" TEXT,
       "basicSalaryKobo" BIGINT NOT NULL,
       "housingAllowanceKobo" BIGINT NOT NULL DEFAULT 0,
       "transportAllowanceKobo" BIGINT NOT NULL DEFAULT 0,
@@ -53,6 +59,9 @@ export async function ensurePayrollExtrasSchema() {
     "SalaryStructure_companyId_fkey",
     "companyId",
     "Company"
+  );
+  await prisma.$executeRawUnsafe(
+    `ALTER TABLE "SalaryStructure" ADD COLUMN IF NOT EXISTS "grade" TEXT`
   );
 
   await prisma.$executeRawUnsafe(

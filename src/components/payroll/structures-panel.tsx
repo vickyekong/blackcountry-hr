@@ -17,6 +17,7 @@ type StaffOption = {
 type StructureRow = {
   id: string;
   name: string;
+  grade: string | null;
   basicSalaryKobo: string;
   housingAllowanceKobo: string;
   transportAllowanceKobo: string;
@@ -61,6 +62,7 @@ export function StructuresPanel() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         name: data.get("name"),
+        grade: String(data.get("grade") || "").trim() || null,
         basicNaira: Number(data.get("basicNaira") || 0),
         housingNaira: Number(data.get("housingNaira") || 0),
         transportNaira: Number(data.get("transportNaira") || 0),
@@ -115,9 +117,13 @@ export function StructuresPanel() {
           onSubmit={add}
           className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
         >
-          <div className="sm:col-span-2 lg:col-span-4">
+          <div className="sm:col-span-2">
             <Label htmlFor="name">Name</Label>
             <Input id="name" name="name" required placeholder="e.g. Officer band" />
+          </div>
+          <div className="sm:col-span-2">
+            <Label htmlFor="grade">Grade (optional)</Label>
+            <Input id="grade" name="grade" placeholder="e.g. GL 08" />
           </div>
           {(
             [
@@ -157,7 +163,14 @@ export function StructuresPanel() {
           <ul className="divide-y divide-line">
             {rows.map((row) => (
               <li key={row.id} className="py-3">
-                <p className="font-medium text-ink">{row.name}</p>
+                <p className="font-medium text-ink">
+                  {row.name}
+                  {row.grade ? (
+                    <span className="ml-2 text-sm font-normal text-muted">
+                      {row.grade}
+                    </span>
+                  ) : null}
+                </p>
                 <p className="text-sm text-muted">
                   Basic {formatCurrency(row.basicSalaryKobo)} · Housing{" "}
                   {formatCurrency(row.housingAllowanceKobo)} · Transport{" "}

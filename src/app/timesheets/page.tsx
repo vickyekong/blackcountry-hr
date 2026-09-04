@@ -20,10 +20,12 @@ import {
 import { WeeklyTimesheet } from "@/components/timesheets/weekly-timesheet";
 import { HolidaysPanel } from "@/components/time/holidays-panel";
 import { OvertimePanel } from "@/components/time/overtime-panel";
+import { ShiftExceptionsPanel } from "@/components/time/shift-exceptions-panel";
+import { EmployeesAttendanceTab } from "@/components/employees/employees-attendance-tab";
 import { can } from "@/lib/permissions";
 import { cn } from "@/lib/cn";
 import { PageHeader } from "@/components/layout/page-header";
-import { Clock, CalendarDays, Timer } from "lucide-react";
+import { Clock, CalendarDays, Timer, ScanLine, CalendarOff } from "lucide-react";
 import type { UserRole } from "@prisma/client";
 
 type ProjectTask = { id: string; name: string; status: string };
@@ -70,7 +72,11 @@ function TimesheetsPageInner() {
   const hasLinkedRecord = Boolean(session?.user?.employeeId);
   const tabParam = searchParams.get("tab");
   const tab =
-    validator && (tabParam === "holidays" || tabParam === "overtime")
+    validator &&
+    (tabParam === "holidays" ||
+      tabParam === "overtime" ||
+      tabParam === "clock" ||
+      tabParam === "roster")
       ? tabParam
       : "hours";
 
@@ -169,13 +175,15 @@ function TimesheetsPageInner() {
       <PageHeader
         icon={Clock}
         title="Timesheets"
-        description="Weekly hours against a project and task are the source of time for payroll. Validate a week to lock it. Holidays affect leave day counts; extra overtime requests attach to the next draft run."
+        description="Weekly hours against a project and task are the source of time for payroll. Validate a week to lock it. Clock compile is the biometric source — punches do not replace timesheets. Holidays affect leave day counts; extra overtime and shift exceptions attach beside hours."
       />
       {validator ? (
         <div className="mb-6 flex flex-wrap gap-1 border-b border-line">
           {(
             [
               { id: "hours", label: "Hours", icon: Clock },
+              { id: "clock", label: "Clock", icon: ScanLine },
+              { id: "roster", label: "Shift exceptions", icon: CalendarOff },
               { id: "holidays", label: "Holidays", icon: CalendarDays },
               { id: "overtime", label: "Overtime", icon: Timer },
             ] as const
@@ -202,6 +210,8 @@ function TimesheetsPageInner() {
         </div>
       ) : null}
 
+      {tab === "clock" && validator ? <EmployeesAttendanceTab /> : null}
+      {tab === "roster" && validator ? <ShiftExceptionsPanel /> : null}
       {tab === "holidays" && validator ? <HolidaysPanel /> : null}
       {tab === "overtime" && validator ? <OvertimePanel /> : null}
       {tab === "hours" ? (

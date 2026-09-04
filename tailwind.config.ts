@@ -36,6 +36,9 @@ const config: Config = {
         warn: withAlpha("--warn"),
         sky: withAlpha("--sky"),
         rail: withAlpha("--rail"),
+        land: withAlpha("--land"),
+        sea: withAlpha("--sea"),
+        earth: withAlpha("--earth"),
       },
       fontFamily: {
         sans: [

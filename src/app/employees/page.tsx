@@ -67,6 +67,7 @@ export default async function EmployeesPage() {
       id: true,
       name: true,
       managerEmployeeId: true,
+      budgetKobo: true,
       manager: {
         select: {
           id: true,
@@ -117,7 +118,7 @@ export default async function EmployeesPage() {
       <PageHeader
         icon={Users}
         title="Employees"
-        description="Staff directory, departments, skills, org chart, and attendance"
+        description="Staff directory, departments, skills, and org chart"
         actions={
           <div className="flex flex-wrap items-center gap-2">
           {can(session.user.role, "manageEmployees") && (
@@ -140,7 +141,7 @@ export default async function EmployeesPage() {
       <Suspense fallback={<p className="text-sm text-muted">Loading…</p>}>
         <EmployeesPageClient
           employees={tableRows}
-          initialDepartments={allDepartments}
+          initialDepartments={serializeBigInts(allDepartments)}
           initialJobDescriptions={allJobDescriptions}
           initialSkills={allSkills.map((skill) => ({
             id: skill.id,

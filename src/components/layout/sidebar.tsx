@@ -12,7 +12,9 @@ import { WorkspaceSwitcher } from "@/components/layout/workspace-switcher";
 import { DashboardToggle } from "@/components/layout/dashboard-toggle";
 import { useDashboardView } from "@/components/layout/dashboard-view-context";
 import { effectivePortalRole } from "@/lib/permissions";
+import { BrandStripe } from "@/components/brand/brand-stripe";
 import {
+  NAV_GROUP_DOT,
   NAV_GROUP_ICONS,
   isNavActive,
   navSectionsFor,
@@ -33,6 +35,7 @@ function NavPanel({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-rail text-foam">
+      <BrandStripe />
       <div className="border-b border-white/10 px-4 py-5">
         <div className="flex items-center gap-3">
           {brand?.logoUrl ? (
@@ -72,6 +75,10 @@ function NavPanel({
           return (
           <div key={section.group}>
             <p className="mb-1.5 flex items-center gap-1.5 px-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/35">
+              <span
+                aria-hidden
+                className={cn("h-1.5 w-1.5 shrink-0 rounded-sm", NAV_GROUP_DOT[section.group])}
+              />
               <GroupIcon className="h-3 w-3" strokeWidth={2} />
               {section.label}
             </p>
@@ -153,7 +160,9 @@ export function MobileNav() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 flex items-center gap-3 border-b border-line bg-foam/95 px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] backdrop-blur-md lg:hidden">
+      <header className="sticky top-0 z-40 border-b border-line bg-foam/95 pt-[max(0px,env(safe-area-inset-top))] backdrop-blur-md lg:hidden">
+        <BrandStripe />
+        <div className="flex items-center gap-3 px-4 py-3">
         <button
           type="button"
           aria-label={open ? "Close menu" : "Open menu"}
@@ -190,6 +199,7 @@ export function MobileNav() {
         </div>
         <DashboardToggle />
         <NotificationsBell />
+        </div>
       </header>
 
       <div

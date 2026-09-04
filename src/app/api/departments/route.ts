@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requirePermission, handleApiError } from "@/lib/api-auth";
+import { serializeBigInts } from "@/lib/payroll/config-mapper";
 import { z } from "zod";
 
 const createSchema = z.object({
@@ -24,7 +25,7 @@ export async function GET() {
         },
       },
     });
-    return NextResponse.json(departments);
+    return NextResponse.json(serializeBigInts(departments));
   } catch (error) {
     return handleApiError(error);
   }

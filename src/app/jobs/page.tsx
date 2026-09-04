@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { PRODUCT_NAME } from "@/lib/brand";
+import { BrandStripe } from "@/components/brand/brand-stripe";
 import { ensureRecruitmentSchema } from "@/lib/ensure-recruitment-schema";
 
 export const dynamic = "force-dynamic";
@@ -14,7 +15,8 @@ export default async function PublicJobsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-mist text-ink">
+    <div className="min-h-screen bg-atmosphere text-ink">
+      <BrandStripe />
       <header className="border-b border-line bg-foam px-5 py-4">
         <p className="page-kicker">{PRODUCT_NAME}</p>
         <h1 className="mt-1 text-lg font-semibold tracking-tight">Open roles</h1>

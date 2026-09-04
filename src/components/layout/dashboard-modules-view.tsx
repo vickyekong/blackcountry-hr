@@ -9,6 +9,7 @@ import { useDashboardView } from "@/components/layout/dashboard-view-context";
 import {
   NAV_BLURBS,
   NAV_GROUP_ICONS,
+  NAV_GROUP_TONE,
   isNavActive,
   navSectionsFor,
 } from "@/components/layout/nav-config";
@@ -56,7 +57,11 @@ export function DashboardModulesView() {
                           active ? "border-ink/30 ring-1 ring-lagoon" : "border-line"
                         )}
                       >
-                        <SectionIcon icon={item.icon} size="sm" />
+                        <SectionIcon
+                          icon={item.icon}
+                          size="sm"
+                          tone={NAV_GROUP_TONE[section.group]}
+                        />
                         <span className="min-w-0">
                           <span className="block text-sm font-semibold text-ink">
                             {item.label}

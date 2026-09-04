@@ -1,12 +1,23 @@
 import { prisma } from "@/lib/db";
 
 let ensured = false;
+let inflight: Promise<void> | null = null;
 
 /**
  * Prisma talks as the database owner (bypasses RLS). PostgREST `anon` /
  * `authenticated` must not read people or pay data. Idempotent.
  */
 export async function ensureAppRls() {
+  if (ensured) return;
+  if (!inflight) {
+    inflight = runEnsureAppRls().finally(() => {
+      inflight = null;
+    });
+  }
+  await inflight;
+}
+
+async function runEnsureAppRls() {
   if (ensured) return;
 
   try {

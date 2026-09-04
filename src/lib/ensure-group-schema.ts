@@ -1,9 +1,14 @@
 import { prisma } from "@/lib/db";
+import { runEnsureOnce } from "@/lib/ensure-once";
 
 let ensured = false;
 
 /** Idempotent: group tree, new roles/statuses, projects, timesheets, files. */
 export async function ensureGroupSchema() {
+  return runEnsureOnce("group-schema", ensureGroupSchemaUnlocked);
+}
+
+async function ensureGroupSchemaUnlocked() {
   if (ensured) return;
 
   await prisma.$executeRawUnsafe(

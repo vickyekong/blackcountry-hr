@@ -1,9 +1,14 @@
 import { prisma } from "@/lib/db";
+import { runEnsureOnce } from "@/lib/ensure-once";
 
 let ensured = false;
 
 /** Idempotent: employee profile extras, skills, certifications, assets. */
 export async function ensurePeopleSchema() {
+  return runEnsureOnce("people-schema", ensurePeopleSchemaUnlocked);
+}
+
+async function ensurePeopleSchemaUnlocked() {
   if (ensured) return;
 
   await prisma.$executeRawUnsafe(
@@ -39,6 +44,9 @@ export async function ensurePeopleSchema() {
 
   await prisma.$executeRawUnsafe(
     `ALTER TABLE "Department" ADD COLUMN IF NOT EXISTS "managerEmployeeId" TEXT`
+  );
+  await prisma.$executeRawUnsafe(
+    `ALTER TABLE "Department" ADD COLUMN IF NOT EXISTS "budgetKobo" BIGINT`
   );
   await prisma.$executeRawUnsafe(
     `CREATE INDEX IF NOT EXISTS "Department_managerEmployeeId_idx" ON "Department"("managerEmployeeId")`
