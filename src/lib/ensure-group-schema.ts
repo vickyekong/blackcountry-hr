@@ -340,6 +340,21 @@ export async function ensureGroupSchema() {
   const { ensureWorkSchema } = await import("@/lib/ensure-work-schema");
   await ensureWorkSchema();
 
+  const { ensurePerformanceSchema } = await import(
+    "@/lib/ensure-performance-schema"
+  );
+  await ensurePerformanceSchema();
+
+  const { ensureAutomationSchema } = await import(
+    "@/lib/ensure-automation-schema"
+  );
+  await ensureAutomationSchema();
+
+  const { ensureIntegrationsSchema } = await import(
+    "@/lib/ensure-integrations-schema"
+  );
+  await ensureIntegrationsSchema();
+
   const { ensureAppRls } = await import("@/lib/ensure-app-rls");
   await ensureAppRls();
 

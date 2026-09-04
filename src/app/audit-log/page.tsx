@@ -37,8 +37,10 @@ const ENTITY_TYPES = [
   "PayrollRun",
   "PayrollAdjustment",
   "LeaveRequest",
+  "ExpenseClaim",
   "StatutoryConfig",
   "HrDeskMessage",
+  "WebhookEndpoint",
 ];
 
 function currentMonthValue() {

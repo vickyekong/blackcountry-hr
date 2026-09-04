@@ -108,6 +108,32 @@ export async function notifyUsersInRoles(options: {
   return recipients.length;
 }
 
+export async function notifyOnce(options: {
+  companyId: string;
+  roles: UserRole[];
+  type: string;
+  title: string;
+  body: string;
+  linkUrl: string;
+  entityType?: string;
+  entityId?: string;
+  dedupeDays?: number;
+}) {
+  const since = new Date();
+  since.setDate(since.getDate() - (options.dedupeDays ?? 6));
+  const existing = await prisma.notification.findFirst({
+    where: {
+      companyId: options.companyId,
+      type: options.type,
+      entityId: options.entityId ?? undefined,
+      createdAt: { gte: since },
+    },
+    select: { id: true },
+  });
+  if (existing) return 0;
+  return notifyUsersInRoles(options);
+}
+
 export async function notifyEmployeeUser(options: {
   companyId: string;
   employeeId: string;

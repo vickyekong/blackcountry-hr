@@ -55,6 +55,12 @@ describe("five-portal roles", () => {
     expect(can("BUSINESS_HEAD", "reviewTimesheets")).toBe(false);
     expect(can("BUSINESS_HEAD", "validateTimesheets")).toBe(false);
     expect(can("BUSINESS_HEAD", "approvePayroll")).toBe(false);
+    expect(can("BUSINESS_HEAD", "viewApprovals")).toBe(true);
+    expect(can("EMPLOYEE", "viewApprovals")).toBe(false);
+    expect(can("FINANCE", "viewApprovals")).toBe(false);
+    expect(can("BUSINESS_HEAD", "askCopilot")).toBe(true);
+    expect(can("EMPLOYEE", "askCopilot")).toBe(false);
+    expect(can("FINANCE", "askCopilot")).toBe(false);
     expect(can("BUSINESS_HEAD", "manageStatutoryRates")).toBe(false);
     expect(can("BUSINESS_HEAD", "manageCompanySettings")).toBe(false);
   });

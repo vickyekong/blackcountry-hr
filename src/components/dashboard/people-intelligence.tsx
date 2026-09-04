@@ -76,6 +76,9 @@ export function PeopleIntelligencePanel({
           </p>
         </div>
         <div className="flex flex-wrap gap-3 text-sm">
+          <Link href="/copilot" className="text-stone-600 hover:text-stone-900">
+            Ask Omni Co-Pilot →
+          </Link>
           <Link href="/reports" className="text-stone-600 hover:text-stone-900">
             Equity & forecast →
           </Link>

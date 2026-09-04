@@ -1,0 +1,88 @@
+export const INTEGRATION_CATALOG = [
+  {
+    id: "google-workspace",
+    title: "Google Workspace",
+    status: "live" as const,
+    href: "/settings",
+    note: "Drive folder tree and Staff / Payroll Sheets. Connect in Settings below.",
+  },
+  {
+    id: "microsoft-365",
+    title: "Microsoft 365",
+    status: "live" as const,
+    href: "/settings",
+    note: "OneDrive mirror of the same HR workspace. Connect in Settings below.",
+  },
+  {
+    id: "clock",
+    title: "Attendance / biometric CSV",
+    status: "live" as const,
+    href: "/timesheets",
+    note: "Map Clock machine ID on the employee record, then import the device CSV. Timesheets remain the source of hours for payroll.",
+  },
+  {
+    id: "notifications",
+    title: "In-app notifications",
+    status: "live" as const,
+    href: "/approvals",
+    note: "The Notification table is the product channel. Email is not a second inbox.",
+  },
+  {
+    id: "cron",
+    title: "Scheduled jobs",
+    status: "live" as const,
+    href: "/settings",
+    note: "Vercel Cron hits /api/cron/daily, /weekly, /monthly. Set CRON_SECRET in production.",
+  },
+  {
+    id: "webhooks",
+    title: "Outbound webhooks",
+    status: "live" as const,
+    href: "/settings",
+    note: "Signed HTTPS posts for payroll, leave, expenses, people, and timesheets. Use this for Slack, Teams, or accounting.",
+  },
+  {
+    id: "audit",
+    title: "Audit log",
+    status: "live" as const,
+    href: "/audit-log",
+    note: "User, action, record, timestamp, and changes JSON for sensitive writes.",
+  },
+  {
+    id: "email",
+    title: "Transactional email",
+    status: "planned" as const,
+    href: "/settings",
+    note: "Not wired. Reminders stay in-app until a mail provider is chosen.",
+  },
+  {
+    id: "slack",
+    title: "Slack",
+    status: "via_webhook" as const,
+    href: "/settings",
+    note: "Paste a Slack incoming webhook URL into Outbound webhooks. No second Slack app.",
+  },
+  {
+    id: "teams",
+    title: "Microsoft Teams",
+    status: "via_webhook" as const,
+    href: "/settings",
+    note: "Paste a Teams incoming webhook URL. Microsoft 365 file sync is already live above.",
+  },
+  {
+    id: "accounting",
+    title: "Accounting platforms",
+    status: "via_webhook" as const,
+    href: "/settings",
+    note: "Subscribe to payroll.paid. Payloads never include bank, TIN, or per-person net pay.",
+  },
+  {
+    id: "payments",
+    title: "Payment platforms",
+    status: "via_webhook" as const,
+    href: "/settings",
+    note: "Finance still processes payroll in this product. A webhook can notify an external payer.",
+  },
+] as const;
+
+export type IntegrationCatalogItem = (typeof INTEGRATION_CATALOG)[number];

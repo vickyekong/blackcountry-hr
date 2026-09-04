@@ -17,6 +17,7 @@ import { getPayrollPreflight } from "@/lib/payroll/preflight";
 import { approvedTimesheetHoursForPeriod } from "@/lib/timesheets/period";
 import { findAccessiblePayrollRun } from "@/lib/tenancy/workspace";
 import { markPayrollExpensesReimbursed } from "@/lib/expenses/payroll-attach";
+import { emitPlatformEvent } from "@/lib/integrations/dispatch";
 import { z } from "zod";
 
 const actionSchema = z.object({
@@ -373,6 +374,30 @@ export async function PATCH(
         },
       },
     });
+
+    const webhookEvent =
+      body.action === "submit_review"
+        ? "payroll.submitted"
+        : body.action === "approve"
+          ? "payroll.approved"
+          : body.action === "forward_finance"
+            ? "payroll.forwarded"
+            : body.action === "complete_processing"
+              ? "payroll.paid"
+              : null;
+    if (webhookEvent) {
+      emitPlatformEvent({
+        companyId: operatingCompanyId,
+        event: webhookEvent,
+        entityType: "PayrollRun",
+        entityId: run.id,
+        data: {
+          periodMonth: run.periodMonth,
+          periodYear: run.periodYear,
+          status: update.status ?? updated.status,
+        },
+      });
+    }
 
     return NextResponse.json(
       serializeBigInts({

@@ -5,6 +5,7 @@ import { AuthError, handleApiError, requireAuth } from "@/lib/api-auth";
 import { nairaToKobo } from "@/lib/money";
 import { serializeBigInts } from "@/lib/payroll/config-mapper";
 import { notifyEmployeeUser, notifyUsersInRoles } from "@/lib/notifications";
+import { emitPlatformEvent } from "@/lib/integrations/dispatch";
 import { displayName } from "@/lib/employees/data-quality";
 import { REIMBURSEMENT_METHODS } from "@/lib/expenses/policy";
 import { approverMayAct, canListCompanyExpenses, canReimburseClaim } from "@/lib/expenses/access";
@@ -171,6 +172,13 @@ export async function PATCH(
         entityType: "ExpenseClaim",
         entityId: existing.id,
         excludeUserId: session.user.id,
+      });
+      emitPlatformEvent({
+        companyId: session.user.companyId,
+        event: "expense.approved",
+        entityType: "ExpenseClaim",
+        entityId: existing.id,
+        data: { employeeCode: existing.employee.employeeCode },
       });
       return NextResponse.json(serializeBigInts(updated));
     }

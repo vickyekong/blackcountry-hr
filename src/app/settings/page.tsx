@@ -9,6 +9,8 @@ import { GoogleDriveSettings } from "@/components/settings/google-drive-settings
 import { MicrosoftWorkspaceSettings } from "@/components/settings/microsoft-workspace-settings";
 import { TeamInviteForm } from "@/components/settings/team-invite-form";
 import { GroupCompaniesForm } from "@/components/settings/group-companies-form";
+import { AutomationSettingsPanel } from "@/components/settings/automation-settings-panel";
+import { IntegrationsHub } from "@/components/settings/integrations-hub";
 import { Suspense } from "react";
 
 export const dynamic = "force-dynamic";
@@ -42,6 +44,8 @@ export default async function SettingsPage() {
       <Suspense fallback={null}>
         <MicrosoftWorkspaceSettings />
       </Suspense>
+      <IntegrationsHub />
+      <AutomationSettingsPanel />
     </AppShell>
   );
 }

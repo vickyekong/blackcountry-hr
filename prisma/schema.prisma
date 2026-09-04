@@ -128,6 +128,7 @@ model Company {
   changeRequests        EmployeeChangeRequest[]
   jobDescriptions       JobDescription[]
   projects              Project[]
+  workScheduleEntries   WorkScheduleEntry[]
   timesheetEntries      TimesheetEntry[]
   timesheetWeeks        TimesheetWeek[]
   workspaceFiles        WorkspaceFile[]
@@ -138,6 +139,7 @@ model Company {
   trainingPrograms      TrainingProgram[]
   performanceGoals      PerformanceGoal[]
   performanceReviews    PerformanceReview[]
+  recognitions          Recognition[]
   salaryStructures      SalaryStructure[]
   benefitPlans          BenefitPlan[]
   recurringDeductions   RecurringDeduction[]
@@ -145,6 +147,9 @@ model Company {
   salaryLoans           SalaryLoan[]
   remittancePayments    RemittancePayment[]
   expenseClaims         ExpenseClaim[]
+  automationSettings    AutomationSettings?
+  automationJobLogs     AutomationJobLog[]
+  webhookEndpoints      WebhookEndpoint[]
 
   @@index([parentId])
 }
@@ -248,6 +253,7 @@ model User {
   timesheetWeeksValidated TimesheetWeek[] @relation("TimesheetWeekValidator")
   jobListingsCreated      JobListing[]    @relation("JobListingCreator")
   taskComments            ProjectTaskComment[]
+  recognitionsGiven       Recognition[] @relation("RecognitionGiver")
 }
 
 model Employee {
@@ -327,6 +333,8 @@ model Employee {
   trainingEnrollments TrainingEnrollment[]
   performanceGoals    PerformanceGoal[]
   performanceReviews  PerformanceReview[]
+  peerReviews         PerformanceReview[] @relation("ReviewPeer")
+  recognitions        Recognition[]
   employeeBenefits    EmployeeBenefit[]
   recurringDeductions RecurringDeduction[]
   salaryAdvances      SalaryAdvance[]
@@ -335,6 +343,7 @@ model Employee {
   managedProjects     Project[] @relation("ProjectManager")
   projectMemberships  ProjectMember[]
   assignedTasks       ProjectTask[] @relation("TaskAssignee")
+  workScheduleEntries WorkScheduleEntry[]
 
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
@@ -1122,6 +1131,7 @@ model Project {
   timesheets        TimesheetEntry[]
   tasks             ProjectTask[]
   members           ProjectMember[]
+  scheduleEntries   WorkScheduleEntry[]
 
   @@unique([companyId, name])
   @@index([companyId, status])
@@ -1141,6 +1151,24 @@ model ProjectMember {
 
   @@unique([projectId, employeeId])
   @@index([employeeId])
+}
+
+model WorkScheduleEntry {
+  id              String   @id @default(cuid())
+  companyId       String
+  company         Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  employeeId      String
+  employee        Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  projectId       String
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  workDate        DateTime
+  plannedMinutes  Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([employeeId, projectId, workDate])
+  @@index([companyId, workDate])
+  @@index([projectId])
 }
 
 model ProjectTask {
@@ -1369,41 +1397,117 @@ model TrainingEnrollment {
 }
 
 model PerformanceGoal {
+  id          String    @id @default(cuid())
+  companyId   String
+  company     Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  /// Null for COMPANY and DEPARTMENT goals.
+  employeeId  String?
+  employee    Employee? @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  /// COMPANY | DEPARTMENT | INDIVIDUAL
+  scope       String    @default("INDIVIDUAL")
+  department  String?
+  title       String
+  target      String
+  actual      String    @default("")
+  targetValue Float?
+  actualValue Float?
+  unit        String?
+  weight      Int       @default(100)
+  periodYear  Int
+  periodLabel String    @default("ANNUAL")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([employeeId, periodYear])
+  @@index([companyId, periodYear])
+  @@index([companyId, scope, periodYear])
+}
+
+model PerformanceReview {
+  id              String    @id @default(cuid())
+  companyId       String
+  company         Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  employeeId      String
+  employee        Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  periodYear      Int
+  periodLabel     String    @default("ANNUAL")
+  status          String    @default("DRAFT")
+  selfNotes       String?
+  managerNotes    String?
+  peerNotes       String?
+  finalNotes      String?
+  selfScore       Int?
+  managerScore    Int?
+  peerScore       Int?
+  finalScore      Int?
+  peerEmployeeId  String?
+  peerEmployee    Employee? @relation("ReviewPeer", fields: [peerEmployeeId], references: [id], onDelete: SetNull)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([employeeId, periodYear, periodLabel])
+  @@index([companyId, periodYear, status])
+  @@index([peerEmployeeId])
+}
+
+model Recognition {
   id          String   @id @default(cuid())
   companyId   String
   company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   employeeId  String
   employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  title       String
-  target      String
-  actual      String   @default("")
-  weight      Int      @default(100)
-  periodYear  Int
-  periodLabel String   @default("ANNUAL")
+  givenById   String
+  givenBy     User     @relation("RecognitionGiver", fields: [givenById], references: [id], onDelete: Restrict)
+  /// PERFORMANCE | TEAMWORK | INNOVATION | LEADERSHIP | CUSTOMER_SERVICE
+  kind        String
+  note        String   @default("")
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
 
-  @@index([employeeId, periodYear])
-  @@index([companyId, periodYear])
+  @@index([companyId, createdAt])
+  @@index([employeeId])
+  @@index([givenById])
 }
 
-model PerformanceReview {
-  id            String   @id @default(cuid())
-  companyId     String
-  company       Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  employeeId    String
-  employee      Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  periodYear    Int
-  periodLabel   String   @default("ANNUAL")
-  status        String   @default("DRAFT")
-  selfNotes     String?
-  managerNotes  String?
-  selfScore     Int?
-  managerScore  Int?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+model AutomationSettings {
+  id                   String   @id @default(cuid())
+  companyId            String   @unique
+  company              Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  expiryLeadDays       Int      @default(60)
+  reviewLeadDays       Int      @default(14)
+  payrollReminderDay   Int      @default(25)
+  /// JSON: { expiry, timesheets, reviews, approvals, payroll, compliance }
+  alerts               Json?
+  updatedAt            DateTime @updatedAt
+}
 
-  @@unique([employeeId, periodYear, periodLabel])
-  @@index([companyId, periodYear, status])
+model AutomationJobLog {
+  id           String   @id @default(cuid())
+  companyId    String
+  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  job          String
+  createdCount Int      @default(0)
+  detail       String   @default("")
+  ranAt        DateTime @default(now())
+
+  @@index([companyId, job, ranAt])
+}
+
+model WebhookEndpoint {
+  id          String    @id @default(cuid())
+  companyId   String
+  company     Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name        String
+  url         String
+  secret      String
+  /// JSON string[] of event names
+  events      Json
+  enabled     Boolean   @default(true)
+  lastStatus  Int?
+  lastError   String    @default("")
+  lastFiredAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([companyId, enabled])
 }
 

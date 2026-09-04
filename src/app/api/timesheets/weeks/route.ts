@@ -17,6 +17,7 @@ import {
   serializeTimesheetWeek,
   validateTimesheetWeek,
 } from "@/lib/timesheets/weeks";
+import { emitPlatformEvent } from "@/lib/integrations/dispatch";
 
 const patchSchema = z.object({
   employeeId: z.string(),
@@ -185,7 +186,7 @@ export async function PATCH(req: NextRequest) {
     const body = patchSchema.parse(await req.json());
     const employee = await prisma.employee.findFirst({
       where: { id: body.employeeId, companyId: session.user.companyId },
-      select: { id: true },
+      select: { id: true, employeeCode: true },
     });
     if (!employee) {
       return NextResponse.json({ error: "Employee not found" }, { status: 404 });
@@ -198,6 +199,18 @@ export async function PATCH(req: NextRequest) {
       action: body.action,
       reason: body.reason,
     });
+    if (body.action === "validate" && week) {
+      emitPlatformEvent({
+        companyId: session.user.companyId,
+        event: "timesheet.validated",
+        entityType: "TimesheetWeek",
+        entityId: week.id,
+        data: {
+          employeeCode: employee.employeeCode,
+          weekStart: week.weekStart,
+        },
+      });
+    }
     return NextResponse.json({
       week: serializeTimesheetWeek(week),
     });

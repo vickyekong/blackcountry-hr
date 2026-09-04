@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { AppShell } from "@/components/layout/app-shell";
 import { ProjectsWorkspace } from "@/components/projects/projects-workspace";
 import { WorkPlanningPanel } from "@/components/projects/work-planning-panel";
+import { WorkSchedulePanel } from "@/components/projects/work-schedule-panel";
 
 export default function StaffProjectsPage() {
   const { data } = useSession();
@@ -15,6 +16,9 @@ export default function StaffProjectsPage() {
       />
       <div className="mt-8">
         <WorkPlanningPanel />
+      </div>
+      <div className="mt-8">
+        <WorkSchedulePanel />
       </div>
     </AppShell>
   );

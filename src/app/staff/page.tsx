@@ -162,6 +162,7 @@ export default function StaffHomePage() {
             </p>
             <p>Download approved payslips after Finance finishes processing.</p>
             <p>Log a week of hours on Timesheets against a project and task. HR validates the week — after that those hours cannot be changed. Open Projects to see the work you can log against, and Files for documents shared with you.</p>
+            <p>Set your own goals and submit a self-assessment on Performance. Recognition from HR shows there too — none of it changes pay.</p>
           </CardContent>
         </Card>
         <Card>

@@ -29,8 +29,10 @@ export function MobileApprovalsBadge() {
           setHref(path.includes("step=") ? path : `${path}${path.includes("?") ? "&" : "?"}step=4`);
         } else if (role === "EMPLOYEE") {
           setHref("/staff");
+        } else if (role === "FINANCE") {
+          setHref("/finance");
         } else {
-          setHref("/payroll");
+          setHref("/approvals");
         }
       })
       .catch(() => undefined);

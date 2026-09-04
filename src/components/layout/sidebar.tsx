@@ -28,6 +28,7 @@ const staffNavItems: Array<{ href: string; label: string }> = [
   { href: "/staff/payslips", label: "Payslips" },
   { href: "/staff/advances", label: "Advances" },
   { href: "/staff/expenses", label: "Expenses" },
+  { href: "/staff/performance", label: "Performance" },
 ];
 
 const financeNavItems: Array<{ href: string; label: string }> = [
@@ -43,6 +44,16 @@ const navItems: Array<{
   {
     href: "/dashboard",
     label: "Overview",
+    roles: ["SUPER_ADMIN", "HR_ADMIN", "BUSINESS_HEAD"],
+  },
+  {
+    href: "/approvals",
+    label: "Approvals",
+    roles: ["SUPER_ADMIN", "HR_ADMIN", "BUSINESS_HEAD"],
+  },
+  {
+    href: "/copilot",
+    label: "Co-Pilot",
     roles: ["SUPER_ADMIN", "HR_ADMIN", "BUSINESS_HEAD"],
   },
   {

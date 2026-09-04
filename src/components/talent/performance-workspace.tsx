@@ -1,28 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { employeeFullName } from "@/lib/utils";
+import { useSearchParams } from "next/navigation";
+import { cn } from "@/lib/cn";
+import { PerformanceGoalsPanel } from "@/components/talent/performance-goals-panel";
+import { PerformanceReviewsPanel } from "@/components/talent/performance-reviews-panel";
+import { PerformanceRecognitionPanel } from "@/components/talent/performance-recognition-panel";
 
-type StaffRow = {
-  id: string;
-  name: string;
-  department: string;
-  employeeCode: string;
-  goalCount: number;
-  review: { status: string; managerScore: number | null } | null;
-};
+const TABS = [
+  { id: "goals", href: "/performance", label: "Goals" },
+  { id: "reviews", href: "/performance?tab=reviews", label: "Reviews" },
+  { id: "recognition", href: "/performance?tab=recognition", label: "Recognition" },
+] as const;
 
-export function PerformanceWorkspace() {
+type TabId = (typeof TABS)[number]["id"];
+
+function PerformanceBody({ canManage }: { canManage: boolean }) {
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const tab: TabId = TABS.some((item) => item.id === tabParam)
+    ? (tabParam as TabId)
+    : "goals";
   const [year, setYear] = useState(new Date().getFullYear());
-  const [staff, setStaff] = useState<StaffRow[]>([]);
-
-  useEffect(() => {
-    fetch(`/api/performance?year=${year}`)
-      .then((r) => r.json())
-      .then((data) => setStaff(Array.isArray(data.staff) ? data.staff : []));
-  }, [year]);
 
   return (
     <div className="space-y-6">
@@ -30,8 +30,8 @@ export function PerformanceWorkspace() {
         <div>
           <h1 className="text-2xl font-semibold text-stone-900">Performance</h1>
           <p className="mt-1 text-sm text-stone-500">
-            Goals and annual reviews on each employee record. This does not
-            change payroll — bonuses stay as payroll adjustments.
+            Company, department, and individual goals with KPI achievement.
+            Appraisals and recognition sit here — they do not change payroll.
           </p>
         </div>
         <label className="text-sm text-stone-600">
@@ -45,47 +45,38 @@ export function PerformanceWorkspace() {
         </label>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Staff this cycle</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {staff.length === 0 ? (
-            <p className="text-sm text-stone-500">No staff in this company.</p>
-          ) : (
-            <ul className="divide-y divide-stone-100 rounded-md border border-stone-200">
-              {staff.map((row) => (
-                <li
-                  key={row.id}
-                  className="flex flex-wrap items-center justify-between gap-2 px-3 py-2.5 text-sm"
-                >
-                  <div>
-                    <Link
-                      href={`/employees/${row.id}`}
-                      className="font-medium text-stone-900 hover:underline"
-                    >
-                      {row.name}
-                    </Link>
-                    <p className="text-xs text-stone-500">
-                      {row.employeeCode} · {row.department}
-                    </p>
-                  </div>
-                  <p className="text-xs text-stone-500">
-                    {row.goalCount} goal{row.goalCount === 1 ? "" : "s"}
-                    {row.review
-                      ? ` · review ${row.review.status.toLowerCase()}${
-                          row.review.managerScore
-                            ? ` · ${row.review.managerScore}/5`
-                            : ""
-                          }`
-                      : " · no review"}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          )}
-        </CardContent>
-      </Card>
+      <div className="flex gap-2 border-b border-line">
+        {TABS.map((item) => (
+          <Link
+            key={item.id}
+            href={item.href}
+            className={cn(
+              "-mb-px border-b-2 px-3 py-2 text-sm font-medium",
+              tab === item.id
+                ? "border-ink text-ink"
+                : "border-transparent text-muted hover:text-ink"
+            )}
+          >
+            {item.label}
+          </Link>
+        ))}
+      </div>
+
+      {tab === "reviews" ? (
+        <PerformanceReviewsPanel year={year} />
+      ) : tab === "recognition" ? (
+        <PerformanceRecognitionPanel year={year} />
+      ) : (
+        <PerformanceGoalsPanel year={year} canManage={canManage} />
+      )}
     </div>
+  );
+}
+
+export function PerformanceWorkspace({ canManage }: { canManage: boolean }) {
+  return (
+    <Suspense>
+      <PerformanceBody canManage={canManage} />
+    </Suspense>
   );
 }

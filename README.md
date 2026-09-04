@@ -62,6 +62,7 @@ The app **needs** these environment variables in your Vercel project (**Settings
 | `NEXTAUTH_SECRET` | output of `openssl rand -base64 32` | **Required at runtime** (`AUTH_SECRET` is an alias) |
 | `NEXTAUTH_URL` | `https://your-app.vercel.app` | Your production URL (or preview URL for previews) |
 | `SIGNUP_ENABLED` | `true` | Optional. Public signup is **off in production** unless this is `true` |
+| `CRON_SECRET` | `openssl rand -base64 32` | Required in production for scheduled jobs. Vercel Cron sends `Authorization: Bearer …` to `/api/cron/daily`, `/weekly`, `/monthly`. Optional locally. |
 | `GOOGLE_CLIENT_ID` | from Google Cloud Console | Optional — Workspace Drive/Sheets sync |
 | `GOOGLE_CLIENT_SECRET` | from Google Cloud Console | Optional — pair with client ID |
 | `GOOGLE_DRIVE_FOLDER_ID` | Shared Drive folder ID | Optional HR root folder |
@@ -104,6 +105,12 @@ Setup:
 4. Create a **client secret**
 5. Set `MICROSOFT_CLIENT_ID` / `MICROSOFT_CLIENT_SECRET` (optional `MICROSOFT_TENANT_ID`) in Vercel → redeploy
 6. Super Admin → **Settings** → **Connect Microsoft 365** → **Sync staff + payroll now**
+
+### Outbound webhooks
+
+**Settings → Integrations.** Signed HTTPS POSTs for payroll, leave, expenses, people, and timesheets. Use a Slack or Teams incoming webhook URL, or an accounting listener. Payloads never include bank details, TIN, or per-person net pay.
+
+Headers: `X-Blackcountry-Signature` (`sha256=` HMAC of the raw JSON body), `X-Blackcountry-Event`, `X-Blackcountry-Delivery`. Copy the signing secret when the endpoint is created — it is not shown again.
 
 After connecting the repo:
 

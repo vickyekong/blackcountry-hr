@@ -118,6 +118,10 @@ export const PERMISSIONS = {
     "BUSINESS_HEAD",
     "EMPLOYEE",
   ] as UserRole[],
+  /** Central approvals inbox — existing engines, one queue */
+  viewApprovals: ["SUPER_ADMIN", "HR_ADMIN", "BUSINESS_HEAD"] as UserRole[],
+  /** Omni Co-Pilot questions — answers still gated per intent */
+  askCopilot: ["SUPER_ADMIN", "HR_ADMIN", "BUSINESS_HEAD"] as UserRole[],
 };
 
 export function can(

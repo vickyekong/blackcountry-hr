@@ -140,9 +140,17 @@ export function OmniCoPilotStrip({
 }) {
   return (
     <section className="mb-8 animate-fade-up rounded-xl border border-ink/20 bg-ink px-5 py-5 text-foam shadow-soft">
-      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-lagoon">
-        Omni Co-Pilot insights
-      </p>
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-lagoon">
+          Omni Co-Pilot insights
+        </p>
+        <Link
+          href="/copilot"
+          className="text-xs font-medium text-lagoon hover:text-foam"
+        >
+          Ask a question →
+        </Link>
+      </div>
       {lines.length === 0 ? (
         <p className="mt-2 text-sm text-lagoon-mist/60">
           Insights appear as attendance, leave, and payroll data accumulate.
@@ -193,6 +201,7 @@ export function QuickWorkflows({
       ? [{ href: "/hr-ask", label: "Draft policy / query desk" }]
       : []),
     { href: "/reports", label: "Run headcount forecast" },
+    { href: "/copilot", label: "Ask Omni Co-Pilot" },
   ];
 
   return (

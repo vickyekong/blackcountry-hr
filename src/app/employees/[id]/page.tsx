@@ -84,6 +84,7 @@ export default async function EmployeeDetailPage({
       <div className="mt-8">
         <EmployeeRecordHub
           canManage={canManage}
+          canReview={can(session!.user.role, "viewEmployees")}
           employee={{
             id: employee.id,
             firstName: employee.firstName,

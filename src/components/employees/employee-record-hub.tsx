@@ -89,9 +89,11 @@ function money(value: string | number) {
 export function EmployeeRecordHub({
   employee,
   canManage,
+  canReview,
 }: {
   employee: EmployeeHubRecord;
   canManage: boolean;
+  canReview?: boolean;
 }) {
   const [tab, setTab] = useState<TabId>("overview");
   const gross =
@@ -307,6 +309,7 @@ export function EmployeeRecordHub({
         <EmployeePerformancePanel
           employeeId={employee.id}
           canManage={canManage}
+          canReview={canReview}
         />
       )}
       {tab === "pay" && <EmployeePayPanel employeeId={employee.id} />}

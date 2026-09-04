@@ -163,5 +163,46 @@ export async function ensureWorkSchema() {
     "ProjectTask"
   );
 
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "WorkScheduleEntry" (
+      "id" TEXT NOT NULL,
+      "companyId" TEXT NOT NULL,
+      "employeeId" TEXT NOT NULL,
+      "projectId" TEXT NOT NULL,
+      "workDate" TIMESTAMP(3) NOT NULL,
+      "plannedMinutes" INTEGER NOT NULL,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "updatedAt" TIMESTAMP(3) NOT NULL,
+      CONSTRAINT "WorkScheduleEntry_pkey" PRIMARY KEY ("id")
+    )
+  `);
+  await prisma.$executeRawUnsafe(
+    `CREATE UNIQUE INDEX IF NOT EXISTS "WorkScheduleEntry_employeeId_projectId_workDate_key" ON "WorkScheduleEntry"("employeeId", "projectId", "workDate")`
+  );
+  await prisma.$executeRawUnsafe(
+    `CREATE INDEX IF NOT EXISTS "WorkScheduleEntry_companyId_workDate_idx" ON "WorkScheduleEntry"("companyId", "workDate")`
+  );
+  await prisma.$executeRawUnsafe(
+    `CREATE INDEX IF NOT EXISTS "WorkScheduleEntry_projectId_idx" ON "WorkScheduleEntry"("projectId")`
+  );
+  await addFk(
+    "WorkScheduleEntry",
+    "WorkScheduleEntry_companyId_fkey",
+    "companyId",
+    "Company"
+  );
+  await addFk(
+    "WorkScheduleEntry",
+    "WorkScheduleEntry_employeeId_fkey",
+    "employeeId",
+    "Employee"
+  );
+  await addFk(
+    "WorkScheduleEntry",
+    "WorkScheduleEntry_projectId_fkey",
+    "projectId",
+    "Project"
+  );
+
   ensured = true;
 }

@@ -8,6 +8,7 @@ import {
   isPlaceholderLabel,
 } from "@/lib/employees/data-quality";
 import { startLifecycle } from "@/lib/lifecycle/service";
+import { emitPlatformEvent } from "@/lib/integrations/dispatch";
 import { isEmploymentEnded } from "@/lib/employees/status";
 import { ensureEmployeeStatusSchema } from "@/lib/ensure-employee-status-schema";
 import { ensureStaffPortalSchema } from "@/lib/ensure-staff-portal-schema";
@@ -127,6 +128,20 @@ export async function POST(req: NextRequest) {
         entityId: employee.id,
         performedById: session.user.id,
         changes: { employeeCode: body.employeeCode },
+      },
+    });
+
+    emitPlatformEvent({
+      companyId: session.user.companyId,
+      event: "employee.created",
+      entityType: "Employee",
+      entityId: employee.id,
+      data: {
+        employeeCode: body.employeeCode,
+        department: body.department,
+        jobTitle: body.jobTitle,
+        employmentType: body.employmentType,
+        status: body.status,
       },
     });
 

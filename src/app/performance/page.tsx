@@ -13,7 +13,9 @@ export default async function PerformancePage() {
 
   return (
     <AppShell>
-      <PerformanceWorkspace />
+      <PerformanceWorkspace
+        canManage={can(session.user.role, "manageEmployees")}
+      />
     </AppShell>
   );
 }

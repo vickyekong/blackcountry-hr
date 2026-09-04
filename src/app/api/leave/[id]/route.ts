@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requirePermission, handleApiError } from "@/lib/api-auth";
 import { notifyEmployeeUser } from "@/lib/notifications";
+import { emitPlatformEvent } from "@/lib/integrations/dispatch";
 import { z } from "zod";
 
 const actionSchema = z.object({
@@ -88,6 +89,18 @@ export async function PATCH(
       linkUrl: "/staff/leave",
       entityType: "LeaveRequest",
       entityId: leave.id,
+    });
+
+    emitPlatformEvent({
+      companyId: session.user.companyId,
+      event: status === "APPROVED" ? "leave.approved" : "leave.rejected",
+      entityType: "LeaveRequest",
+      entityId: leave.id,
+      data: {
+        type: leave.type,
+        days: leave.days,
+        employeeCode: leave.employee.employeeCode,
+      },
     });
 
     return NextResponse.json(updated);
