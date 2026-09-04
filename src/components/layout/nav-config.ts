@@ -26,10 +26,19 @@ import {
   HandCoins,
   Briefcase,
   Gauge,
+  Settings,
 } from "lucide-react";
 import type { UserRole } from "@prisma/client";
+import { can, effectivePortalRole } from "@/lib/permissions";
 
-export type NavGroupId = "operate" | "people" | "work" | "pay" | "insight" | "me";
+export type NavGroupId =
+  | "operate"
+  | "people"
+  | "work"
+  | "pay"
+  | "insight"
+  | "me"
+  | "system";
 
 export type NavItem = {
   href: string;
@@ -46,6 +55,7 @@ export const NAV_GROUP_LABELS: Record<NavGroupId, string> = {
   pay: "Pay",
   insight: "Insight",
   me: "Me",
+  system: "System",
 };
 
 export const NAV_GROUP_ICONS: Record<NavGroupId, LucideIcon> = {
@@ -55,6 +65,7 @@ export const NAV_GROUP_ICONS: Record<NavGroupId, LucideIcon> = {
   pay: Wallet,
   insight: BarChart3,
   me: UserRound,
+  system: Settings,
 };
 
 export const NAV_GROUP_ORDER: NavGroupId[] = [
@@ -63,6 +74,7 @@ export const NAV_GROUP_ORDER: NavGroupId[] = [
   "work",
   "pay",
   "insight",
+  "system",
 ];
 
 export const STAFF_GROUP_ORDER: NavGroupId[] = ["me", "work"];
@@ -194,6 +206,13 @@ export const adminNavItems: NavItem[] = [
     roles: ["SUPER_ADMIN", "HR_ADMIN"],
     group: "insight",
   },
+  {
+    href: "/settings",
+    label: "Settings",
+    icon: Settings,
+    roles: ["SUPER_ADMIN", "HR_ADMIN"],
+    group: "system",
+  },
 ];
 
 export const staffNavItems: NavItem[] = [
@@ -319,6 +338,75 @@ export function portalPurpose(portal: string | null) {
     default:
       return "";
   }
+}
+
+export const NAV_BLURBS: Record<string, string> = {
+  "/dashboard": "Actions, payroll run-rate, and compliance",
+  "/approvals": "One queue for work waiting on this seat",
+  "/copilot": "Ask Omni Co-Pilot over live company records",
+  "/employees": "Staff directory, departments, skills, and org chart",
+  "/assets": "Laptops, vehicles, and other items assigned to staff",
+  "/recruitment": "Listings, applications, and hire into staff records",
+  "/training": "Programmes and enrolment",
+  "/performance": "Goals, reviews, and recognition — not pay",
+  "/hr-desk": "Company inbox, triage, and Gmail drafts",
+  "/hr-ask": "Policy queries and change requests",
+  "/payroll": "Draft, clear, and forward the pay run",
+  "/expenses": "Expense reports for HR and Super Admin",
+  "/timesheets": "Weekly hours that feed payroll",
+  "/projects": "Work catalog and assigned tasks",
+  "/files": "Company library for this employer",
+  "/leave": "Record and approve staff leave",
+  "/reports": "Payroll, people, time, and cost snapshots",
+  "/audit-log": "Immutable record of payroll and HR actions",
+  "/settings": "Branding, team, rates, and workspace sync",
+  "/staff": "Your portal home",
+  "/staff/profile": "Personal details HR still needs",
+  "/staff/payslips": "Approved slips after Super Admin signs off",
+  "/staff/advances": "Request an advance repaid on the slip",
+  "/staff/expenses": "Submit a claim with a receipt",
+  "/staff/requests": "Letters, bank, tax, and other company help",
+  "/staff/files": "Documents shared with full-time staff",
+  "/staff/performance": "Your goals, self-assessment, and recognition",
+  "/staff/leave": "Apply for leave",
+  "/staff/timesheets": "Log weekly hours on a project and task",
+  "/staff/projects": "Work you can log hours against",
+  "/finance": "Payroll forwarded for this company",
+  "/finance/expenses": "Pay claims after they are cleared",
+};
+
+export type NavSection = {
+  group: NavGroupId;
+  label: string;
+  items: NavItem[];
+};
+
+export function visibleNavItems(role: UserRole | undefined | null): NavItem[] {
+  if (!role) return [];
+  const portal = effectivePortalRole(role);
+  const items =
+    portal === "EMPLOYEE"
+      ? staffNavItems
+      : portal === "FINANCE"
+        ? financeNavItems
+        : adminNavItems.filter((item) => item.roles.includes(role));
+  return items.filter((item) => {
+    if (item.href === "/settings") return can(role, "manageCompanySettings");
+    return true;
+  });
+}
+
+export function navSectionsFor(role: UserRole | undefined | null): NavSection[] {
+  const portal = role ? effectivePortalRole(role) : null;
+  const items = visibleNavItems(role);
+  const order = portal === "EMPLOYEE" ? STAFF_GROUP_ORDER : NAV_GROUP_ORDER;
+  return order
+    .map((group) => ({
+      group,
+      label: NAV_GROUP_LABELS[group],
+      items: items.filter((item) => item.group === group),
+    }))
+    .filter((section) => section.items.length > 0);
 }
 
 export function isNavActive(pathname: string, href: string) {

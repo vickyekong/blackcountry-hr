@@ -3,6 +3,7 @@
 import { signOut, useSession } from "next-auth/react";
 import { NotificationsBell } from "@/components/layout/notifications-bell";
 import { WorkspaceSwitcher } from "@/components/layout/workspace-switcher";
+import { DashboardToggle } from "@/components/layout/dashboard-toggle";
 import { portalEyebrow } from "@/components/layout/nav-config";
 import { effectivePortalRole, portalLabel } from "@/lib/permissions";
 
@@ -17,6 +18,7 @@ export function TopBar() {
         {portalEyebrow(portal)}
       </span>
       <WorkspaceSwitcher className="max-w-[16rem]" />
+      <DashboardToggle />
       <div className="ml-auto flex items-center gap-3">
         <NotificationsBell />
         <div className="hidden min-w-0 text-right xl:block">
