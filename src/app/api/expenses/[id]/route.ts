@@ -167,7 +167,6 @@ export async function PATCH(
         type: "EXPENSE_CLAIM",
         title: "Expense ready to reimburse",
         body: `${staffName} — approved claim awaiting payment.`,
-        linkUrl:
         linkUrl: "/finance/expenses",
         entityType: "ExpenseClaim",
         entityId: existing.id,
