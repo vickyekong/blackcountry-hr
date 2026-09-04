@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
@@ -58,7 +58,7 @@ type WeekRow = {
   }>;
 };
 
-export default function TimesheetsPage() {
+function TimesheetsPageInner() {
   const { data: session } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -393,5 +393,13 @@ export default function TimesheetsPage() {
         </>
       ) : null}
     </AppShell>
+  );
+}
+
+export default function TimesheetsPage() {
+  return (
+    <Suspense fallback={<p className="p-8 text-muted">Loading…</p>}>
+      <TimesheetsPageInner />
+    </Suspense>
   );
 }

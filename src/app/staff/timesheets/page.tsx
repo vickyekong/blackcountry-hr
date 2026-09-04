@@ -1,12 +1,13 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { WeeklyTimesheet } from "@/components/timesheets/weekly-timesheet";
 import { StaffOvertimePanel } from "@/components/time/staff-overtime-panel";
 import { AppShell } from "@/components/layout/app-shell";
 import { cn } from "@/lib/cn";
 
-export default function StaffTimesheetsPage() {
+function StaffTimesheetsInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const tab = searchParams.get("tab") === "overtime" ? "overtime" : "hours";
@@ -49,5 +50,13 @@ export default function StaffTimesheetsPage() {
       </div>
       {tab === "overtime" ? <StaffOvertimePanel /> : <WeeklyTimesheet />}
     </AppShell>
+  );
+}
+
+export default function StaffTimesheetsPage() {
+  return (
+    <Suspense fallback={<p className="p-8 text-muted">Loading…</p>}>
+      <StaffTimesheetsInner />
+    </Suspense>
   );
 }

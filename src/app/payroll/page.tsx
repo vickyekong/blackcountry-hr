@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
@@ -48,7 +48,7 @@ const TABS = [
 
 type TabId = (typeof TABS)[number]["id"];
 
-export default function PayrollPage() {
+function PayrollPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
@@ -180,5 +180,13 @@ export default function PayrollPage() {
       {tab === "remittances" ? <RemittancesPanel /> : null}
       {tab === "what-if" ? <SimulatePanel /> : null}
     </AppShell>
+  );
+}
+
+export default function PayrollPage() {
+  return (
+    <Suspense fallback={<p className="p-8 text-muted">Loading…</p>}>
+      <PayrollPageInner />
+    </Suspense>
   );
 }

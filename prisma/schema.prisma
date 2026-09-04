@@ -247,6 +247,7 @@ model User {
   hrDeskAssigned      HrDeskMessage[] @relation("HrDeskAssignee")
   timesheetWeeksValidated TimesheetWeek[] @relation("TimesheetWeekValidator")
   jobListingsCreated      JobListing[]    @relation("JobListingCreator")
+  taskComments            ProjectTaskComment[]
 }
 
 model Employee {
@@ -331,6 +332,9 @@ model Employee {
   salaryAdvances      SalaryAdvance[]
   salaryLoans         SalaryLoan[]
   expenseClaims       ExpenseClaim[]
+  managedProjects     Project[] @relation("ProjectManager")
+  projectMemberships  ProjectMember[]
+  assignedTasks       ProjectTask[] @relation("TaskAssignee")
 
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
@@ -1101,33 +1105,91 @@ enum WorkspaceFileVisibility {
 }
 
 model Project {
-  id         String            @id @default(cuid())
-  companyId  String
-  company    Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  name       String
-  code       String?
-  status     String            @default("ACTIVE")
-  createdAt  DateTime          @default(now())
-  updatedAt  DateTime          @updatedAt
-  timesheets TimesheetEntry[]
-  tasks      ProjectTask[]
+  id                String            @id @default(cuid())
+  companyId         String
+  company           Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name              String
+  code              String?
+  description       String?
+  status            String            @default("ACTIVE")
+  managerEmployeeId String?
+  manager           Employee?         @relation("ProjectManager", fields: [managerEmployeeId], references: [id], onDelete: SetNull)
+  startsOn          DateTime?
+  dueOn             DateTime?
+  budgetKobo        BigInt            @default(0)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  timesheets        TimesheetEntry[]
+  tasks             ProjectTask[]
+  members           ProjectMember[]
 
   @@unique([companyId, name])
   @@index([companyId, status])
+  @@index([managerEmployeeId])
+}
+
+model ProjectMember {
+  id                    String   @id @default(cuid())
+  projectId             String
+  project               Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  employeeId            String
+  employee              Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  role                  String   @default("MEMBER")
+  plannedMinutesPerWeek Int      @default(0)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@unique([projectId, employeeId])
+  @@index([employeeId])
 }
 
 model ProjectTask {
-  id         String           @id @default(cuid())
-  projectId  String
-  project    Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  name       String
-  status     String           @default("ACTIVE")
-  createdAt  DateTime         @default(now())
-  updatedAt  DateTime         @updatedAt
-  timesheets TimesheetEntry[]
+  id                 String           @id @default(cuid())
+  projectId          String
+  project            Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name               String
+  status             String           @default("ACTIVE")
+  progress           String           @default("TODO")
+  priority           String           @default("MEDIUM")
+  assigneeEmployeeId String?
+  assignee           Employee?        @relation("TaskAssignee", fields: [assigneeEmployeeId], references: [id], onDelete: SetNull)
+  parentTaskId       String?
+  parent             ProjectTask?     @relation("TaskTree", fields: [parentTaskId], references: [id], onDelete: SetNull)
+  subtasks           ProjectTask[]    @relation("TaskTree")
+  dueOn              DateTime?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  timesheets         TimesheetEntry[]
+  comments           ProjectTaskComment[]
+  attachments        ProjectTaskAttachment[]
 
   @@unique([projectId, name])
   @@index([projectId, status])
+  @@index([assigneeEmployeeId])
+  @@index([parentTaskId])
+}
+
+model ProjectTaskComment {
+  id           String      @id @default(cuid())
+  taskId       String
+  task         ProjectTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  authorUserId String
+  author       User        @relation(fields: [authorUserId], references: [id], onDelete: Cascade)
+  body         String
+  createdAt    DateTime    @default(now())
+
+  @@index([taskId, createdAt])
+}
+
+model ProjectTaskAttachment {
+  id        String      @id @default(cuid())
+  taskId    String
+  task      ProjectTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  name      String
+  fileUrl   String
+  createdAt DateTime    @default(now())
+
+  @@index([taskId])
 }
 
 model TimesheetEntry {
